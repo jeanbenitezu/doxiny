@@ -48,12 +48,72 @@ body {
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.level-info {
-  margin-bottom: 0.8rem;
+/* Level Selector */
+.level-selector {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.level-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 80px;
+  font-size: 0.8rem;
+}
+
+.level-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.level-btn.active {
+  background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+  border-color: #dd6b20;
+  box-shadow: 0 4px 15px rgba(221, 107, 32, 0.3);
+}
+
+.level-btn.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.level-number {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.level-name {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.level-goal {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Current Level Info */
+.current-level-info {
+  margin-bottom: 1rem;
 }
 
 .level-badge {
@@ -67,17 +127,19 @@ body {
   letter-spacing: 1px;
   box-shadow: 0 2px 8px rgba(221, 107, 32, 0.3);
   display: inline-block;
+  margin-bottom: 0.5rem;
 }
 
-.goal {
-  font-size: 1.2rem;
+.level-description {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.3rem;
+}
+
+.optimal-moves {
+  font-size: 0.8rem;
   color: #38a169;
   font-weight: 600;
-  background: rgba(56, 161, 105, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 25px;
-  display: inline-block;
-  border: 2px solid rgba(56, 161, 105, 0.3);
 }
 
 /* Current Number Display */
@@ -153,7 +215,7 @@ body {
   margin-bottom: 1rem;
 }
 
-.reset-btn, .info-btn {
+.reset-btn, .info-btn, .hint-btn {
   flex: 1;
   background: rgba(255, 255, 255, 0.1);
   color: white;
@@ -167,6 +229,24 @@ body {
   touch-action: manipulation;
 }
 
+.hint-btn {
+  background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+  border-color: #9f7aea;
+  box-shadow: 0 2px 8px rgba(159, 122, 234, 0.3);
+}
+
+.hint-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+  transform: translateY(-1px);
+}
+
+.hint-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
+  transform: none;
+}
+
 .reset-btn:hover, .info-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.4);
@@ -175,14 +255,42 @@ body {
 
 /* Game Stats */
 .game-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   text-align: center;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #dd6b20;
   font-weight: 600;
   background: rgba(221, 107, 32, 0.1);
   padding: 0.8rem;
   border-radius: 12px;
   border: 2px solid rgba(221, 107, 32, 0.3);
+}
+
+.efficiency {
+  font-size: 0.9rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+.efficiency.perfect {
+  background: rgba(56, 161, 105, 0.2);
+  color: #38a169;
+  border: 1px solid rgba(56, 161, 105, 0.5);
+}
+
+.efficiency.great {
+  background: rgba(221, 107, 32, 0.2);
+  color: #dd6b20;
+  border: 1px solid rgba(221, 107, 32, 0.5);
+}
+
+.efficiency.good {
+  background: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.5);
 }
 
 /* History Section */
@@ -247,19 +355,128 @@ body {
   text-align: right;
 }
 
-/* Success Modal */
-.success-modal {
+/* Hint Modal */
+.hint-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
+  z-index: 999;
+  backdrop-filter: blur(5px);
+}
+
+.hint-modal.hidden {
+  display: none;
+}
+
+.hint-content {
+  background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+  border: 3px solid #9f7aea;
+  box-shadow: 0 0 30px rgba(159, 122, 234, 0.5);
+  max-width: 320px;
+}
+
+.hint-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.hint-content p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.4;
+}
+
+.close-hint-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.close-hint-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Success Modal Enhanced */
+.success-content {
+  max-width: 350px;
+  position: relative;
+  overflow: hidden;
+}
+
+.celebration-emoji {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.success-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #38a169;
+  text-shadow: 0 0 10px rgba(56, 161, 105, 0.5);
+}
+
+/* Animations */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(56, 161, 105, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(56, 161, 105, 0.6);
+  }
 }
 
 .success-modal.hidden {

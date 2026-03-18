@@ -3,19 +3,21 @@
  * Mobile-first mathematical puzzle game
  */
 
-import { createGameState, applyMove, resetGame, getGameStats } from './game.js';
-import { operations, operationLabels } from './operations.js';
+import { createGameState, applyMove, resetGame, getHints, getOptimalMoves, getLevelCompletionData } from './game.js';
+import { operationLabels } from './operations.js';
 import './style.css';
 
 // Game state with progressive levels
 const levels = [
-  { goal: 10, name: "Beginner" },
-  { goal: 25, name: "Intermediate" }, 
-  { goal: 128, name: "Expert" }
+  { goal: 10, name: "Beginner", description: "Master the basics" },
+  { goal: 25, name: "Intermediate", description: "Strategic thinking" }, 
+  { goal: 128, name: "Expert", description: "Ultimate challenge" }
 ];
 
 let currentLevel = 0;
 let gameState = createGameState(levels[currentLevel].goal, currentLevel + 1);
+let hintsUsed = 0;
+let maxHints = 3;
 
 // DOM elements
 const app = document.querySelector('#app');
@@ -42,14 +44,30 @@ function registerServiceWorker() {
  */
 function createGameUI() {
   const level = levels[currentLevel];
+  const optimal = getOptimalMoves(currentLevel);
+  
   return `
     <div class="game-container">
       <header class="game-header">
         <h1>🧩 Number Puzzle</h1>
-        <div class="level-info">
-          <span class="level-badge">Level ${currentLevel + 1}: ${level.name}</span>
+        
+        <!-- Level Selector -->
+        <div class="level-selector">
+          ${levels.map((lvl, idx) => 
+            `<button class="level-btn ${idx === currentLevel ? 'active' : ''} ${idx > currentLevel ? 'locked' : ''}" 
+                     data-level="${idx}" ${idx > currentLevel ? 'disabled' : ''}>
+              <span class="level-number">${idx + 1}</span>
+              <span class="level-name">${lvl.name}</span>
+              <span class="level-goal">→ ${lvl.goal}</span>
+            </button>`
+          ).join('')}
         </div>
-        <div class="goal">Goal: <span id="goal-number">${gameState.goal}</span></div>
+        
+        <div class="current-level-info">
+          <div class="level-badge">Level ${currentLevel + 1}: ${level.name}</div>
+          <div class="level-description">${level.description}</div>
+          <div class="optimal-moves">Target: ≤ ${optimal} moves</div>
+        </div>
       </header>
       
       <main class="game-main">
@@ -66,12 +84,18 @@ function createGameUI() {
           
           <div class="control-buttons">
             <button class="reset-btn" id="reset-btn">🔄 Reset</button>
+            <button class="hint-btn" id="hint-btn" ${hintsUsed >= maxHints ? 'disabled' : ''}>
+              💡 Hint (${hintsUsed}/${maxHints})
+            </button>
             <button class="info-btn" id="info-btn">ℹ️ Help</button>
           </div>
         </div>
         
         <div class="game-stats">
           <span class="moves-counter">Moves: <span id="moves-count">${gameState.moves}</span></span>
+          <span class="efficiency ${gameState.moves <= optimal ? 'perfect' : gameState.moves <= optimal + 2 ? 'great' : 'good'}">
+            ${gameState.moves <= optimal ? '🎯 Perfect' : gameState.moves <= optimal + 2 ? '⭐ Great' : '📈 Good'}
+          </span>
         </div>
       </main>
       
@@ -82,10 +106,29 @@ function createGameUI() {
         </div>
       </section>
       
+      <div class="hint-modal hidden" id="hint-modal">
+        <div class="modal-content hint-content">
+          <h3>💡 Smart Hint</h3>
+          <p id="hint-text"></p>
+          <button class="close-hint-btn" id="close-hint-btn">Got it!</button>
+        </div>
+      </div>
+      
       <div class="success-modal hidden" id="success-modal">
-        <div class="modal-content">
-          <h2>🎉 Level Complete!</h2>
-          <p>You reached <strong>${gameState.goal}</strong> in <span id="final-moves">0</span> moves!</p>
+        <div class="modal-content success-content">
+          <div class="celebration-emoji" id="celebration-emoji">🎉</div>
+          <h2 id="success-title">Level Complete!</h2>
+          <p id="success-message">Great job!</p>
+          <div class="success-stats">
+            <div class="stat">
+              <span class="stat-label">Moves</span>
+              <span class="stat-value" id="final-moves">0</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Target</span>  
+              <span class="stat-value">${optimal}</span>
+            </div>
+          </div>
           <div class="modal-buttons">
             ${currentLevel < levels.length - 1 ? '<button class="next-level-btn" id="next-level-btn">Next Level 🚀</button>' : ''}
             <button class="play-again-btn" id="play-again-btn">Play Again</button>
@@ -139,20 +182,34 @@ function updateDisplay() {
 }
 
 /**
- * Show success modal
+ * Show success modal with enhanced celebration
  */
 function showSuccessModal() {
   const modal = document.getElementById('success-modal');
   const finalMoves = document.getElementById('final-moves');
+  const title = document.getElementById('success-title');
+  const message = document.getElementById('success-message');
+  const emoji = document.getElementById('celebration-emoji');
   
   if (modal && finalMoves) {
+    const completionData = getLevelCompletionData(currentLevel, gameState.moves);
+    
     finalMoves.textContent = gameState.moves;
+    title.textContent = completionData.title;
+    message.textContent = completionData.message;
+    emoji.textContent = completionData.emoji;
+    
     modal.classList.remove('hidden');
     
-    // Add celebration effect
+    // Enhanced celebration effects
     if ('vibrate' in navigator) {
-      navigator.vibrate([200, 100, 200]);
+      navigator.vibrate([200, 100, 200, 100, 300]);
     }
+    
+    // Animate celebration emoji
+    setTimeout(() => {
+      emoji.style.animation = 'bounce 1s ease-in-out infinite';
+    }, 100);
   }
 }
 
@@ -175,6 +232,7 @@ function handleOperationClick(operation) {
  */
 function handleReset() {
   gameState = resetGame(levels[currentLevel].goal, currentLevel + 1);
+  hintsUsed = 0;
   updateDisplay();
 }
 
@@ -184,9 +242,48 @@ function handleReset() {
 function handleNextLevel() {
   if (currentLevel < levels.length - 1) {
     currentLevel++;
+    hintsUsed = 0;
     gameState = createGameState(levels[currentLevel].goal, currentLevel + 1);
     // Re-render entire UI for new level
     app.innerHTML = createGameUI();
+  }
+}
+
+/**
+ * Handle level selection
+ */
+function handleLevelSelect(level) {
+  if (level <= currentLevel) { // Only allow selecting unlocked levels
+    currentLevel = level;
+    hintsUsed = 0;
+    gameState = createGameState(levels[currentLevel].goal, currentLevel + 1);
+    app.innerHTML = createGameUI();
+  }
+}
+
+/**
+ * Show hint modal
+ */
+function showHint() {
+  if (hintsUsed >= maxHints) return;
+  
+  const modal = document.getElementById('hint-modal');
+  const hintText = document.getElementById('hint-text');
+  
+  if (modal && hintText) {
+    const hint = getHints(currentLevel, gameState.current);
+    hintText.textContent = hint;
+    modal.classList.remove('hidden');
+    hintsUsed++;
+    
+    // Update hint button
+    const hintBtn = document.getElementById('hint-btn');
+    if (hintBtn) {
+      hintBtn.textContent = `💡 Hint (${hintsUsed}/${maxHints})`;
+      if (hintsUsed >= maxHints) {
+        hintBtn.disabled = true;
+      }
+    }
   }
 }
 
@@ -221,6 +318,10 @@ function init() {
       handleOperationClick(operation);
     } else if (e.target.matches('#reset-btn')) {
       handleReset();
+    } else if (e.target.matches('#hint-btn')) {
+      showHint();
+    } else if (e.target.matches('#close-hint-btn')) {
+      document.getElementById('hint-modal').classList.add('hidden');
     } else if (e.target.matches('#info-btn')) {
       showInfoModal();
     } else if (e.target.matches('#next-level-btn')) {
@@ -229,6 +330,9 @@ function init() {
     } else if (e.target.matches('#play-again-btn')) {
       document.getElementById('success-modal').classList.add('hidden');
       handleReset();
+    } else if (e.target.matches('.level-btn')) {
+      const level = parseInt(e.target.dataset.level);
+      handleLevelSelect(level);
     }
   });
   

@@ -61,16 +61,76 @@ export function resetGame(goalNumber = 10, level = 1) {
 }
 
 /**
- * Get formatted game stats
+ * Get hints for current level
  */
-export function getGameStats(state) {
-  return {
-    moves: state.moves,
-    current: state.current,
-    goal: state.goal,
-    level: state.level,
-    progress: `${state.current}/${state.goal}`,
-    isComplete: state.isComplete,
-    duration: state.duration ? Math.round(state.duration / 1000) : 0
+export function getHints(level, currentNumber) {
+  const hints = {
+    0: [ // Beginner (1 → 10)
+      "Try using ×2 to grow your number quickly!",
+      "Use SUM when your number gets too big",
+      "ADD 1 can help create interesting patterns", 
+      "MIRROR can sometimes give you useful reversals"
+    ],
+    1: [ // Intermediate (1 → 25) 
+      "Think about getting to 24 first, then ADD 1",
+      "×2 repeatedly: 1→2→4→8→16... then what?",
+      "Try MIRROR on two-digit numbers",
+      "SUM can help reduce large numbers strategically"
+    ],
+    2: [ // Expert (1 → 128)
+      "128 = 2^7... think powers of 2",
+      "64 × 2 = 128. How can you reach 64?", 
+      "Try: 1→11→2→4→8→16→32→64→128",
+      "Advanced: Use digit manipulation creatively"
+    ]
   };
+  
+  const levelHints = hints[level] || hints[0];
+  
+  // Smart hint selection based on current number
+  if (currentNumber === 1) {
+    return levelHints[0]; 
+  } else if (currentNumber > 50) {
+    return "Consider using SUM to reduce the number";
+  } else if (currentNumber % 2 === 0 && currentNumber < 64) {
+    return "Perfect for ×2! Keep doubling when possible";
+  } else {
+    return levelHints[Math.floor(Math.random() * levelHints.length)];
+  }
+}
+
+/**
+ * Get optimal move count for each level
+ */
+export function getOptimalMoves(level) {
+  const optimal = [7, 9, 12]; // Rough optimal moves for each level
+  return optimal[level] || 10;
+}
+
+/**
+ * Get level completion message
+ */
+export function getLevelCompletionData(level, moves) {
+  const optimal = getOptimalMoves(level);
+  const efficiency = moves <= optimal ? "Perfect!" : moves <= optimal + 2 ? "Great!" : moves <= optimal + 4 ? "Good!" : "Try again!";
+  
+  const messages = {
+    0: {
+      title: "🎯 Beginner Conquered!",
+      message: `You mastered the basics! ${efficiency}`,
+      emoji: "🌟"
+    },
+    1: {
+      title: "🚀 Intermediate Complete!", 
+      message: `Excellent strategic thinking! ${efficiency}`,
+      emoji: "⭐"
+    },
+    2: {
+      title: "👑 Expert Master!",
+      message: `You're a Number Puzzle champion! ${efficiency}`,
+      emoji: "🏆"
+    }
+  };
+  
+  return messages[level] || messages[0];
 }
