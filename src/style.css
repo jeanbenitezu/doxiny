@@ -30,51 +30,51 @@ body {
 .game-container {
   max-width: 400px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.5rem;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  gap: 1.5rem;
+  gap: 0.8rem;
 }
 
 /* Header */
 .game-header {
   text-align: center;
-  padding: 1rem 0;
+  padding: 0.5rem 0;
 }
 
 .game-header h1 {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  margin-bottom: 0.6rem;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 /* Level Selector */
 .level-selector {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.3rem;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
   flex-wrap: wrap;
 }
 
 .level-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 10px;
   color: white;
-  padding: 0.6rem 1rem;
+  padding: 0.4rem 0.6rem;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
-  min-width: 80px;
-  font-size: 0.8rem;
+  gap: 0.1rem;
+  min-width: 65px;
+  font-size: 0.7rem;
 }
 
 .level-btn:hover:not(:disabled) {
@@ -96,63 +96,63 @@ body {
 }
 
 .level-number {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
 .level-name {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .level-goal {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: rgba(255, 255, 255, 0.7);
 }
 
 /* Current Level Info */
 .current-level-info {
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
 }
 
 .level-badge {
   background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
   color: white;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   box-shadow: 0 2px 8px rgba(221, 107, 32, 0.3);
   display: inline-block;
-  margin-bottom: 0.5rem;
-}
-
-.level-description {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 0.3rem;
 }
 
+.level-description {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.2rem;
+}
+
 .optimal-moves {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: #38a169;
   font-weight: 600;
 }
 
 /* Current Number Display */
 .current-number {
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: bold;
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 1.2rem 0.8rem;
   background: rgba(255, 255, 255, 0.05);
   border: 3px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  margin: 1rem 0;
-  min-height: 120px;
+  margin: 0.6rem 0;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -172,28 +172,28 @@ body {
 .operations-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
 }
 
 .operation-btn {
   background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
   color: white;
   border: none;
-  padding: 1.2rem;
-  font-size: 1.1rem;
+  padding: 0.9rem;
+  font-size: 1rem;
   font-weight: bold;
-  border-radius: 15px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
   touch-action: manipulation;
-  min-height: 60px;
+  min-height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+  box-shadow: 0 3px 12px rgba(229, 62, 62, 0.3);
   border: 2px solid transparent;
 }
 
@@ -211,8 +211,8 @@ body {
 /* Control Buttons */
 .control-buttons {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
 .reset-btn, .info-btn, .hint-btn {
@@ -220,10 +220,10 @@ body {
   background: rgba(255, 255, 255, 0.1);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.2);
-  padding: 0.8rem;
-  font-size: 0.9rem;
+  padding: 0.6rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
   touch-action: manipulation;
@@ -259,19 +259,19 @@ body {
   justify-content: space-between;
   align-items: center;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #dd6b20;
   font-weight: 600;
   background: rgba(221, 107, 32, 0.1);
-  padding: 0.8rem;
-  border-radius: 12px;
+  padding: 0.5rem;
+  border-radius: 10px;
   border: 2px solid rgba(221, 107, 32, 0.3);
 }
 
 .efficiency {
-  font-size: 0.9rem;
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
   font-weight: bold;
 }
 
@@ -296,15 +296,15 @@ body {
 /* History Section */
 .history-section {
   flex: 1;
-  min-height: 200px;
+  min-height: 150px;
 }
 
 .history-section h2 {
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
   text-align: center;
   color: rgba(255, 255, 255, 0.9);
 }
@@ -312,9 +312,9 @@ body {
 .history-list {
   background: rgba(0, 0, 0, 0.3);
   border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  padding: 1rem;
-  max-height: 250px;
+  border-radius: 12px;
+  padding: 0.6rem;
+  max-height: 180px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   backdrop-filter: blur(5px);
@@ -323,9 +323,10 @@ body {
 .history-item {
   display: flex;
   align-items: center;
-  padding: 0.6rem 0;
+  padding: 0.4rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
 }
 
 .history-item:last-child {
@@ -333,9 +334,9 @@ body {
 }
 
 .step-number {
-  min-width: 2rem;
+  min-width: 1.5rem;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
 }
 
 .action {
@@ -343,15 +344,15 @@ body {
   font-weight: bold;
   color: #dd6b20;
   text-transform: uppercase;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   letter-spacing: 0.5px;
 }
 
 .value {
   font-weight: bold;
   color: #38a169;
-  font-size: 1rem;
-  min-width: 3rem;
+  font-size: 0.85rem;
+  min-width: 2.5rem;
   text-align: right;
 }
 
@@ -562,20 +563,103 @@ body {
 
 /* Responsive Design */
 @media (max-width: 350px) {
-  .current-number {
-    font-size: 3rem;
-    padding: 1.5rem 1rem;
-    min-height: 100px;
-  }
-  
-  .operation-btn {
-    font-size: 1rem;
-    padding: 1rem;
-    min-height: 50px;
+  .game-container {
+    padding: 0.3rem;
+    gap: 0.5rem;
   }
   
   .game-header h1 {
+    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
+  }
+  
+  .current-number {
+    font-size: 2.5rem;
+    padding: 1rem 0.5rem;
+    min-height: 70px;
+  }
+  
+  .operations-grid {
+    gap: 0.4rem;
+  }
+  
+  .operation-btn {
+    font-size: 0.9rem;
+    padding: 0.7rem;
+    min-height: 45px;
+  }
+  
+  .level-btn {
+    min-width: 55px;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.9rem;
+  }
+  
+  .control-buttons {
+    gap: 0.3rem;
+  }
+  
+  .reset-btn, .info-btn, .hint-btn {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .history-list {
+    max-height: 120px;
+    padding: 0.4rem;
+  }
+  
+  .history-item {
+    padding: 0.3rem 0;
+    font-size: 0.85rem;
+  }
+  
+  .modal-content {
+    padding: 1.5rem;
+    max-width: 280px;
+  }
+  
+  .modal-content h2 {
     font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .modal-content p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .modal-buttons {
+    gap: 0.6rem;
+  }
+  
+  .play-again-btn, .next-level-btn {
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .game-container {
+    gap: 0.4rem;
+  }
+  
+  .game-header {
+    padding: 0.3rem 0;
+  }
+  
+  .current-number {
+    font-size: 2.8rem;
+    padding: 0.8rem;
+    min-height: 70px;
+  }
+  
+  .history-section {
+    min-height: 100px;
+  }
+  
+  .history-list {
+    max-height: 120px;
   }
 }
 
@@ -629,4 +713,4 @@ body {
 .play-again-btn:focus {
   outline: 2px solid #38a169;
   outline-offset: 2px;
-}\n
+}
