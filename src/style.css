@@ -355,8 +355,8 @@ body {
   text-align: right;
 }
 
-/* Hint Modal */
-.hint-modal {
+/* Hint and Success Modal */
+.hint-modal, .success-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -370,7 +370,7 @@ body {
   backdrop-filter: blur(5px);
 }
 
-.hint-modal.hidden {
+.hint-modal.hidden, .success-modal.hidden {
   display: none;
 }
 
