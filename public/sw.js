@@ -11,9 +11,7 @@ const urlsToCache = [
   './src/game.js', 
   './src/operations.js',
   './src/style.css',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  './manifest.json'
 ];
 
 // Install event - cache resources
