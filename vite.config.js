@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: './',
+  base: '/doxiny/', // Replace 'doxiny' with your repo name
   build: {
     target: 'es2015',
     outDir: 'dist'
