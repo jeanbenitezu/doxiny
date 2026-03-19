@@ -147,7 +147,8 @@ let gameState = createGameState(
 
 // UI state for preview visibility
 let showPreviews = true;
-
+// UI state for history visibility
+let showHistory = true;
 // Dynamic move limit based on exercise difficulty
 let moveLimit = 12;
 
@@ -352,9 +353,14 @@ function createGameUI() {
       
       <!-- Inline History -->
       <section class="mb-4" data-purpose="inline-history">
-        <div class="bg-[#1a1a1a] rounded-2xl p-3 border border-white/10">
-          <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold mb-2 text-center">Move History</h4>
-          <div class="flex flex-wrap gap-2 justify-center min-h-[2rem] items-center" id="inline-history-content">
+        <div class="bg-[#1a1a1a] rounded-2xl p-3 border border-white/10 transition-all duration-300" id="history-container">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold">Move History</h4>
+            <button class="text-white/70 hover:text-white transition-colors" id="history-toggle-btn" aria-label="Toggle history visibility">
+              <span class="text-sm transform transition-transform duration-200 ${showHistory ? 'rotate-180' : ''}" id="history-arrow">▼</span>
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center transition-all duration-300 overflow-hidden ${showHistory ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}" id="inline-history-content">
             ${renderInlineHistory()}
           </div>
         </div>
@@ -600,6 +606,18 @@ function updateDisplay() {
     inlineHistoryContent.innerHTML = renderInlineHistory();
   }
 
+  // Update history toggle arrow
+  const historyArrow = document.getElementById("history-arrow");
+  if (historyArrow) {
+    historyArrow.className = `text-sm transform transition-transform duration-200 ${showHistory ? 'rotate-180' : ''}`;
+  }
+
+  // Update history container visibility
+  const historyContent = document.getElementById("inline-history-content");
+  if (historyContent) {
+    historyContent.className = `flex flex-wrap gap-2 items-center transition-all duration-300 overflow-hidden ${showHistory ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`;
+  }
+
   // Check for win condition
   if (gameState.isComplete) {
     showSuccessModal();
@@ -654,6 +672,22 @@ function showSuccessModal() {
     }
 
     modal.classList.remove("hidden");
+
+    // Auto-expand and glow history when success modal appears
+    const historyContainer = document.getElementById("history-container");
+    if (historyContainer) {
+      if (!showHistory) {
+        showHistory = true;
+        updateDisplay(); // Update the accordion state
+      }
+      // Add glow effect
+      historyContainer.classList.add("ring-4", "ring-emerald-400", "ring-opacity-75", "shadow-lg", "shadow-emerald-400/30");
+      
+      // Remove glow after 3 seconds
+      setTimeout(() => {
+        historyContainer.classList.remove("ring-4", "ring-emerald-400", "ring-opacity-75", "shadow-lg", "shadow-emerald-400/30");
+      }, 3000);
+    }
 
     // Enhanced celebration effects based on performance
     if (completionResult.isPerfect && "vibrate" in navigator) {
@@ -727,6 +761,14 @@ function togglePreviews() {
   app.innerHTML = createGameUI();
 
   // Reapply dynamic scaling and other display updates after re-render
+  updateDisplay();
+}
+
+/**
+ * Toggle history visibility
+ */
+function toggleHistory() {
+  showHistory = !showHistory;
   updateDisplay();
 }
 
@@ -821,6 +863,8 @@ function setupGlobalEventListeners() {
       handleDifficultySelect(difficulty);
     } else if (e.target.closest("#preview-toggle-btn")) {
       togglePreviews();
+    } else if (e.target.closest("#history-toggle-btn")) {
+      toggleHistory();
     }
   });
 
