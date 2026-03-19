@@ -27,7 +27,7 @@ export const operations = {
    * APPEND 1: Append digit 1 to the right
    * Examples: 4 → 41, 12 → 121
    */
-  add1Right: (n) => {
+  append1: (n) => {
     return parseInt(n.toString() + "1");
   },
 
@@ -46,7 +46,7 @@ export const operations = {
 export const operationLabels = {
   reverse: "REVERSE",
   sum: "SUM DIGITS",
-  add1Right: "APPEND 1",
+  append1: "APPEND 1",
   double: "DOUBLE",
 };
 

@@ -177,9 +177,9 @@ function getOperationPreviews(currentNumber) {
   const digits = currentNumber.toString().split("").join(" + ");
   previews.sum = `${digits} → ${sum}`;
 
-  // ADD 1 preview
-  const appended = operations.add1Right(currentNumber);
-  previews.add1Right = `${currentNumber} → ${appended}`;
+  // APPEND 1 preview
+  const appended = operations.append1(currentNumber);
+  previews.append1 = `${currentNumber} → ${appended}`;
 
   // DOUBLE preview
   const doubled = operations.double(currentNumber);
@@ -824,7 +824,7 @@ function setupGlobalEventListeners() {
         handleOperationClick("sum");
         break;
       case "3":
-        handleOperationClick("add1Right");
+        handleOperationClick("append1");
         break;
       case "4":
         handleOperationClick("double");
