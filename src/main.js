@@ -54,7 +54,7 @@ class GameManager {
     }
 
     // Calculate level change
-    const levelChange = this.moveToNextLevel();
+    const levelChange = this.getNextLevelInfo();
 
     return {
       efficiency,
@@ -64,23 +64,33 @@ class GameManager {
     };
   }
 
-  moveToNextLevel() {
+  getNextLevelInfo() {
     const maxLevel = 6;
     if (this.currentDifficulty < maxLevel) {
       const oldDifficulty = this.currentDifficulty;
-      this.currentDifficulty++;
+      const nextDifficulty = this.currentDifficulty + 1;
 
-      console.log(`🎯 Advanced to level ${this.currentDifficulty}!`);
+      console.log(`🎯 New level available: ${nextDifficulty}`);
 
       return {
         changed: true,
         oldDifficulty,
-        newDifficulty: this.currentDifficulty,
+        nextDifficulty: nextDifficulty,
         direction: "increased",
       };
     }
 
     return { changed: false };
+  }
+
+  moveToNextLevel() {
+    const levelChange = this.getNextLevelInfo();
+    if (levelChange.changed) {
+      this.currentDifficulty = levelChange.nextDifficulty;
+      console.log(`🎯 Advanced to level ${this.currentDifficulty}!`);
+    } else {
+      console.log(`🎯 Already at max level! Keep mastering the challenges!`);
+    }
   }
 
   getPerformanceGrade(efficiency) {
@@ -487,7 +497,7 @@ function showSuccessModal() {
     // Check for level progression
     const levelChange = completionResult.levelChange;
     if (levelChange.changed) {
-      difficultyChangeText.textContent = `Advanced to Level ${levelChange.newDifficulty}!`;
+      difficultyChangeText.textContent = `Advanced to Level ${levelChange.nextDifficulty}!`;
       difficultyChangeMessage.classList.remove("hidden");
     } else if (gameManager.currentDifficulty === 6) {
       difficultyChangeText.textContent = `🏆 You've mastered all levels!`;
@@ -556,6 +566,9 @@ function handleNewExercise() {
  * Handle next exercise from success modal
  */
 function handleNextExercise() {
+  moveToNextLevel();
+
+  gameManager.currentDifficulty = nextDifficulty;
   handleNewExercise();
 }
 
