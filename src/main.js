@@ -3,7 +3,7 @@
  * Mobile-first mathematical puzzle game with dynamic exercise generation
  */
 
-import { createGameState, applyMove, resetGame, getHints, getOptimalMoves, getLevelCompletionData } from './game.js';
+import { createGameState, applyMove, resetGame, getOptimalMoves, getLevelCompletionData } from './game.js';
 import { operationLabels } from './operations.js';
 import { generateExercise, getDifficultyLevels } from './exerciseGenerator.js';
 import './style.css';
@@ -111,8 +111,6 @@ class GameManager {
 // Initialize game manager
 const gameManager = new GameManager();
 let gameState = createGameState(gameManager.currentExercise.goal, gameManager.currentDifficulty);
-let hintsUsed = 0;
-let maxHints = 3;
 
 // Get available difficulty levels for UI
 const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
@@ -203,13 +201,9 @@ function createGameUI() {
       </section>
       
       <!-- Utility Row -->
-      <section class="grid grid-cols-4 gap-3" data-purpose="utility-controls">
+      <section class="grid grid-cols-3 gap-3" data-purpose="utility-controls">
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2 text-sm font-bold transition-transform active:scale-95 reset-btn" id="reset-btn">
           <span>🔄</span> Reset
-        </button>
-        <button class="bg-[#8b5cf6] border border-[#a78bfa] rounded-2xl py-4 flex flex-col items-center justify-center text-xs font-bold transition-transform active:scale-95 hint-btn" id="hint-btn" ${hintsUsed >= maxHints ? 'disabled' : ''}>
-          <span>💡 Hint</span>
-          <span class="opacity-80">(${hintsUsed}/${maxHints})</span>
         </button>
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2 text-sm font-bold transition-transform active:scale-95 info-btn" id="info-btn">
           <span>ℹ️</span> Help
@@ -231,15 +225,6 @@ function createGameUI() {
         <div class="bg-[#111827] rounded-xl p-4 font-mono text-sm max-h-[50vh] overflow-y-auto" id="history-content">
           ${renderHistory()}
         </div>
-      </div>
-    </div>
-    
-    <!-- Hint Modal -->
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm hint-modal hidden" id="hint-modal">
-      <div class="bg-gradient-to-br from-[#9f7aea] to-[#805ad5] border-3 border-[#9f7aea] rounded-3xl p-8 max-w-sm w-11/12 text-center shadow-2xl">
-        <h3 class="text-2xl font-bold text-white mb-4">💡 Smart Hint</h3>
-        <p class="text-white/95 text-lg mb-6 leading-relaxed" id="hint-text"></p>
-        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-6 py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 close-hint-btn" id="close-hint-btn">Got it!</button>
       </div>
     </div>
     
@@ -441,7 +426,6 @@ function handleOperationClick(operation) {
  */
 function handleReset() {
   gameState = resetGame(gameManager.currentExercise.goal, gameManager.currentDifficulty);
-  hintsUsed = 0;
   updateDisplay();
 }
 
@@ -450,7 +434,6 @@ function handleReset() {
  */
 function handleNewExercise() {
   gameManager.generateNewExercise();
-  hintsUsed = 0;
   gameState = createGameState(gameManager.currentExercise.goal, gameManager.currentDifficulty);
   // Re-render UI (event listeners are already set up globally)
   app.innerHTML = createGameUI();
@@ -475,40 +458,9 @@ function handleRetryExercise() {
  */
 function handleDifficultySelect(difficulty) {
   if (gameManager.setDifficulty(difficulty)) {
-    hintsUsed = 0;
     gameState = createGameState(gameManager.currentExercise.goal, gameManager.currentDifficulty);
     // Re-render UI (event listeners are already set up globally)
     app.innerHTML = createGameUI();
-  }
-}
-
-/**
- * Show hint modal with context-aware hints
- */
-function showHint() {
-  if (hintsUsed >= maxHints) return;
-  
-  const modal = document.getElementById('hint-modal');
-  const hintText = document.getElementById('hint-text');
-  
-  if (modal && hintText) {
-    const hint = getHints(gameManager.currentDifficulty - 1, gameState.current);
-    hintText.textContent = hint;
-    modal.classList.remove('hidden');
-    hintsUsed++;
-    
-    // Update hint button
-    const hintBtn = document.getElementById('hint-btn');
-    if (hintBtn) {
-      const hintBtnContent = hintBtn.querySelector('span:first-child');
-      const hintCounter = hintBtn.querySelector('span:last-child');
-      if (hintCounter) hintCounter.textContent = `(${hintsUsed}/${maxHints})`;
-      
-      if (hintsUsed >= maxHints) {
-        hintBtn.disabled = true;
-        hintBtn.classList.add('opacity-50');
-      }
-    }
   }
 }
 
@@ -557,10 +509,6 @@ function setupGlobalEventListeners() {
       handleReset();
     } else if (e.target.closest('#new-exercise-btn')) {
       handleNewExercise();
-    } else if (e.target.closest('#hint-btn')) {
-      showHint();
-    } else if (e.target.closest('#close-hint-btn')) {
-      document.getElementById('hint-modal').classList.add('hidden');
     } else if (e.target.closest('#close-info-btn')) {
       document.getElementById('info-modal').classList.add('hidden');
     } else if (e.target.closest('#info-btn')) {
