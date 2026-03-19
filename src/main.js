@@ -119,7 +119,7 @@ const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
 const app = document.querySelector('#app');
 
 /**
- * Register service worker for PWA functionality
+ * Register service worker for PWA functionality with update handling
  */
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
@@ -127,12 +127,61 @@ function registerServiceWorker() {
       navigator.serviceWorker.register('./sw.js')
         .then((registration) => {
           console.log('🔧 SW registered: ', registration);
+          
+          // Check for updates every 30 seconds
+          setInterval(() => {
+            registration.update();
+          }, 30000);
+          
+          // Handle service worker updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New version available
+                showUpdateNotification();
+              }
+            });
+          });
         })
         .catch((registrationError) => {
           console.log('❌ SW registration failed: ', registrationError);
         });
     });
   }
+}
+
+/**
+ * Show update notification to user
+ */
+function showUpdateNotification() {
+  const updateBanner = document.createElement('div');
+  updateBanner.id = 'update-banner';
+  updateBanner.className = 'fixed top-0 left-0 right-0 bg-blue-600 text-white p-3 text-center z-50 shadow-lg';
+  updateBanner.innerHTML = `
+    <div class="flex items-center justify-between max-w-md mx-auto">
+      <span>🚀 New version available!</span>
+      <button id="update-btn" class="bg-white text-blue-600 px-3 py-1 rounded text-sm font-bold hover:bg-blue-50 transition-colors">
+        Update Now
+      </button>
+    </div>
+  `;
+  
+  document.body.prepend(updateBanner);
+  
+  // Handle update button click
+  document.getElementById('update-btn').addEventListener('click', () => {
+    // Tell service worker to skip waiting and take control
+    navigator.serviceWorker.getRegistration().then((reg) => {
+      if (reg && reg.waiting) {
+        reg.waiting.postMessage({ action: 'skipWaiting' });
+      }
+    });
+    
+    // Reload the page to get the new version
+    window.location.reload();
+  });
 }
 
 /**
