@@ -154,21 +154,34 @@ function createGameUI() {
       </div>
       
       <!-- Level Selector -->
-      <nav class="w-full flex justify-between gap-2 mb-6" data-purpose="level-selector">
-        ${availableLevels.map((lvl) => 
-          `<button class="flex-1 ${lvl.level === gameManager.currentDifficulty ? 'bg-orange-600 border-2 border-orange-400' : 'bg-[#2a2f3a] border border-white/10 opacity-60'} rounded-xl p-3 flex flex-col items-center transition-all active:scale-95 level-btn" 
-                   data-level="${lvl.level}">
-            <span class="text-xl font-bold">${lvl.level}</span>
-            <span class="text-[10px] uppercase font-bold">${lvl.name}</span>
-          </button>`
-        ).join('')}
+      <nav class="w-full mb-6" data-purpose="level-selector">
+        <div class="grid grid-cols-6 gap-1 sm:gap-2">
+          ${availableLevels.map((lvl) => 
+            `<button class="${lvl.level === gameManager.currentDifficulty ? 'bg-orange-600 border-2 border-orange-400' : 'bg-[#2a2f3a] border border-white/10 opacity-60'} rounded-lg sm:rounded-xl p-1 sm:p-3 flex flex-col items-center transition-all active:scale-95 level-btn" 
+                     data-level="${lvl.level}">
+              <span class="text-sm sm:text-xl font-bold">${lvl.level}</span>
+              <span class="text-[8px] sm:text-[10px] uppercase font-bold leading-tight">${lvl.name}</span>
+            </button>`
+          ).join('')}
+        </div>
       </nav>
       
-      <!-- Goal Display - CLEAR AND SIMPLE -->
-      <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-4 mb-4 text-center border-2 border-emerald-500">
-        <div class="text-white text-sm font-semibold uppercase tracking-wide mb-1">Goal</div>
-        <div class="text-white text-4xl font-black tracking-tight">Reach ${exercise.goal}</div>
-        <div class="text-emerald-200 text-xs mt-1">Transform 1 into ${exercise.goal}</div>
+      <!-- Goal Display with Moves and New Exercise on the right -->  
+      <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-4 mb-4 border-2 border-emerald-500 flex justify-between items-center">
+        <div class="text-center flex-1">
+          <div class="text-white text-sm font-semibold uppercase tracking-wide mb-1">Goal</div>
+          <div class="text-white text-4xl font-black tracking-tight">Reach ${exercise.goal}</div>
+          <div class="text-emerald-200 text-xs mt-1">Transform 1 into ${exercise.goal}</div>
+        </div>
+        <div class="flex flex-col gap-2 ml-4">
+          <div class="text-center">
+            <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">Moves</div>
+            <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}</div>
+          </div>
+          <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all active:scale-95" id="new-exercise-btn">
+            🎲 New
+          </button>
+        </div>
       </div>
     </header>
     <!-- END: MainHeader -->
@@ -190,7 +203,7 @@ function createGameUI() {
       </section>
       
       <!-- Utility Row -->
-      <section class="grid grid-cols-3 gap-3" data-purpose="utility-controls">
+      <section class="grid grid-cols-4 gap-3" data-purpose="utility-controls">
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2 text-sm font-bold transition-transform active:scale-95 reset-btn" id="reset-btn">
           <span>🔄</span> Reset
         </button>
@@ -201,32 +214,25 @@ function createGameUI() {
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2 text-sm font-bold transition-transform active:scale-95 info-btn" id="info-btn">
           <span>ℹ️</span> Help
         </button>
-      </section>
-      
-      <!-- Stats Bar - SIMPLIFIED -->
-      <section class="border border-orange-900/50 bg-orange-900/10 rounded-xl p-3 flex justify-center items-center" data-purpose="stats-display">
-        <div class="text-orange-400 text-lg font-bold">
-          Moves: <span id="moves-count" class="text-white">${gameState.moves}</span>
-        </div>
-      </section>
-      
-      <!-- New Exercise Button -->
-      <section class="w-full">
-        <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 rounded-2xl shadow-lg uppercase tracking-wide transition-all active:scale-95" id="new-exercise-btn">
-          🎲 New Exercise
+        <button class="bg-[#4a5568] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2 text-xs font-bold transition-transform active:scale-95" id="history-btn">
+          <span>📋</span> History
         </button>
       </section>
     </main>
     <!-- END: GameBoard -->
     
-    <!-- BEGIN: HistorySection -->
-    <footer class="w-full max-w-md mt-6 pb-8" data-purpose="game-history">
-      <h3 class="text-center text-gray-500 font-bold uppercase tracking-widest text-sm mb-3">History</h3>
-      <div class="bg-[#111827] rounded-xl p-4 font-mono text-sm history-list" id="history-list">
-        ${renderHistory()}
+    <!-- History Overlay Modal -->
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm history-modal hidden" id="history-modal">
+      <div class="bg-gradient-to-br from-[#1f2937] to-[#111827] border-2 border-gray-600 rounded-3xl p-6 max-w-sm w-11/12 max-h-[70vh] overflow-hidden">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-white font-bold uppercase tracking-widest text-lg">📋 Move History</h3>
+          <button class="text-gray-400 hover:text-white text-2xl font-bold" id="close-history-btn">×</button>
+        </div>
+        <div class="bg-[#111827] rounded-xl p-4 font-mono text-sm max-h-[50vh] overflow-y-auto" id="history-content">
+          ${renderHistory()}
+        </div>
       </div>
-    </footer>
-    <!-- END: HistorySection -->
+    </div>
     
     <!-- Hint Modal -->
     <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm hint-modal hidden" id="hint-modal">
@@ -295,6 +301,17 @@ function renderHistory() {
 }
 
 /**
+ * Update the history modal content
+ */
+function updateHistoryModal() {
+  const historyContent = document.getElementById('history-content');
+  if (historyContent) {
+    historyContent.innerHTML = renderHistory();
+    historyContent.scrollTop = historyContent.scrollHeight; // Auto-scroll to bottom
+  }
+}
+
+/**
  * Update the game display
  */
 function updateDisplay() {
@@ -309,13 +326,6 @@ function updateDisplay() {
   // Update moves counter
   const movesEl = document.getElementById('moves-count');
   if (movesEl) movesEl.textContent = gameState.moves;
-  
-  // Update history
-  const historyEl = document.getElementById('history-list');
-  if (historyEl) {
-    historyEl.innerHTML = renderHistory();
-    historyEl.scrollTop = historyEl.scrollHeight; // Auto-scroll to bottom
-  }
   
   // Check for win condition
   if (gameState.isComplete) {
@@ -524,6 +534,11 @@ function setupGlobalEventListeners() {
     } else if (e.target.matches('.level-btn')) {
       const difficulty = parseInt(e.target.dataset.level);
       handleDifficultySelect(difficulty);
+    } else if (e.target.matches('#history-btn')) {
+      document.getElementById('history-modal').classList.remove('hidden');
+      updateHistoryModal();
+    } else if (e.target.matches('#close-history-btn')) {
+      document.getElementById('history-modal').classList.add('hidden');
     }
   });
 
