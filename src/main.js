@@ -333,7 +333,7 @@ function createGameUI() {
             const previewText = isBlocked ? "Blocked" : previews[op];
             return `<button class="${buttonClass} font-black py-4 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? "disabled" : ""}>
             <span class="text-lg">${label}</span>
-            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? "" : "invisible"}" data-operation="${op}">${previewText}</span>
+            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? "" : "hidden"}" data-operation="${op}">${previewText}</span>
           </button>`;
           })
           .join("")}
