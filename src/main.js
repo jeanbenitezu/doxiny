@@ -145,6 +145,9 @@ let gameState = createGameState(
   gameManager.currentDifficulty,
 );
 
+// UI state for preview visibility
+let showPreviews = true;
+
 // Get available difficulty levels for UI
 const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
 
@@ -313,9 +316,14 @@ function createGameUI() {
           .map(
             ([op, label]) => {
               const previews = getOperationPreviews(gameState.current);
-              return `<button class="bg-[#ef4444] hover:bg-[#dc2626] text-white font-black py-4 px-2 rounded-2xl shadow-lg uppercase tracking-widest transition-transform active:scale-95 operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation">
+              const isBlocked = gameState.moves >= 12;
+              const buttonClass = isBlocked 
+                ? "bg-gray-600 text-gray-400 cursor-not-allowed" 
+                : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
+              const previewText = isBlocked ? 'Blocked' : previews[op];
+              return `<button class="${buttonClass} font-black py-4 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? 'disabled' : ''}>
             <span class="text-lg">${label}</span>
-            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text" data-operation="${op}">${previews[op]}</span>
+            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? '' : 'invisible'}" data-operation="${op}">${previewText}</span>
           </button>`;
             }
           )
@@ -323,15 +331,18 @@ function createGameUI() {
       </section>
       
       <!-- Utility Row -->
-      <section class="grid grid-cols-3 gap-3" data-purpose="utility-controls">
-        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2 text-sm font-bold transition-transform active:scale-95 reset-btn" id="reset-btn">
+      <section class="grid grid-cols-4 gap-2" data-purpose="utility-controls">
+        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= 12 ? 'ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400' : ''}" id="reset-btn">
           <span>🔄</span> Reset
         </button>
-        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2 text-sm font-bold transition-transform active:scale-95 info-btn" id="info-btn">
+        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
           <span>ℹ️</span> Help
         </button>
-        <button class="bg-[#4a5568] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-2 text-xs font-bold transition-transform active:scale-95" id="history-btn">
+        <button class="bg-[#4a5568] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95" id="history-btn">
           <span>📋</span> History
+        </button>
+        <button class="bg-[#6b46c1] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? 'bg-purple-600' : 'bg-gray-600'}" id="preview-toggle-btn">
+          <span>${showPreviews ? '👁️' : '🙈'}</span> Preview
         </button>
       </section>
     </main>
@@ -492,14 +503,45 @@ function updateDisplay() {
     }
   }
 
-  // Update operation preview text
+  // Update operation preview text and button states
   const previews = getOperationPreviews(gameState.current);
-  document.querySelectorAll('.preview-text').forEach(previewEl => {
-    const operation = previewEl.dataset.operation;
-    if (previews[operation]) {
-      previewEl.textContent = previews[operation];
+  const isBlocked = gameState.moves >= 12;
+  
+  document.querySelectorAll('.operation-btn').forEach(btn => {
+    const operation = btn.dataset.operation;
+    const previewEl = btn.querySelector('.preview-text');
+    
+    // Update preview text and visibility
+    if (previewEl) {
+      previewEl.textContent = isBlocked ? 'Blocked' : previews[operation];
+      if (showPreviews) {
+        previewEl.classList.remove('invisible');
+      } else {
+        previewEl.classList.add('invisible');
+      }
+    }
+    
+    // Update button styling
+    if (isBlocked) {
+      btn.className = btn.className.replace(/bg-\[#ef4444\]|hover:bg-\[#dc2626\]|transition-transform|active:scale-95/g, '');
+      btn.className += ' bg-gray-600 text-gray-400 cursor-not-allowed';
+      btn.disabled = true;
+    } else {
+      btn.className = btn.className.replace(/bg-gray-600|text-gray-400|cursor-not-allowed/g, '');
+      btn.className += ' bg-[#ef4444] hover:bg-[#dc2626] transition-transform active:scale-95';
+      btn.disabled = false;
     }
   });
+  
+  // Update reset button glow
+  const resetBtn = document.getElementById('reset-btn');
+  if (resetBtn) {
+    if (isBlocked) {
+      resetBtn.className += ' ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400';
+    } else {
+      resetBtn.className = resetBtn.className.replace(/ring-4|ring-yellow-400|ring-opacity-75|animate-pulse|bg-yellow-500\/20|border-yellow-400/g, '');
+    }
+  }
 
   // Check for win condition
   if (gameState.isComplete) {
@@ -582,7 +624,7 @@ function showSuccessModal() {
  * Handle operation button clicks
  */
 function handleOperationClick(operation) {
-  if (!gameState.isComplete) {
+  if (!gameState.isComplete && gameState.moves < 12) {
     try {
       // Calculate what the result would be
       const resultValue = operations[operation](gameState.current);
@@ -619,7 +661,17 @@ function handleNewExercise() {
     gameManager.currentExercise.goal,
     gameManager.currentDifficulty,
   );
-  // Re-render UI (event listeners are already set up globally)
+  // Re-render UI to reset all button states
+  app.innerHTML = createGameUI();
+}
+
+/**
+ * Toggle preview visibility
+ */
+function togglePreviews() {
+  showPreviews = !showPreviews;
+  
+  // Re-render UI to update all button states and toggle button appearance
   app.innerHTML = createGameUI();
 }
 
@@ -716,6 +768,8 @@ function setupGlobalEventListeners() {
       updateHistoryModal();
     } else if (e.target.closest("#close-history-btn")) {
       document.getElementById("history-modal").classList.add("hidden");
+    } else if (e.target.closest("#preview-toggle-btn")) {
+      togglePreviews();
     }
   });
 
