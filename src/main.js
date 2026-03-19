@@ -243,6 +243,36 @@ function createGameUI() {
       </div>
     </div>
     
+    <!-- Info Modal -->
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm info-modal hidden" id="info-modal">
+      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-3xl p-8 max-w-md w-11/12 text-center shadow-2xl">
+        <h3 class="text-2xl font-bold text-white mb-4">ℹ️ Game Help</h3>
+        <div class="text-white/95 text-sm text-left leading-relaxed mb-6" id="info-content">
+          <div class="mb-4">
+            <div class="text-center mb-3">
+              <span class="text-lg font-bold text-blue-300">Operations:</span>
+            </div>
+            <div class="space-y-2">
+              <div>• <span class="font-bold text-yellow-300">MIRROR:</span> Reverse digits (12 → 21)</div>
+              <div>• <span class="font-bold text-yellow-300">SUM:</span> Add digits (123 → 6)</div>
+              <div>• <span class="font-bold text-yellow-300">ADD 1:</span> Append 1 (4 → 41)</div>
+              <div>• <span class="font-bold text-yellow-300">×2:</span> Double the number (8 → 16)</div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <div class="text-center mb-2">
+              <span class="text-lg font-bold text-blue-300">Keyboard Shortcuts:</span>
+            </div>
+            <div class="text-center text-sm">
+              <span class="bg-gray-700 px-2 py-1 rounded mx-1">1-4</span> Operations • <span class="bg-gray-700 px-2 py-1 rounded mx-1">R</span> Reset • <span class="bg-gray-700 px-2 py-1 rounded mx-1">N</span> New
+            </div>
+          </div>
+          <div class="text-center text-emerald-300 font-semibold" id="difficulty-tip"></div>
+        </div>
+        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-6 py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1" id="close-info-btn">Got it!</button>
+      </div>
+    </div>
+    
     <!-- Success Modal -->
     <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm success-modal hidden" id="success-modal">
       <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-3 border-emerald-500 rounded-3xl p-8 max-w-sm w-11/12 text-center shadow-2xl shadow-emerald-500/30">
@@ -483,7 +513,7 @@ function showHint() {
 }
 
 /**
- * Show info modal with simple exercise info
+ * Show info modal with game help
  */
 function showInfoModal() {
   const exercise = gameManager.currentExercise;
@@ -498,7 +528,14 @@ function showInfoModal() {
     6: "💡 Insane: The ultimate challenge!"
   };
   
-  alert(`🧩 Number Puzzle - ${difficultyInfo.name}\n\n• Start: 1\n• Goal: ${exercise.goal}\n\nOperations:\n• MIRROR: Reverse digits (12 → 21)\n• SUM: Add digits (123 → 6)\n• ADD 1: Append 1 (4 → 41)\n• ×2: Double the number (8 → 16)\n\n${difficultyTips[gameManager.currentDifficulty]}\n\nTip: Use keyboard shortcuts 1-4 for operations, R for reset!`);
+  // Update difficulty tip
+  const difficultyTip = document.getElementById('difficulty-tip');
+  if (difficultyTip) {
+    difficultyTip.textContent = difficultyTips[gameManager.currentDifficulty];
+  }
+  
+  // Show modal
+  document.getElementById('info-modal').classList.remove('hidden');
 }
 
 // Global event handler - only set up once
@@ -524,6 +561,8 @@ function setupGlobalEventListeners() {
       showHint();
     } else if (e.target.closest('#close-hint-btn')) {
       document.getElementById('hint-modal').classList.add('hidden');
+    } else if (e.target.closest('#close-info-btn')) {
+      document.getElementById('info-modal').classList.add('hidden');
     } else if (e.target.closest('#info-btn')) {
       showInfoModal();
     } else if (e.target.closest('#next-exercise-btn')) {
