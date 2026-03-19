@@ -395,9 +395,6 @@ function createGameUI() {
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
           <span>ℹ️</span> Help
         </button>
-        <button class="bg-[#6b46c1] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn">
-          <span>${showPreviews ? "👁️" : "🙈"}</span> Preview
-        </button>
       </section>
     </main>
     <!-- END: GameBoard -->
