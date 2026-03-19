@@ -146,7 +146,7 @@ let gameState = createGameState(
 );
 
 // UI state for preview visibility
-let showPreviews = true;
+let showPreviews = false;
 
 // Get available difficulty levels for UI
 const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
