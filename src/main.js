@@ -211,10 +211,13 @@ function getOperationIcon(operation, color = 'currentColor') {
     double: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" style="color: ${color};">
       <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m5 43.666A8.33 8.33 0 0 1 48.668 54H15.334A8.334 8.334 0 0 1 7 45.666V12.334A8.334 8.334 0 0 1 15.334 4h33.334A8.33 8.33 0 0 1 57 12.334z"/>
       <text fill="currentColor" x="34" y="42" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="bold">x2</text>
-    </svg>`
+    </svg>`,
+    start: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" style="color: ${color};">
+      <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m-20 40l16-8l-16-8v16z"/>
+    </svg>`,
   };
   
-  return icons[operation] || '';
+  return icons[operation] || icons.start;
 }
 
 // DOM elements
@@ -308,7 +311,7 @@ function createGameUI() {
       </div>
       
       <!-- Level Selector -->
-      <nav class="w-full mb-6" data-purpose="level-selector">
+      <nav class="w-full mb-4" data-purpose="level-selector">
         <div class="grid grid-cols-6 gap-1 sm:gap-2">
           ${availableLevels
             .map(
@@ -344,7 +347,7 @@ function createGameUI() {
     <!-- END: MainHeader -->
     
     <!-- BEGIN: GameBoard -->
-    <main class="w-full max-w-md flex-1 flex flex-col gap-4">
+    <main class="w-full max-w-md flex-1 flex flex-col gap-2">
       <!-- Central Number Display -->
       <section class="glass-panel rounded-3xl p-6 flex justify-center items-center mb-2" data-purpose="number-display">
         <span class="text-8xl font-black text-white tracking-tighter current-number" id="current-number">${gameState.current}</span>
@@ -376,7 +379,7 @@ function createGameUI() {
               : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
             const previewText = isBlocked ? "Blocked" : previews[op];
             const iconColor = isBlocked ? '#9ca3af' : '#ffffff';
-            return `<button class="${buttonClass} font-black py-3 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? "disabled" : ""}>
+            return `<button class="${buttonClass} font-black py-3 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1 h-20" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? "disabled" : ""}>
             <div class="flex items-center gap-2">
               ${getOperationIcon(op, iconColor)}
               <span class="text-sm">${label}</span>
