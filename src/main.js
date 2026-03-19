@@ -566,9 +566,7 @@ function handleNewExercise() {
  * Handle next exercise from success modal
  */
 function handleNextExercise() {
-  moveToNextLevel();
-
-  gameManager.currentDifficulty = nextDifficulty;
+  gameManager.moveToNextLevel();
   handleNewExercise();
 }
 
