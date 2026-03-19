@@ -156,7 +156,9 @@ let moveLimit = 12;
  */
 function updateMoveLimit() {
   moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 12);
-  console.log(`🎯 Move limit updated to: ${moveLimit} (optimal: ${gameManager.currentExercise.optimalMoves})`);
+  console.log(
+    `🎯 Move limit updated to: ${moveLimit} (optimal: ${gameManager.currentExercise.optimalMoves})`,
+  );
 }
 
 // Get available difficulty levels for UI
@@ -191,7 +193,7 @@ function getOperationPreviews(currentNumber) {
 /**
  * Get colored SVG icons for operations
  */
-function getOperationIcon(operation, color = 'currentColor') {
+function getOperationIcon(operation, color = "currentColor") {
   const icons = {
     reverse: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" style="color: ${color};">
       <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m5 43.666A8.33 8.33 0 0 1 48.668 54H15.334A8.334 8.334 0 0 1 7 45.666V12.334A8.334 8.334 0 0 1 15.334 4h33.334A8.33 8.33 0 0 1 57 12.334z"/>
@@ -216,7 +218,7 @@ function getOperationIcon(operation, color = 'currentColor') {
       <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m-20 40l16-8l-16-8v16z"/>
     </svg>`,
   };
-  
+
   return icons[operation] || icons.start;
 }
 
@@ -359,10 +361,10 @@ function createGameUI() {
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold">Move History</h4>
             <button class="text-white/70 hover:text-white transition-colors" id="history-toggle-btn" aria-label="Toggle history visibility">
-              <span class="text-sm transform transition-transform duration-200 ${showHistory ? 'rotate-180' : ''}" id="history-arrow">▼</span>
+              <span class="text-sm transform transition-transform duration-200 ${showHistory ? "rotate-180" : ""}" id="history-arrow">▼</span>
             </button>
           </div>
-          <div class="flex flex-wrap gap-2 items-start transition-all duration-300 overflow-hidden h-40 ${showHistory ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}" id="inline-history-content">
+          <div class="flex flex-wrap gap-2 items-start transition-all duration-300 overflow-hidden h-40 ${showHistory ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}" id="inline-history-content">
             ${renderInlineHistory()}
           </div>
         </div>
@@ -378,7 +380,7 @@ function createGameUI() {
               ? "bg-gray-600 text-gray-400 cursor-not-allowed"
               : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
             const previewText = isBlocked ? "Blocked" : previews[op];
-            const iconColor = isBlocked ? '#9ca3af' : '#ffffff';
+            const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
             return `<button class="${buttonClass} font-black py-3 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1 h-20" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? "disabled" : ""}>
             <div class="flex items-center gap-2">
               ${getOperationIcon(op, iconColor)}
@@ -467,8 +469,6 @@ function createGameUI() {
   `;
 }
 
-
-
 /**
  * Render inline history with colored SVG icons
  */
@@ -479,17 +479,18 @@ function renderInlineHistory() {
 
   return gameState.history
     .map((entry, index) => {
-      const operationKey = entry.action.toLowerCase().replace(' ', '');
+      const operationKey = entry.action.toLowerCase().replace(" ", "");
       const operationMap = {
-        'reverse': 'reverse',
-        'sum': 'sum', 
-        'sumdigits': 'sum',
-        'append1': 'append1',
-        'double': 'double'
+        reverse: "reverse",
+        sum: "sum",
+        sumdigits: "sum",
+        append1: "append1",
+        double: "double",
       };
-      const op = operationMap[operationKey] || operationMap[entry.action.toLowerCase()];
-      const color = index === 0 ? '#0099CC' : '#10b981'; // emerald-500
-      
+      const op =
+        operationMap[operationKey] || operationMap[entry.action.toLowerCase()];
+      const color = index === 0 ? "#0099CC" : "#10b981"; // emerald-500
+
       return `<div class="flex items-center gap-1 bg-[${color}10] border border-[${color}20] rounded-lg px-2 py-1" title="${entry.action}: ${gameState.history[index].value} → ${entry.value}">
         ${getOperationIcon(op, color)}
         <span class="text-[${color}] text-xs font-bold">${entry.value}</span>
@@ -497,8 +498,6 @@ function renderInlineHistory() {
     })
     .join("");
 }
-
-
 
 /**
  * Update the game display
@@ -510,7 +509,7 @@ function updateDisplay() {
     const newValue = gameState.current.toString();
     const previousValue = currentEl.textContent;
     const hasChanged = newValue !== previousValue;
-    
+
     currentEl.textContent = gameState.current;
 
     // Apply dynamic scaling based on digit count
@@ -524,7 +523,7 @@ function updateDisplay() {
     }
 
     currentEl.style.transform = `scale(${scale})`;
-    
+
     // Only animate if the number actually changed
     if (hasChanged) {
       currentEl.classList.add("updated");
@@ -571,15 +570,31 @@ function updateDisplay() {
     // Update button styling
     if (isBlocked) {
       // Remove active button classes
-      btn.classList.remove("bg-[#ef4444]", "hover:bg-[#dc2626]", "transition-transform", "active:scale-95", "text-white");
+      btn.classList.remove(
+        "bg-[#ef4444]",
+        "hover:bg-[#dc2626]",
+        "transition-transform",
+        "active:scale-95",
+        "text-white",
+      );
       // Add blocked button classes
       btn.classList.add("bg-gray-600", "text-gray-400", "cursor-not-allowed");
       btn.disabled = true;
     } else {
       // Remove blocked button classes
-      btn.classList.remove("bg-gray-600", "text-gray-400", "cursor-not-allowed");
+      btn.classList.remove(
+        "bg-gray-600",
+        "text-gray-400",
+        "cursor-not-allowed",
+      );
       // Add active button classes
-      btn.classList.add("bg-[#ef4444]", "hover:bg-[#dc2626]", "transition-transform", "active:scale-95", "text-white");
+      btn.classList.add(
+        "bg-[#ef4444]",
+        "hover:bg-[#dc2626]",
+        "transition-transform",
+        "active:scale-95",
+        "text-white",
+      );
       btn.disabled = false;
     }
   });
@@ -588,14 +603,30 @@ function updateDisplay() {
   const resetBtn = document.getElementById("reset-btn");
   if (resetBtn) {
     if (isBlocked) {
-      resetBtn.classList.add("ring-4", "ring-yellow-400", "ring-opacity-75", "animate-pulse", "bg-yellow-500/20", "border-yellow-400");
+      resetBtn.classList.add(
+        "ring-4",
+        "ring-yellow-400",
+        "ring-opacity-75",
+        "animate-pulse",
+        "bg-yellow-500/20",
+        "border-yellow-400",
+      );
     } else {
-      resetBtn.classList.remove("ring-4", "ring-yellow-400", "ring-opacity-75", "animate-pulse", "bg-yellow-500/20", "border-yellow-400");
+      resetBtn.classList.remove(
+        "ring-4",
+        "ring-yellow-400",
+        "ring-opacity-75",
+        "animate-pulse",
+        "bg-yellow-500/20",
+        "border-yellow-400",
+      );
     }
   }
 
   // Update inline history
-  const inlineHistoryContent = document.getElementById("inline-history-content");
+  const inlineHistoryContent = document.getElementById(
+    "inline-history-content",
+  );
   if (inlineHistoryContent) {
     inlineHistoryContent.innerHTML = renderInlineHistory();
   }
@@ -603,13 +634,13 @@ function updateDisplay() {
   // Update history toggle arrow
   const historyArrow = document.getElementById("history-arrow");
   if (historyArrow) {
-    historyArrow.className = `text-sm transform transition-transform duration-200 ${showHistory ? 'rotate-180' : 'rotate-0'}`;
+    historyArrow.className = `text-sm transform transition-transform duration-200 ${showHistory ? "rotate-180" : "rotate-0"}`;
   }
 
   // Update history container visibility
   const historyContent = document.getElementById("inline-history-content");
   if (historyContent) {
-    historyContent.className = `flex flex-wrap gap-2 items-start transition-all duration-300 overflow-hidden h-40 ${showHistory ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`;
+    historyContent.className = `flex flex-wrap gap-2 items-start transition-all duration-300 overflow-hidden h-40 ${showHistory ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`;
   }
 
   // Check for win condition
@@ -675,11 +706,23 @@ function showSuccessModal() {
         updateDisplay(); // Update the accordion state
       }
       // Add glow effect
-      historyContainer.classList.add("ring-4", "ring-emerald-400", "ring-opacity-75", "shadow-lg", "shadow-emerald-400/30");
-      
+      historyContainer.classList.add(
+        "ring-4",
+        "ring-emerald-400",
+        "ring-opacity-75",
+        "shadow-lg",
+        "shadow-emerald-400/30",
+      );
+
       // Remove glow after 3 seconds
       setTimeout(() => {
-        historyContainer.classList.remove("ring-4", "ring-emerald-400", "ring-opacity-75", "shadow-lg", "shadow-emerald-400/30");
+        historyContainer.classList.remove(
+          "ring-4",
+          "ring-emerald-400",
+          "ring-opacity-75",
+          "shadow-lg",
+          "shadow-emerald-400/30",
+        );
       }, 3000);
     }
 
@@ -744,8 +787,6 @@ function handleNewExercise() {
   // Re-render UI to reset all button states
   app.innerHTML = createGameUI();
 }
-
-
 
 /**
  * Toggle history visibility

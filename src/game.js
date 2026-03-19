@@ -39,7 +39,10 @@ export function applyMove(state, operation) {
     moves: state.moves + 1,
     history: [
       ...state.history,
-      { action: (operationLabels[operation] ?? operation).toUpperCase(), value: newValue },
+      {
+        action: (operationLabels[operation] ?? operation).toUpperCase(),
+        value: newValue,
+      },
     ],
   };
 
