@@ -486,11 +486,9 @@ function updateDisplay() {
     const digitCount = gameState.current.toString().length;
     let scale = 1; // Default scale
 
-    if (digitCount >= 8 && digitCount < 10) {
-      scale = 0.8;
-    } else if (digitCount === 10) {
+    if (digitCount >= 7 && digitCount < 9) {
       scale = 0.7;
-    } else if (digitCount > 10) {
+    } else if (digitCount >= 9) {
       scale = 0.5;
     }
 
@@ -698,6 +696,9 @@ function handleNewExercise() {
  */
 function togglePreviews() {
   showPreviews = !showPreviews;
+  
+  // Re-render UI to update all button states and toggle button appearance
+  app.innerHTML = createGameUI();
 
   // Reapply dynamic scaling and other display updates after re-render
   updateDisplay();
