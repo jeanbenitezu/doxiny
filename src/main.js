@@ -156,24 +156,24 @@ const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
  */
 function getOperationPreviews(currentNumber) {
   const previews = {};
-  
+
   // FLIP/REVERSE preview
   const reversed = operations.mirror(currentNumber);
   previews.mirror = `${currentNumber} → ${reversed}`;
-  
+
   // SUM preview
   const sum = operations.sum(currentNumber);
-  const digits = currentNumber.toString().split('').join(' + ');
+  const digits = currentNumber.toString().split("").join(" + ");
   previews.sum = `${digits} → ${sum}`;
-  
+
   // ADD 1 preview
   const appended = operations.add1Right(currentNumber);
   previews.add1Right = `${currentNumber} → ${appended}`;
-  
+
   // DOUBLE preview
   const doubled = operations.double(currentNumber);
   previews.double = `${currentNumber} × 2 → ${doubled}`;
-  
+
   return previews;
 }
 
@@ -313,26 +313,24 @@ function createGameUI() {
       <!-- Operation Buttons Grid -->
       <section class="grid grid-cols-2 gap-3" data-purpose="game-controls">
         ${Object.entries(operationLabels)
-          .map(
-            ([op, label]) => {
-              const previews = getOperationPreviews(gameState.current);
-              const isBlocked = gameState.moves >= 12;
-              const buttonClass = isBlocked 
-                ? "bg-gray-600 text-gray-400 cursor-not-allowed" 
-                : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
-              const previewText = isBlocked ? 'Blocked' : previews[op];
-              return `<button class="${buttonClass} font-black py-4 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? 'disabled' : ''}>
+          .map(([op, label]) => {
+            const previews = getOperationPreviews(gameState.current);
+            const isBlocked = gameState.moves >= 12;
+            const buttonClass = isBlocked
+              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+              : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
+            const previewText = isBlocked ? "Blocked" : previews[op];
+            return `<button class="${buttonClass} font-black py-4 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? "disabled" : ""}>
             <span class="text-lg">${label}</span>
-            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? '' : 'invisible'}" data-operation="${op}">${previewText}</span>
+            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? "" : "invisible"}" data-operation="${op}">${previewText}</span>
           </button>`;
-            }
-          )
+          })
           .join("")}
       </section>
       
       <!-- Utility Row -->
       <section class="grid grid-cols-4 gap-2" data-purpose="utility-controls">
-        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= 12 ? 'ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400' : ''}" id="reset-btn">
+        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= 12 ? "ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn">
           <span>🔄</span> Reset
         </button>
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
@@ -341,8 +339,8 @@ function createGameUI() {
         <button class="bg-[#4a5568] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95" id="history-btn">
           <span>📋</span> History
         </button>
-        <button class="bg-[#6b46c1] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? 'bg-purple-600' : 'bg-gray-600'}" id="preview-toggle-btn">
-          <span>${showPreviews ? '👁️' : '🙈'}</span> Preview
+        <button class="bg-[#6b46c1] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn">
+          <span>${showPreviews ? "👁️" : "🙈"}</span> Preview
         </button>
       </section>
     </main>
@@ -479,11 +477,11 @@ function updateDisplay() {
   const currentEl = document.getElementById("current-number");
   if (currentEl) {
     currentEl.textContent = gameState.current;
-    
+
     // Apply dynamic scaling based on digit count
     const digitCount = gameState.current.toString().length;
     let scale = 1; // Default scale
-    
+
     if (digitCount >= 8 && digitCount < 10) {
       scale = 0.8;
     } else if (digitCount === 10) {
@@ -491,7 +489,7 @@ function updateDisplay() {
     } else if (digitCount > 10) {
       scale = 0.6;
     }
-    
+
     currentEl.style.transform = `scale(${scale})`;
     currentEl.classList.add("updated");
     setTimeout(() => currentEl.classList.remove("updated"), 300);
@@ -500,60 +498,75 @@ function updateDisplay() {
   // Update moves counter with dynamic color
   const movesEl = document.getElementById("moves-count");
   if (movesEl) {
-    movesEl.textContent = gameState.moves + "/" + gameManager.currentExercise.optimalMoves;
-    
+    movesEl.textContent =
+      gameState.moves + "/" + gameManager.currentExercise.optimalMoves;
+
     // Apply color based on performance vs optimal
     const optimalMoves = gameManager.currentExercise.optimalMoves;
-    
+
     // Remove existing color classes
-    movesEl.className = movesEl.className.replace(/text-(green|orange|red)-\d+/g, '');
-    
+    movesEl.className = movesEl.className.replace(
+      /text-(green|orange|red)-\d+/g,
+      "",
+    );
+
     if (gameState.moves < optimalMoves) {
-      movesEl.classList.add('text-green-400');
+      movesEl.classList.add("text-green-400");
     } else if (gameState.moves === optimalMoves) {
-      movesEl.classList.add('text-orange-400');
+      movesEl.classList.add("text-orange-400");
     } else {
-      movesEl.classList.add('text-red-400');
+      movesEl.classList.add("text-red-400");
     }
   }
 
   // Update operation preview text and button states
   const previews = getOperationPreviews(gameState.current);
   const isBlocked = gameState.moves >= 12;
-  
-  document.querySelectorAll('.operation-btn').forEach(btn => {
+
+  document.querySelectorAll(".operation-btn").forEach((btn) => {
     const operation = btn.dataset.operation;
-    const previewEl = btn.querySelector('.preview-text');
-    
+    const previewEl = btn.querySelector(".preview-text");
+
     // Update preview text and visibility
     if (previewEl) {
-      previewEl.textContent = isBlocked ? 'Blocked' : previews[operation];
+      previewEl.textContent = isBlocked ? "Blocked" : previews[operation];
       if (showPreviews) {
-        previewEl.classList.remove('invisible');
+        previewEl.classList.remove("invisible");
       } else {
-        previewEl.classList.add('invisible');
+        previewEl.classList.add("invisible");
       }
     }
-    
+
     // Update button styling
     if (isBlocked) {
-      btn.className = btn.className.replace(/bg-\[#ef4444\]|hover:bg-\[#dc2626\]|transition-transform|active:scale-95/g, '');
-      btn.className += ' bg-gray-600 text-gray-400 cursor-not-allowed';
+      btn.className = btn.className.replace(
+        /bg-\[#ef4444\]|hover:bg-\[#dc2626\]|transition-transform|active:scale-95/g,
+        "",
+      );
+      btn.className += " bg-gray-600 text-gray-400 cursor-not-allowed";
       btn.disabled = true;
     } else {
-      btn.className = btn.className.replace(/bg-gray-600|text-gray-400|cursor-not-allowed/g, '');
-      btn.className += ' bg-[#ef4444] hover:bg-[#dc2626] transition-transform active:scale-95';
+      btn.className = btn.className.replace(
+        /bg-gray-600|text-gray-400|cursor-not-allowed/g,
+        "",
+      );
+      btn.className +=
+        " bg-[#ef4444] hover:bg-[#dc2626] transition-transform active:scale-95";
       btn.disabled = false;
     }
   });
-  
+
   // Update reset button glow
-  const resetBtn = document.getElementById('reset-btn');
+  const resetBtn = document.getElementById("reset-btn");
   if (resetBtn) {
     if (isBlocked) {
-      resetBtn.className += ' ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400';
+      resetBtn.className +=
+        " ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400";
     } else {
-      resetBtn.className = resetBtn.className.replace(/ring-4|ring-yellow-400|ring-opacity-75|animate-pulse|bg-yellow-500\/20|border-yellow-400/g, '');
+      resetBtn.className = resetBtn.className.replace(
+        /ring-4|ring-yellow-400|ring-opacity-75|animate-pulse|bg-yellow-500\/20|border-yellow-400/g,
+        "",
+      );
     }
   }
 
@@ -642,7 +655,7 @@ function handleOperationClick(operation) {
     try {
       // Calculate what the result would be
       const resultValue = operations[operation](gameState.current);
-      
+
       // Only apply the move if the result is different from current value
       if (resultValue !== gameState.current) {
         gameState = applyMove(gameState, operation);
