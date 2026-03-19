@@ -5,10 +5,10 @@
 
 export const operations = {
   /**
-   * MIRROR: Reverse all digits
+   * REVERSE: Reverse all digits
    * Examples: 12 → 21, 100 → 1, 1234 → 4321
    */
-  mirror: (n) => {
+  reverse: (n) => {
     return parseInt(n.toString().split("").reverse().join("")) || 0;
   },
 
@@ -44,7 +44,7 @@ export const operations = {
  * Get human-readable operation names for UI
  */
 export const operationLabels = {
-  mirror: "REVERSE",
+  reverse: "REVERSE",
   sum: "SUM DIGITS",
   add1Right: "APPEND 1",
   double: "DOUBLE",

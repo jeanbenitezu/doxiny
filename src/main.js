@@ -169,8 +169,8 @@ function getOperationPreviews(currentNumber) {
   const previews = {};
 
   // FLIP/REVERSE preview
-  const reversed = operations.mirror(currentNumber);
-  previews.mirror = `${currentNumber} → ${reversed}`;
+  const reversed = operations.reverse(currentNumber);
+  previews.reverse = `${currentNumber} → ${reversed}`;
 
   // SUM preview
   const sum = operations.sum(currentNumber);
@@ -818,7 +818,7 @@ function setupGlobalEventListeners() {
   document.addEventListener("keydown", (e) => {
     switch (e.key) {
       case "1":
-        handleOperationClick("mirror");
+        handleOperationClick("reverse");
         break;
       case "2":
         handleOperationClick("sum");

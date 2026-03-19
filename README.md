@@ -10,7 +10,7 @@ A minimalist mathematical puzzle game where you transform numbers using 4 operat
   - **Level 2 (Intermediate)**: 1 → 25  
   - **Level 3 (Expert)**: 1 → 128
 - **Operations**:
-  - **MIRROR**: Reverse all digits (12 → 21)
+  - **REVERSE**: Reverse all digits (12 → 21)
   - **SUM**: Add all digits (128 → 11)
   - **ADD 1**: Append 1 to the end (4 → 41)
   - **×2**: Double the number (8 → 16)
@@ -72,7 +72,7 @@ Spoiler-free hints for getting started:
 - Experiment with combinations - operations interact in interesting ways
 - The SHIFT operation creates cycles that can be very useful
 - SUM is great for reducing large numbers
-- MIRROR can create surprising new patterns
+- REVERSE can create surprising new patterns
 - Track your best solutions and try to optimize!
 
 ## 🔧 Customization
