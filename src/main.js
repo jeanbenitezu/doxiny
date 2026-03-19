@@ -362,7 +362,7 @@ function createGameUI() {
               <span class="text-sm transform transition-transform duration-200 ${showHistory ? 'rotate-180' : ''}" id="history-arrow">▼</span>
             </button>
           </div>
-          <div class="flex flex-wrap gap-2 items-center transition-all duration-300 overflow-hidden ${showHistory ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}" id="inline-history-content">
+          <div class="flex flex-wrap gap-2 items-start transition-all duration-300 overflow-hidden h-40 ${showHistory ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}" id="inline-history-content">
             ${renderInlineHistory()}
           </div>
         </div>
@@ -609,7 +609,7 @@ function updateDisplay() {
   // Update history container visibility
   const historyContent = document.getElementById("inline-history-content");
   if (historyContent) {
-    historyContent.className = `flex flex-wrap gap-2 items-center transition-all duration-300 overflow-hidden ${showHistory ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`;
+    historyContent.className = `flex flex-wrap gap-2 items-start transition-all duration-300 overflow-hidden h-40 ${showHistory ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`;
   }
 
   // Check for win condition
