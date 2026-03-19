@@ -539,19 +539,16 @@ function updateDisplay() {
 
     // Update button styling
     if (isBlocked) {
-      btn.className = btn.className.replace(
-        /bg-\[#ef4444\]|hover:bg-\[#dc2626\]|transition-transform|active:scale-95/g,
-        "",
-      );
-      btn.className += " bg-gray-600 text-gray-400 cursor-not-allowed";
+      // Remove active button classes
+      btn.classList.remove("bg-[#ef4444]", "hover:bg-[#dc2626]", "transition-transform", "active:scale-95", "text-white");
+      // Add blocked button classes
+      btn.classList.add("bg-gray-600", "text-gray-400", "cursor-not-allowed");
       btn.disabled = true;
     } else {
-      btn.className = btn.className.replace(
-        /bg-gray-600|text-gray-400|cursor-not-allowed/g,
-        "",
-      );
-      btn.className +=
-        " bg-[#ef4444] hover:bg-[#dc2626] transition-transform active:scale-95";
+      // Remove blocked button classes
+      btn.classList.remove("bg-gray-600", "text-gray-400", "cursor-not-allowed");
+      // Add active button classes
+      btn.classList.add("bg-[#ef4444]", "hover:bg-[#dc2626]", "transition-transform", "active:scale-95", "text-white");
       btn.disabled = false;
     }
   });
@@ -560,13 +557,9 @@ function updateDisplay() {
   const resetBtn = document.getElementById("reset-btn");
   if (resetBtn) {
     if (isBlocked) {
-      resetBtn.className +=
-        " ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400";
+      resetBtn.classList.add("ring-4", "ring-yellow-400", "ring-opacity-75", "animate-pulse", "bg-yellow-500/20", "border-yellow-400");
     } else {
-      resetBtn.className = resetBtn.className.replace(
-        /ring-4|ring-yellow-400|ring-opacity-75|animate-pulse|bg-yellow-500\/20|border-yellow-400/g,
-        "",
-      );
+      resetBtn.classList.remove("ring-4", "ring-yellow-400", "ring-opacity-75", "animate-pulse", "bg-yellow-500/20", "border-yellow-400");
     }
   }
 
