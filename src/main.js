@@ -145,9 +145,6 @@ let gameState = createGameState(
   gameManager.currentDifficulty,
 );
 
-// UI state for history visibility
-let showHistory = true;
-
 // Dynamic move limit based on exercise difficulty
 let moveLimit = 12;
 
@@ -360,11 +357,8 @@ function createGameUI() {
         <div class="bg-[#1a1a1a] rounded-2xl p-3 border border-white/10 transition-all duration-300" id="history-container">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold">Move History</h4>
-            <button class="text-white/70 hover:text-white transition-colors" id="history-toggle-btn" aria-label="Toggle history visibility">
-              <span class="text-sm transform transition-transform duration-200 ${showHistory ? "rotate-180" : ""}" id="history-arrow">▼</span>
-            </button>
           </div>
-          <div class="flex flex-wrap gap-2 items-start transition-all duration-300 overflow-hidden h-40 ${showHistory ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}" id="inline-history-content">
+          <div class="flex overflow-x-scroll gap-2 items-start transition-all duration-300 pb-3" id="inline-history-content">
             ${renderInlineHistory()}
           </div>
         </div>
@@ -629,18 +623,7 @@ function updateDisplay() {
   );
   if (inlineHistoryContent) {
     inlineHistoryContent.innerHTML = renderInlineHistory();
-  }
-
-  // Update history toggle arrow
-  const historyArrow = document.getElementById("history-arrow");
-  if (historyArrow) {
-    historyArrow.className = `text-sm transform transition-transform duration-200 ${showHistory ? "rotate-180" : "rotate-0"}`;
-  }
-
-  // Update history container visibility
-  const historyContent = document.getElementById("inline-history-content");
-  if (historyContent) {
-    historyContent.className = `flex flex-wrap gap-2 items-start transition-all duration-300 overflow-hidden h-40 ${showHistory ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`;
+    inlineHistoryContent.classList.remove("flex-wrap"); // Reset flex-wrap on update
   }
 
   // Check for win condition
@@ -701,10 +684,6 @@ function showSuccessModal() {
     // Auto-expand and glow history when success modal appears
     const historyContainer = document.getElementById("history-container");
     if (historyContainer) {
-      if (!showHistory) {
-        showHistory = true;
-        updateDisplay(); // Update the accordion state
-      }
       // Add glow effect
       historyContainer.classList.add(
         "ring-4",
@@ -725,6 +704,13 @@ function showSuccessModal() {
         );
       }, 3000);
     }
+
+  const inlineHistoryContent = document.getElementById(
+    "inline-history-content",
+  );
+  if (inlineHistoryContent) {
+    inlineHistoryContent.classList.add("flex-wrap");
+  }
 
     // Enhanced celebration effects based on performance
     if (completionResult.isPerfect && "vibrate" in navigator) {
@@ -786,14 +772,6 @@ function handleNewExercise() {
   );
   // Re-render UI to reset all button states
   app.innerHTML = createGameUI();
-}
-
-/**
- * Toggle history visibility
- */
-function toggleHistory() {
-  showHistory = !showHistory;
-  updateDisplay();
 }
 
 /**
@@ -885,8 +863,6 @@ function setupGlobalEventListeners() {
       const levelBtn = e.target.closest(".level-btn");
       const difficulty = parseInt(levelBtn.dataset.level);
       handleDifficultySelect(difficulty);
-    } else if (e.target.closest("#history-toggle-btn")) {
-      toggleHistory();
     }
   });
 
