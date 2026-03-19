@@ -168,7 +168,7 @@ const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
 function getOperationPreviews(currentNumber) {
   const previews = {};
 
-  // FLIP/REVERSE preview
+  // REVERSE preview
   const reversed = operations.reverse(currentNumber);
   previews.reverse = `${currentNumber} → ${reversed}`;
 
@@ -186,6 +186,35 @@ function getOperationPreviews(currentNumber) {
   previews.double = `${currentNumber} × 2 → ${doubled}`;
 
   return previews;
+}
+
+/**
+ * Get colored SVG icons for operations
+ */
+function getOperationIcon(operation, color = 'currentColor') {
+  const icons = {
+    reverse: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" style="color: ${color};">
+      <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m5 43.666A8.33 8.33 0 0 1 48.668 54H15.334A8.334 8.334 0 0 1 7 45.666V12.334A8.334 8.334 0 0 1 15.334 4h33.334A8.33 8.33 0 0 1 57 12.334z"/>
+      <!-- Top arrow -->
+      <path fill="currentColor" d="M14.001 31.548c0-2.865 1.105-5.555 3.114-7.58a10.52 10.52 0 0 1 7.518-3.141h11.771v-3.828l11.598 6.752l-11.598 6.752v-3.828H24.633c-2.665 0-4.831 2.186-4.831 4.873q0 .196.014.393L14.564 35a10.8 10.8 0 0 1-.563-3.452" />
+      <!-- Bottom arrow -->
+      <path fill="currentColor" d="M46.885 40.024a10.54 10.54 0 0 1-7.526 3.143H27.61v3.832l-11.609-6.758l11.609-6.758v3.832h11.748c2.668 0 4.838-2.191 4.838-4.879q0-.189-.015-.371l5.265-3.066c.365 1.094.555 2.25.555 3.438c0 2.867-1.107 5.56-3.116 7.587" />
+    </svg>`,
+    sum: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" style="color: ${color};">
+      <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m5 43.666A8.33 8.33 0 0 1 48.668 54H15.334A8.334 8.334 0 0 1 7 45.666V12.334A8.334 8.334 0 0 1 15.334 4h33.334A8.33 8.33 0 0 1 57 12.334z"/>
+      <text fill="currentColor" x="32" y="46" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold">Σ</text>
+    </svg>`,
+    append1: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" style="color: ${color};">
+      <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m5 43.666A8.33 8.33 0 0 1 48.668 54H15.334A8.334 8.334 0 0 1 7 45.666V12.334A8.334 8.334 0 0 1 15.334 4h33.334A8.33 8.33 0 0 1 57 12.334z"/>
+      <text fill="currentColor" x="32" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="38" font-weight="bold">+1</text>
+    </svg>`,
+    double: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" style="color: ${color};">
+      <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m5 43.666A8.33 8.33 0 0 1 48.668 54H15.334A8.334 8.334 0 0 1 7 45.666V12.334A8.334 8.334 0 0 1 15.334 4h33.334A8.33 8.33 0 0 1 57 12.334z"/>
+      <text fill="currentColor" x="34" y="42" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="bold">x2</text>
+    </svg>`
+  };
+  
+  return icons[operation] || '';
 }
 
 // DOM elements
@@ -321,6 +350,16 @@ function createGameUI() {
         <span class="text-8xl font-black text-white tracking-tighter current-number" id="current-number">${gameState.current}</span>
       </section>
       
+      <!-- Inline History -->
+      <section class="mb-4" data-purpose="inline-history">
+        <div class="bg-[#1a1a1a] rounded-2xl p-3 border border-white/10">
+          <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold mb-2 text-center">Move History</h4>
+          <div class="flex flex-wrap gap-2 justify-center min-h-[2rem] items-center" id="inline-history-content">
+            ${renderInlineHistory()}
+          </div>
+        </div>
+      </section>
+      
       <!-- Operation Buttons Grid -->
       <section class="grid grid-cols-2 gap-3" data-purpose="game-controls">
         ${Object.entries(operationLabels)
@@ -331,8 +370,12 @@ function createGameUI() {
               ? "bg-gray-600 text-gray-400 cursor-not-allowed"
               : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
             const previewText = isBlocked ? "Blocked" : previews[op];
-            return `<button class="${buttonClass} font-black py-4 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? "disabled" : ""}>
-            <span class="text-lg">${label}</span>
+            const iconColor = isBlocked ? '#9ca3af' : '#ffffff';
+            return `<button class="${buttonClass} font-black py-3 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? "disabled" : ""}>
+            <div class="flex items-center gap-2">
+              ${getOperationIcon(op, iconColor)}
+              <span class="text-sm">${label}</span>
+            </div>
             <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? "" : "hidden"}" data-operation="${op}">${previewText}</span>
           </button>`;
           })
@@ -447,7 +490,7 @@ function createGameUI() {
 function renderHistory() {
   if (gameState.history.length === 0) {
     return `<div class="flex justify-between items-center opacity-70">
-      <div>
+      <div class="flex items-center gap-2">
         <span class="text-gray-600">1.</span>
         <span class="text-orange-500 font-bold ml-2">START</span>
       </div>
@@ -456,16 +499,59 @@ function renderHistory() {
   }
 
   return gameState.history
-    .map(
-      (entry, index) =>
-        `<div class="flex justify-between items-center opacity-70 ${index < gameState.history.length - 1 ? "border-b border-white/10 pb-2 mb-2" : ""}">
-      <div>
-        <span class="text-gray-600">${index + 1}.</span>
-        <span class="text-orange-500 font-bold ml-2">${entry.action}</span>
-      </div>
-      <span class="text-emerald-500">[${entry.value}]</span>
-    </div>`,
-    )
+    .map((entry, index) => {
+      let iconHtml = '';
+      if (index > 0) { // Skip START entry
+        const operationKey = entry.action.toLowerCase().replace(' ', '');
+        const operationMap = {
+          'reverse': 'reverse',
+          'sum': 'sum', 
+          'sumdigits': 'sum',
+          'append1': 'append1',
+          'double': 'double'
+        };
+        const op = operationMap[operationKey] || operationMap[entry.action.toLowerCase()];
+        iconHtml = getOperationIcon(op, '#f97316'); // orange-500
+      }
+      
+      return `<div class="flex justify-between items-center opacity-70 ${index < gameState.history.length - 1 ? "border-b border-white/10 pb-2 mb-2" : ""}">
+        <div class="flex items-center gap-2">
+          <span class="text-gray-600">${index + 1}.</span>
+          ${iconHtml}
+          <span class="text-orange-500 font-bold">${entry.action}</span>
+        </div>
+        <span class="text-emerald-500">[${entry.value}]</span>
+      </div>`;
+    })
+    .join("");
+}
+
+/**
+ * Render inline history with colored SVG icons
+ */
+function renderInlineHistory() {
+  if (gameState.history.length === 0) {
+    return `<div class="text-white/50 text-xs">No moves yet</div>`;
+  }
+
+  return gameState.history.slice(1) // Skip START entry
+    .map((entry, index) => {
+      const operationKey = entry.action.toLowerCase().replace(' ', '');
+      const operationMap = {
+        'reverse': 'reverse',
+        'sum': 'sum', 
+        'sumdigits': 'sum',
+        'append1': 'append1',
+        'double': 'double'
+      };
+      const op = operationMap[operationKey] || operationMap[entry.action.toLowerCase()];
+      const color = '#10b981'; // emerald-500
+      
+      return `<div class="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-2 py-1" title="${entry.action}: ${gameState.history[index].value} → ${entry.value}">
+        ${getOperationIcon(op, color)}
+        <span class="text-emerald-400 text-xs font-bold">${entry.value}</span>
+      </div>`;
+    })
     .join("");
 }
 
@@ -577,6 +663,12 @@ function updateDisplay() {
     } else {
       resetBtn.classList.remove("ring-4", "ring-yellow-400", "ring-opacity-75", "animate-pulse", "bg-yellow-500/20", "border-yellow-400");
     }
+  }
+
+  // Update inline history
+  const inlineHistoryContent = document.getElementById("inline-history-content");
+  if (inlineHistoryContent) {
+    inlineHistoryContent.innerHTML = renderInlineHistory();
   }
 
   // Check for win condition
