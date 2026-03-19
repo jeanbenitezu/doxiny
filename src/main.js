@@ -491,7 +491,7 @@ function updateDisplay() {
     } else if (digitCount === 10) {
       scale = 0.7;
     } else if (digitCount > 10) {
-      scale = 0.6;
+      scale = 0.5;
     }
 
     currentEl.style.transform = `scale(${scale})`;
