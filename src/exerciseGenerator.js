@@ -42,8 +42,8 @@ const difficultyLevels = {
   6: { 
     name: 'Insane',
     description: 'Ultimate challenge',
-    targetMoves: [10, 20],
-    goalRange: [200, 1000]
+    targetMoves: [8, 18],
+    goalRange: [300, 999]
   }
 };
 
@@ -54,14 +54,14 @@ function generateSimpleExercise(difficulty) {
   const config = difficultyLevels[difficulty];
   const [minGoal, maxGoal] = config.goalRange;
   
-  // Try a few goals and pick the first solvable one
-  for (let attempt = 0; attempt < 10; attempt++) {
+  // Try more goals with slightly more flexible criteria
+  for (let attempt = 0; attempt < 25; attempt++) {
     const goal = Math.floor(Math.random() * (maxGoal - minGoal + 1)) + minGoal;
-    const validation = validateExercise(goal, 20);
+    const validation = validateExercise(goal, 25); // Increased max moves for validation
     
     if (validation.solvable && 
         validation.minMoves >= config.targetMoves[0] && 
-        validation.minMoves <= config.targetMoves[1] + 3) {
+        validation.minMoves <= config.targetMoves[1] + 5) { // More flexible move range
       return {
         goal,
         optimalMoves: validation.minMoves,
@@ -70,11 +70,20 @@ function generateSimpleExercise(difficulty) {
     }
   }
   
-  // Fallback to known good goals
+  // Fallback to diverse known good goals for each difficulty
   const fallbackGoals = {
-    1: 10, 2: 25, 3: 64, 4: 128, 5: 256, 6: 512
+    1: [10, 12, 21],
+    2: [25, 34, 43, 55], 
+    3: [64, 89, 98, 77],
+    4: [128, 132, 231, 189],
+    5: [256, 289, 982, 334, 443],
+    6: [729, 867, 678, 987, 765, 345, 534, 672, 267, 387, 783, 832, 238]
   };
-  const fallbackGoal = fallbackGoals[difficulty] || 64;
+  
+  const goalOptions = fallbackGoals[difficulty] || [171];
+  // Pick a random goal from the fallback options instead of always the same one
+  const randomIndex = Math.floor(Math.random() * goalOptions.length);
+  const fallbackGoal = goalOptions[randomIndex];
   const validation = validateExercise(fallbackGoal);
   
   return {
