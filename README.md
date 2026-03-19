@@ -11,9 +11,9 @@ A minimalist mathematical puzzle game where you transform numbers using 4 operat
   - **Level 3 (Expert)**: 1 → 128
 - **Operations**:
   - **REVERSE**: Reverse all digits (12 → 21)
-  - **SUM**: Add all digits (128 → 11)
-  - **ADD 1**: Append 1 to the end (4 → 41)
-  - **×2**: Double the number (8 → 16)
+  - **SUM DIGITS**: Add all digits (128 → 11)
+  - **APPEND 1**: Append 1 to the end (4 → 41)
+  - **DOUBLE**: Double the number (8 → 16)
 
 ## ✨ Features
 
@@ -71,7 +71,7 @@ Spoiler-free hints for getting started:
 
 - Experiment with combinations - operations interact in interesting ways
 - The SHIFT operation creates cycles that can be very useful
-- SUM is great for reducing large numbers
+- SUM DIGITS is great for reducing large numbers
 - REVERSE can create surprising new patterns
 - Track your best solutions and try to optimize!
 

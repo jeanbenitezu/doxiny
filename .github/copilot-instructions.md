@@ -10,7 +10,7 @@ This is a mathematical puzzle PWA game built with Vanilla JS + Vite.
 
 ## Game Mechanics
 - Start with number 1, reach goal (e.g., 128)
-- Operations: REVERSE, SUM, ADD1RIGHT, SHIFT
+- Operations: REVERSE, SUM, APPEND 1, SHIFT
 - Track movement history and optimize for fewest steps
 - PWA with offline capability
 

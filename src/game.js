@@ -3,7 +3,7 @@
  * Manages game state, moves, and history
  */
 
-import { operations, isValidOperation } from "./operations.js";
+import { operationLabels, operations, isValidOperation } from "./operations.js";
 
 /**
  * Create initial game state
@@ -39,7 +39,7 @@ export function applyMove(state, operation) {
     moves: state.moves + 1,
     history: [
       ...state.history,
-      { action: operation.toUpperCase(), value: newValue },
+      { action: (operationLabels[operation] ?? operation).toUpperCase(), value: newValue },
     ],
   };
 

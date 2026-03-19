@@ -24,7 +24,7 @@ export const operations = {
   },
 
   /**
-   * ADD1RIGHT: Append digit 1 to the right
+   * APPEND 1: Append digit 1 to the right
    * Examples: 4 → 41, 12 → 121
    */
   add1Right: (n) => {
