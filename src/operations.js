@@ -47,7 +47,7 @@ export const operationLabels = {
   mirror: "REVERSE",
   sum: "SUM DIGITS",
   add1Right: "APPEND 1",
-  double: "DOUBLE (×2)",
+  double: "DOUBLE",
 };
 
 /**

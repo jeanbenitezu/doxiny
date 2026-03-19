@@ -363,7 +363,7 @@ function createGameUI() {
               <div>• <span class="font-bold text-yellow-300">REVERSE:</span> Reverse digits (12 → 21)</div>
               <div>• <span class="font-bold text-yellow-300">SUM DIGITS:</span> Add digits (123 → 6)</div>
               <div>• <span class="font-bold text-yellow-300">APPEND 1:</span> Append 1 (4 → 41)</div>
-              <div>• <span class="font-bold text-yellow-300">DOUBLE (×2):</span> Double the number (8 → 16)</div>
+              <div>• <span class="font-bold text-yellow-300">DOUBLE:</span> Double the number (8 → 16)</div>
             </div>
           </div>
           <div class="mb-4">
@@ -584,7 +584,14 @@ function showSuccessModal() {
 function handleOperationClick(operation) {
   if (!gameState.isComplete) {
     try {
-      gameState = applyMove(gameState, operation);
+      // Calculate what the result would be
+      const resultValue = operations[operation](gameState.current);
+      
+      // Only apply the move if the result is different from current value
+      if (resultValue !== gameState.current) {
+        gameState = applyMove(gameState, operation);
+      }
+      // Always update display to show user that operation was attempted
       updateDisplay();
     } catch (error) {
       console.error("Error applying operation:", error);
