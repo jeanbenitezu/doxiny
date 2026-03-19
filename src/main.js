@@ -534,7 +534,7 @@ function renderInlineHistory() {
     return `<div class="text-white/50 text-xs">No moves yet</div>`;
   }
 
-  return gameState.history.slice(1) // Skip START entry
+  return gameState.history
     .map((entry, index) => {
       const operationKey = entry.action.toLowerCase().replace(' ', '');
       const operationMap = {
@@ -545,11 +545,11 @@ function renderInlineHistory() {
         'double': 'double'
       };
       const op = operationMap[operationKey] || operationMap[entry.action.toLowerCase()];
-      const color = '#10b981'; // emerald-500
+      const color = index === 0 ? '#0099CC' : '#10b981'; // emerald-500
       
-      return `<div class="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-2 py-1" title="${entry.action}: ${gameState.history[index].value} → ${entry.value}">
+      return `<div class="flex items-center gap-1 bg-[${color}10] border border-[${color}20] rounded-lg px-2 py-1" title="${entry.action}: ${gameState.history[index].value} → ${entry.value}">
         ${getOperationIcon(op, color)}
-        <span class="text-emerald-400 text-xs font-bold">${entry.value}</span>
+        <span class="text-[${color}] text-xs font-bold">${entry.value}</span>
       </div>`;
     })
     .join("");
