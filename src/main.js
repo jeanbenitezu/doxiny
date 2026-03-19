@@ -475,10 +475,24 @@ function updateHistoryModal() {
  * Update the game display
  */
 function updateDisplay() {
-  // Update current number with animation
+  // Update current number with animation and dynamic scaling
   const currentEl = document.getElementById("current-number");
   if (currentEl) {
     currentEl.textContent = gameState.current;
+    
+    // Apply dynamic scaling based on digit count
+    const digitCount = gameState.current.toString().length;
+    let scale = 1; // Default scale
+    
+    if (digitCount >= 8 && digitCount < 10) {
+      scale = 0.8;
+    } else if (digitCount === 10) {
+      scale = 0.7;
+    } else if (digitCount > 10) {
+      scale = 0.6;
+    }
+    
+    currentEl.style.transform = `scale(${scale})`;
     currentEl.classList.add("updated");
     setTimeout(() => currentEl.classList.remove("updated"), 300);
   }
@@ -670,9 +684,9 @@ function handleNewExercise() {
  */
 function togglePreviews() {
   showPreviews = !showPreviews;
-  
-  // Re-render UI to update all button states and toggle button appearance
-  app.innerHTML = createGameUI();
+
+  // Reapply dynamic scaling and other display updates after re-render
+  updateDisplay();
 }
 
 /**
