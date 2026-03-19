@@ -145,10 +145,9 @@ let gameState = createGameState(
   gameManager.currentDifficulty,
 );
 
-// UI state for preview visibility
-let showPreviews = true;
 // UI state for history visibility
 let showHistory = true;
+
 // Dynamic move limit based on exercise difficulty
 let moveLimit = 12;
 
@@ -382,7 +381,7 @@ function createGameUI() {
               ${getOperationIcon(op, iconColor)}
               <span class="text-sm">${label}</span>
             </div>
-            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? "" : "hidden"}" data-operation="${op}">${previewText}</span>
+            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text" data-operation="${op}">${previewText}</span>
           </button>`;
           })
           .join("")}
@@ -567,11 +566,6 @@ function updateDisplay() {
     // Update preview text and visibility
     if (previewEl) {
       previewEl.textContent = isBlocked ? "Blocked" : previews[operation];
-      if (showPreviews) {
-        previewEl.classList.remove("invisible");
-      } else {
-        previewEl.classList.add("invisible");
-      }
     }
 
     // Update button styling
@@ -609,7 +603,7 @@ function updateDisplay() {
   // Update history toggle arrow
   const historyArrow = document.getElementById("history-arrow");
   if (historyArrow) {
-    historyArrow.className = `text-sm transform transition-transform duration-200 ${showHistory ? 'rotate-180' : ''}`;
+    historyArrow.className = `text-sm transform transition-transform duration-200 ${showHistory ? 'rotate-180' : 'rotate-0'}`;
   }
 
   // Update history container visibility
@@ -751,18 +745,7 @@ function handleNewExercise() {
   app.innerHTML = createGameUI();
 }
 
-/**
- * Toggle preview visibility
- */
-function togglePreviews() {
-  showPreviews = !showPreviews;
-  
-  // Re-render UI to update all button states and toggle button appearance
-  app.innerHTML = createGameUI();
 
-  // Reapply dynamic scaling and other display updates after re-render
-  updateDisplay();
-}
 
 /**
  * Toggle history visibility
@@ -861,8 +844,6 @@ function setupGlobalEventListeners() {
       const levelBtn = e.target.closest(".level-btn");
       const difficulty = parseInt(levelBtn.dataset.level);
       handleDifficultySelect(difficulty);
-    } else if (e.target.closest("#preview-toggle-btn")) {
-      togglePreviews();
     } else if (e.target.closest("#history-toggle-btn")) {
       toggleHistory();
     }
