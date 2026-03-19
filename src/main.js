@@ -264,7 +264,7 @@ function createGameUI() {
         <div class="flex flex-col gap-2 ml-4">
           <div class="text-center">
             <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">Moves</div>
-            <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}</div>
+            <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}/${exercise.optimalMoves}</div>
           </div>
           <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all active:scale-95" id="new-exercise-btn">
             🎲 New
@@ -445,7 +445,7 @@ function updateDisplay() {
 
   // Update moves counter
   const movesEl = document.getElementById("moves-count");
-  if (movesEl) movesEl.textContent = gameState.moves;
+  if (movesEl) movesEl.textContent = gameState.moves + "/" + gameManager.currentExercise.optimalMoves;
 
   // Check for win condition
   if (gameState.isComplete) {
