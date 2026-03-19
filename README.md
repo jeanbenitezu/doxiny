@@ -6,9 +6,6 @@ A minimalist mathematical puzzle game where you transform numbers using 4 operat
 
 - **Goal**: Transform numbers using 4 operations to reach the target
 - **Progressive Levels**:
-  - **Level 1 (Beginner)**: 1 → 10
-  - **Level 2 (Intermediate)**: 1 → 25  
-  - **Level 3 (Expert)**: 1 → 128
 - **Operations**:
   - **REVERSE**: Reverse all digits (12 → 21)
   - **SUM DIGITS**: Add all digits (128 → 11)
@@ -55,7 +52,7 @@ npm run preview
 ```
 ├── src/
 │   ├── main.js       # Main entry point & UI
-│   ├── game.js       # Game engine & state management  
+│   ├── game.js       # Game engine & state management
 │   ├── operations.js # Mathematical operations
 │   └── style.css     # Mobile-first styles
 ├── public/
@@ -70,7 +67,7 @@ npm run preview
 Spoiler-free hints for getting started:
 
 - Experiment with combinations - operations interact in interesting ways
-- The SHIFT operation creates cycles that can be very useful
+- DOUBLE operation can help reach larger targets quickly
 - SUM DIGITS is great for reducing large numbers
 - REVERSE can create surprising new patterns
 - Track your best solutions and try to optimize!
