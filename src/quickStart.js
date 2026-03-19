@@ -69,19 +69,8 @@ export class SimpleGameIntegration {
             goal: this.currentExercise.goal,
             level: this.difficulty,
             levelName: this.currentExercise.levelName,
-            optimalMoves: this.currentExercise.optimalMoves,
-            isInteresting: this.currentExercise.metadata.isInteresting,
-            features: this.getFeatureText()
+            optimalMoves: this.currentExercise.optimalMoves
         };
-    }
-
-    // Get exercise features for UI display
-    getFeatureText() {
-        const features = [];
-        if (this.currentExercise.metadata.isPowerOf2) features.push('💫 Power of 2');
-        if (this.currentExercise.metadata.isPalindrome) features.push('🪞 Palindrome');
-        if (this.currentExercise.metadata.isInteresting) features.push('⭐ Special');
-        return features.join(' ');
     }
 
     // Handle level completion
@@ -131,7 +120,6 @@ export class SimpleGameIntegration {
     <p>${exercise.description}</p>
     <div class="goal-display">
         Goal: 1 → ${exercise.goal}
-        ${exercise.features} <!-- Show special number properties -->
     </div>
     <div class="target-moves">
         Target: ≤ ${exercise.optimalMoves} moves
@@ -194,14 +182,14 @@ export function advancedFeatures() {
     console.log('  - Tutorial for specific operation patterns\n');
     
     console.log('• 🏆 Achievement System');
-    console.log('  - "Power of 2 Master" - Solve 10 power-of-2 goals');
+    console.log('  - "Speed Master" - Solve exercises quickly');
     console.log('  - "Efficiency Expert" - 5 perfect solutions in a row');
-    console.log('  - "Pattern Recognition" - Solve palindromes quickly\n');
+    console.log('  - "Level Champion" - Complete all difficulty levels\n');
     
     console.log('• 🎲 Special Game Modes');
     console.log('  - Time Attack: Solve as many as possible in 5 minutes');
     console.log('  - Daily Challenge: One special exercise per day');
-    console.log('  - Puzzle of the Day: Community-shared interesting numbers\n');
+    console.log('  - Puzzle of the Day: Community-shared challenging exercises\n');
     
     console.log('• 📈 Adaptive Difficulty');
     console.log('  - Real-time difficulty adjustment');

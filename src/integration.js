@@ -298,7 +298,7 @@ export function exampleUsage() {
   const practiceSet = game.generatePracticeSet(3);
   console.log(`\n📚 Generated ${practiceSet.exercises.length} practice exercises:`);
   practiceSet.exercises.forEach((ex, i) => {
-    console.log(`   ${i + 1}. Goal: ${ex.goal} (${ex.optimalMoves} moves) - ${ex.metadata.isInteresting ? '⭐' : '📝'}`);
+    console.log(`   ${i + 1}. Goal: ${ex.goal} (${ex.optimalMoves} moves)`);
   });
 }
 
@@ -319,7 +319,6 @@ export function integrationTips() {
   
   console.log('\n3. Enhanced UI feedback:');
   console.log('   // Show optimal moves, efficiency percentage, skill level');
-  console.log('   // Display interesting number properties (palindrome, power of 2, etc.)');
   
   console.log('\n4. Practice mode:');
   console.log('   // Generate batches for practice sessions');
