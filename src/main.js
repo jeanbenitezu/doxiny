@@ -428,32 +428,34 @@ function createGameUI() {
     </div>
     
     <!-- Success Modal -->
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm success-modal hidden" id="success-modal">
-      <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-3 border-emerald-500 rounded-3xl p-8 max-w-sm w-11/12 text-center shadow-2xl shadow-emerald-500/30">
-        <div class="text-6xl mb-4 celebration-emoji" id="celebration-emoji">🎉</div>
-        <h2 class="text-3xl font-bold text-emerald-400 mb-4 drop-shadow-lg" id="success-title">Level Complete!</h2>
-        <p class="text-white/90 text-xl mb-6" id="success-message">Great job!</p>
-        <div class="flex gap-8 justify-center mb-4">
+    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40" id="success-modal">
+      <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-t-4 border-emerald-500 rounded-t-3xl p-3 max-w-md mx-auto text-center shadow-2xl shadow-emerald-500/30">
+        <div class="flex items-center justify-center gap-3 mb-2">
+          <div class="text-4xl celebration-emoji" id="celebration-emoji">🎉</div>
+          <h2 class="text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">Level Complete!</h2>
+        </div>
+        <p class="text-white/90 text-lg mb-2" id="success-message">Great job!</p>
+        <div class="flex gap-6 justify-center mb-2">
           <div class="flex flex-col items-center">
-            <span class="text-white/70 text-sm uppercase tracking-wide font-semibold">Moves</span>
-            <span class="text-emerald-400 text-2xl font-bold drop-shadow-lg" id="final-moves">0</span>
+            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">Moves</span>
+            <span class="text-emerald-400 text-xl font-bold drop-shadow-lg" id="final-moves">0</span>
           </div>
           <div class="flex flex-col items-center">
-            <span class="text-white/70 text-sm uppercase tracking-wide font-semibold">Target</span>
-            <span class="text-emerald-400 text-2xl font-bold drop-shadow-lg" id="final-optimal">0</span>
+            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">Target</span>
+            <span class="text-emerald-400 text-xl font-bold drop-shadow-lg" id="final-optimal">0</span>
           </div>
           <div class="flex flex-col items-center">
-            <span class="text-white/70 text-sm uppercase tracking-wide font-semibold">Efficiency</span>
-            <span class="text-yellow-400 text-2xl font-bold drop-shadow-lg" id="final-efficiency">100%</span>
+            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">Efficiency</span>
+            <span class="text-yellow-400 text-xl font-bold drop-shadow-lg" id="final-efficiency">100%</span>
           </div>
         </div>
         
-        <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-4 hidden">
+        <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-2 hidden">
           📈 <span id="difficulty-change-text"></span>
         </div>
-        <div class="flex gap-4 justify-center flex-wrap">
-          <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-6 py-3 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">Next Exercise 🎯</button>
-          <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-6 py-3 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">Retry Exercise</button>
+        <div class="flex gap-4 justify-center">
+          <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">Next 🎯</button>
+          <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">Retry</button>
         </div>
       </div>
     </div>
