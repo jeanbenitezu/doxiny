@@ -4,7 +4,7 @@
  */
 
 import { createGameState, applyMove, resetGame } from "./game.js";
-import { operationLabels } from "./operations.js";
+import { operations, operationLabels } from "./operations.js";
 import { generateExercise, getDifficultyLevels } from "./exerciseGenerator.js";
 import "./style.css";
 
@@ -148,6 +148,32 @@ let gameState = createGameState(
 // Get available difficulty levels for UI
 const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
 
+/**
+ * Generate preview text for what each operation will do to current number
+ */
+function getOperationPreviews(currentNumber) {
+  const previews = {};
+  
+  // FLIP/REVERSE preview
+  const reversed = operations.mirror(currentNumber);
+  previews.mirror = `${currentNumber} → ${reversed}`;
+  
+  // SUM preview
+  const sum = operations.sum(currentNumber);
+  const digits = currentNumber.toString().split('').join(' + ');
+  previews.sum = `${digits} → ${sum}`;
+  
+  // ADD 1 preview
+  const appended = operations.add1Right(currentNumber);
+  previews.add1Right = `${currentNumber} → ${appended}`;
+  
+  // DOUBLE preview
+  const doubled = operations.double(currentNumber);
+  previews.double = `${currentNumber} × 2 → ${doubled}`;
+  
+  return previews;
+}
+
 // DOM elements
 const app = document.querySelector("#app");
 
@@ -285,10 +311,13 @@ function createGameUI() {
       <section class="grid grid-cols-2 gap-3" data-purpose="game-controls">
         ${Object.entries(operationLabels)
           .map(
-            ([op, label]) =>
-              `<button class="bg-[#ef4444] hover:bg-[#dc2626] text-white font-black py-5 rounded-2xl shadow-lg uppercase tracking-widest text-lg transition-transform active:scale-95 operation-btn" data-operation="${op}" aria-label="${label} operation">
-            ${label}
-          </button>`,
+            ([op, label]) => {
+              const previews = getOperationPreviews(gameState.current);
+              return `<button class="bg-[#ef4444] hover:bg-[#dc2626] text-white font-black py-4 px-2 rounded-2xl shadow-lg uppercase tracking-widest transition-transform active:scale-95 operation-btn flex flex-col items-center gap-1" data-operation="${op}" aria-label="${label} operation">
+            <span class="text-lg">${label}</span>
+            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text" data-operation="${op}">${previews[op]}</span>
+          </button>`;
+            }
           )
           .join("")}
       </section>
@@ -331,10 +360,10 @@ function createGameUI() {
               <span class="text-lg font-bold text-blue-300">Operations:</span>
             </div>
             <div class="space-y-2">
-              <div>• <span class="font-bold text-yellow-300">MIRROR:</span> Reverse digits (12 → 21)</div>
-              <div>• <span class="font-bold text-yellow-300">SUM:</span> Add digits (123 → 6)</div>
-              <div>• <span class="font-bold text-yellow-300">ADD 1:</span> Append 1 (4 → 41)</div>
-              <div>• <span class="font-bold text-yellow-300">×2:</span> Double the number (8 → 16)</div>
+              <div>• <span class="font-bold text-yellow-300">REVERSE:</span> Reverse digits (12 → 21)</div>
+              <div>• <span class="font-bold text-yellow-300">SUM DIGITS:</span> Add digits (123 → 6)</div>
+              <div>• <span class="font-bold text-yellow-300">APPEND 1:</span> Append 1 (4 → 41)</div>
+              <div>• <span class="font-bold text-yellow-300">DOUBLE (×2):</span> Double the number (8 → 16)</div>
             </div>
           </div>
           <div class="mb-4">
@@ -462,6 +491,15 @@ function updateDisplay() {
       movesEl.classList.add('text-red-400');
     }
   }
+
+  // Update operation preview text
+  const previews = getOperationPreviews(gameState.current);
+  document.querySelectorAll('.preview-text').forEach(previewEl => {
+    const operation = previewEl.dataset.operation;
+    if (previews[operation]) {
+      previewEl.textContent = previews[operation];
+    }
+  });
 
   // Check for win condition
   if (gameState.isComplete) {

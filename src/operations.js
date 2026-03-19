@@ -44,10 +44,10 @@ export const operations = {
  * Get human-readable operation names for UI
  */
 export const operationLabels = {
-  mirror: "MIRROR",
-  sum: "SUM",
-  add1Right: "ADD 1",
-  double: "×2",
+  mirror: "REVERSE",
+  sum: "SUM DIGITS",
+  add1Right: "APPEND 1",
+  double: "DOUBLE (×2)",
 };
 
 /**
