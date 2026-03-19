@@ -443,9 +443,25 @@ function updateDisplay() {
     setTimeout(() => currentEl.classList.remove("updated"), 300);
   }
 
-  // Update moves counter
+  // Update moves counter with dynamic color
   const movesEl = document.getElementById("moves-count");
-  if (movesEl) movesEl.textContent = gameState.moves + "/" + gameManager.currentExercise.optimalMoves;
+  if (movesEl) {
+    movesEl.textContent = gameState.moves + "/" + gameManager.currentExercise.optimalMoves;
+    
+    // Apply color based on performance vs optimal
+    const optimalMoves = gameManager.currentExercise.optimalMoves;
+    
+    // Remove existing color classes
+    movesEl.className = movesEl.className.replace(/text-(green|orange|red)-\d+/g, '');
+    
+    if (gameState.moves < optimalMoves) {
+      movesEl.classList.add('text-green-400');
+    } else if (gameState.moves === optimalMoves) {
+      movesEl.classList.add('text-orange-400');
+    } else {
+      movesEl.classList.add('text-red-400');
+    }
+  }
 
   // Check for win condition
   if (gameState.isComplete) {
