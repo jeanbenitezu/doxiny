@@ -3,7 +3,7 @@
  * Manages game state, moves, and history
  */
 
-import { operations, isValidOperation } from './operations.js';
+import { operations, isValidOperation } from "./operations.js";
 
 /**
  * Create initial game state
@@ -14,9 +14,9 @@ export function createGameState(goalNumber = 10, level = 1) {
     goal: goalNumber,
     level: level,
     moves: 0,
-    history: [{ action: 'START', value: 1 }],
+    history: [{ action: "START", value: 1 }],
     isComplete: false,
-    startTime: Date.now()
+    startTime: Date.now(),
   };
 }
 
@@ -39,8 +39,8 @@ export function applyMove(state, operation) {
     moves: state.moves + 1,
     history: [
       ...state.history,
-      { action: operation.toUpperCase(), value: newValue }
-    ]
+      { action: operation.toUpperCase(), value: newValue },
+    ],
   };
 
   // Check if goal is reached

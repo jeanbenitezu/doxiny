@@ -3,48 +3,48 @@
  * Creates solvable exercises with appropriate difficulty scaling
  */
 
-import { operations } from './operations.js';
+import { operations } from "./operations.js";
 
 /**
  * Simple difficulty configuration
  */
 const difficultyLevels = {
-  1: { 
-    name: 'Beginner',
-    description: 'Learn the basics',
+  1: {
+    name: "Beginner",
+    description: "Learn the basics",
     targetMoves: [3, 6],
-    goalRange: [5, 20]
+    goalRange: [5, 20],
   },
-  2: { 
-    name: 'Easy',
-    description: 'Building confidence',
+  2: {
+    name: "Easy",
+    description: "Building confidence",
     targetMoves: [4, 8],
-    goalRange: [10, 50]
+    goalRange: [10, 50],
   },
-  3: { 
-    name: 'Medium',
-    description: 'Strategic thinking',
+  3: {
+    name: "Medium",
+    description: "Strategic thinking",
     targetMoves: [5, 10],
-    goalRange: [20, 100]
+    goalRange: [20, 100],
   },
-  4: { 
-    name: 'Hard',
-    description: 'Advanced tactics',
+  4: {
+    name: "Hard",
+    description: "Advanced tactics",
     targetMoves: [6, 12],
-    goalRange: [50, 200]
+    goalRange: [50, 200],
   },
-  5: { 
-    name: 'Expert',
-    description: 'Master level',
+  5: {
+    name: "Expert",
+    description: "Master level",
     targetMoves: [7, 15],
-    goalRange: [100, 500]
+    goalRange: [100, 500],
   },
-  6: { 
-    name: 'Insane',
-    description: 'Ultimate challenge',
+  6: {
+    name: "Insane",
+    description: "Ultimate challenge",
     targetMoves: [8, 18],
-    goalRange: [300, 999]
-  }
+    goalRange: [300, 999],
+  },
 };
 
 /**
@@ -53,43 +53,46 @@ const difficultyLevels = {
 function generateSimpleExercise(difficulty) {
   const config = difficultyLevels[difficulty];
   const [minGoal, maxGoal] = config.goalRange;
-  
+
   // Try more goals with slightly more flexible criteria
   for (let attempt = 0; attempt < 25; attempt++) {
     const goal = Math.floor(Math.random() * (maxGoal - minGoal + 1)) + minGoal;
     const validation = validateExercise(goal, 25); // Increased max moves for validation
-    
-    if (validation.solvable && 
-        validation.minMoves >= config.targetMoves[0] && 
-        validation.minMoves <= config.targetMoves[1] + 5) { // More flexible move range
+
+    if (
+      validation.solvable &&
+      validation.minMoves >= config.targetMoves[0] &&
+      validation.minMoves <= config.targetMoves[1] + 5
+    ) {
+      // More flexible move range
       return {
         goal,
         optimalMoves: validation.minMoves,
-        solutionPath: validation.solutionPath
+        solutionPath: validation.solutionPath,
       };
     }
   }
-  
+
   // Fallback to diverse known good goals for each difficulty
   const fallbackGoals = {
     1: [10, 12, 21],
-    2: [25, 34, 43, 55], 
+    2: [25, 34, 43, 55],
     3: [64, 89, 98, 77],
     4: [128, 132, 231, 189],
     5: [256, 289, 982, 334, 443],
-    6: [729, 867, 678, 987, 765, 345, 534, 672, 267, 387, 783, 832, 238]
+    6: [729, 867, 678, 987, 765, 345, 534, 672, 267, 387, 783, 832, 238],
   };
-  
+
   const goalOptions = fallbackGoals[difficulty] || [171];
   // Pick a random goal from the fallback options instead of always the same one
   const randomIndex = Math.floor(Math.random() * goalOptions.length);
   const fallbackGoal = goalOptions[randomIndex];
   const validation = validateExercise(fallbackGoal);
-  
+
   return {
     goal: fallbackGoal,
     optimalMoves: validation.minMoves,
-    solutionPath: validation.solutionPath
+    solutionPath: validation.solutionPath,
   };
 }
 
@@ -100,30 +103,30 @@ function validateExercise(goal, maxMoves = 20) {
   // Simple BFS to verify solvability
   const queue = [{ current: 1, steps: 0, path: [] }];
   const visited = new Set([1]);
-  
+
   while (queue.length > 0) {
     const { current, steps, path } = queue.shift();
-    
+
     if (current === goal) {
       return { solvable: true, minMoves: steps, solutionPath: path };
     }
-    
+
     if (steps >= maxMoves || visited.size > 1000) continue;
-    
+
     for (const [opName, opFunc] of Object.entries(operations)) {
       const next = opFunc(current);
-      
+
       if (next > 0 && next <= 10000 && !visited.has(next)) {
         visited.add(next);
         queue.push({
           current: next,
           steps: steps + 1,
-          path: [...path, { operation: opName, from: current, to: next }]
+          path: [...path, { operation: opName, from: current, to: next }],
         });
       }
     }
   }
-  
+
   return { solvable: false, minMoves: Infinity, solutionPath: [] };
 }
 
@@ -134,10 +137,10 @@ export function generateExercise(difficulty = 3) {
   if (!difficultyLevels[difficulty]) {
     throw new Error(`Invalid difficulty level: ${difficulty}. Must be 1-6.`);
   }
-  
+
   const config = difficultyLevels[difficulty];
   const result = generateSimpleExercise(difficulty);
-  
+
   return {
     goal: result.goal,
     level: difficulty,
@@ -145,7 +148,7 @@ export function generateExercise(difficulty = 3) {
     description: config.description,
     optimalMoves: result.optimalMoves,
     difficulty: config.name.toLowerCase(),
-    solutionPath: result.solutionPath
+    solutionPath: result.solutionPath,
   };
 }
 
@@ -155,6 +158,6 @@ export function generateExercise(difficulty = 3) {
 export function getDifficultyLevels() {
   return Object.entries(difficultyLevels).map(([level, config]) => ({
     level: parseInt(level),
-    ...config
+    ...config,
   }));
 }

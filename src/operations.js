@@ -9,17 +9,17 @@ export const operations = {
    * Examples: 12 → 21, 100 → 1, 1234 → 4321
    */
   mirror: (n) => {
-    return parseInt(n.toString().split('').reverse().join('')) || 0;
+    return parseInt(n.toString().split("").reverse().join("")) || 0;
   },
 
   /**
-   * SUM: Add all digits together  
+   * SUM: Add all digits together
    * Examples: 128 → 1+2+8 = 11, 99 → 9+9 = 18
    */
   sum: (n) => {
     return n
       .toString()
-      .split('')
+      .split("")
       .reduce((acc, digit) => acc + Number(digit), 0);
   },
 
@@ -28,7 +28,7 @@ export const operations = {
    * Examples: 4 → 41, 12 → 121
    */
   add1Right: (n) => {
-    return parseInt(n.toString() + '1');
+    return parseInt(n.toString() + "1");
   },
 
   /**
@@ -37,17 +37,17 @@ export const operations = {
    */
   double: (n) => {
     return n * 2;
-  }
+  },
 };
 
 /**
  * Get human-readable operation names for UI
  */
 export const operationLabels = {
-  mirror: 'MIRROR',
-  sum: 'SUM', 
-  add1Right: 'ADD 1',
-  double: '×2'
+  mirror: "MIRROR",
+  sum: "SUM",
+  add1Right: "ADD 1",
+  double: "×2",
 };
 
 /**
