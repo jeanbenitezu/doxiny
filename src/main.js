@@ -148,6 +148,17 @@ let gameState = createGameState(
 // UI state for preview visibility
 let showPreviews = false;
 
+// Dynamic move limit based on exercise difficulty
+let moveLimit = 12;
+
+/**
+ * Update move limit based on current exercise optimal moves
+ */
+function updateMoveLimit() {
+  moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 12);
+  console.log(`🎯 Move limit updated to: ${moveLimit} (optimal: ${gameManager.currentExercise.optimalMoves})`);
+}
+
 // Get available difficulty levels for UI
 const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
 
@@ -293,7 +304,7 @@ function createGameUI() {
         <div class="flex flex-col gap-2 ml-4">
           <div class="text-center">
             <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">Moves</div>
-            <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}/${exercise.optimalMoves}</div>
+            <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
           </div>
           <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all active:scale-95" id="new-exercise-btn">
             🎲 New
@@ -315,7 +326,7 @@ function createGameUI() {
         ${Object.entries(operationLabels)
           .map(([op, label]) => {
             const previews = getOperationPreviews(gameState.current);
-            const isBlocked = gameState.moves >= 12;
+            const isBlocked = gameState.moves >= moveLimit;
             const buttonClass = isBlocked
               ? "bg-gray-600 text-gray-400 cursor-not-allowed"
               : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
@@ -330,7 +341,7 @@ function createGameUI() {
       
       <!-- Utility Row -->
       <section class="grid grid-cols-4 gap-2" data-purpose="utility-controls">
-        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= 12 ? "ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn">
+        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= moveLimit ? "ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn">
           <span>🔄</span> Reset
         </button>
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
@@ -504,11 +515,10 @@ function updateDisplay() {
   // Update moves counter with dynamic color
   const movesEl = document.getElementById("moves-count");
   if (movesEl) {
-    movesEl.textContent =
-      gameState.moves + "/" + gameManager.currentExercise.optimalMoves;
-
     // Apply color based on performance vs optimal
     const optimalMoves = gameManager.currentExercise.optimalMoves;
+    movesEl.textContent =
+      gameState.moves + "/" + (optimalMoves === Infinity ? "∞" : optimalMoves);
 
     // Remove existing color classes
     movesEl.className = movesEl.className.replace(
@@ -527,7 +537,7 @@ function updateDisplay() {
 
   // Update operation preview text and button states
   const previews = getOperationPreviews(gameState.current);
-  const isBlocked = gameState.moves >= 12;
+  const isBlocked = gameState.moves >= moveLimit;
 
   document.querySelectorAll(".operation-btn").forEach((btn) => {
     const operation = btn.dataset.operation;
@@ -650,7 +660,7 @@ function showSuccessModal() {
  * Handle operation button clicks
  */
 function handleOperationClick(operation) {
-  if (!gameState.isComplete && gameState.moves < 12) {
+  if (!gameState.isComplete && gameState.moves < moveLimit) {
     try {
       // Calculate what the result would be
       const resultValue = operations[operation](gameState.current);
@@ -683,6 +693,7 @@ function handleReset() {
  */
 function handleNewExercise() {
   gameManager.generateNewExercise();
+  updateMoveLimit();
   gameState = createGameState(
     gameManager.currentExercise.goal,
     gameManager.currentDifficulty,
@@ -724,6 +735,7 @@ function handleRetryExercise() {
  */
 function handleDifficultySelect(difficulty) {
   if (gameManager.setDifficulty(difficulty)) {
+    updateMoveLimit();
     gameState = createGameState(
       gameManager.currentExercise.goal,
       gameManager.currentDifficulty,
@@ -840,6 +852,9 @@ function init() {
 
   // Set up global event listeners (only once)
   setupGlobalEventListeners();
+
+  // Update move limit for initial exercise
+  updateMoveLimit();
 
   // Render initial UI
   app.innerHTML = createGameUI();
