@@ -146,7 +146,7 @@ let gameState = createGameState(
 );
 
 // UI state for preview visibility
-let showPreviews = false;
+let showPreviews = true;
 
 // Dynamic move limit based on exercise difficulty
 let moveLimit = 12;
@@ -383,15 +383,12 @@ function createGameUI() {
       </section>
       
       <!-- Utility Row -->
-      <section class="grid grid-cols-4 gap-2" data-purpose="utility-controls">
+      <section class="grid grid-cols-3 gap-2" data-purpose="utility-controls">
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= moveLimit ? "ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn">
           <span>🔄</span> Reset
         </button>
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
           <span>ℹ️</span> Help
-        </button>
-        <button class="bg-[#4a5568] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95" id="history-btn">
-          <span>📋</span> History
         </button>
         <button class="bg-[#6b46c1] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn">
           <span>${showPreviews ? "👁️" : "🙈"}</span> Preview
@@ -399,19 +396,6 @@ function createGameUI() {
       </section>
     </main>
     <!-- END: GameBoard -->
-    
-    <!-- History Overlay Modal -->
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm history-modal hidden" id="history-modal">
-      <div class="bg-gradient-to-br from-[#1f2937] to-[#111827] border-2 border-gray-600 rounded-3xl p-6 max-w-sm w-11/12 max-h-[70vh] overflow-hidden">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-white font-bold uppercase tracking-widest text-lg">📋 Move History</h3>
-          <button class="text-gray-400 hover:text-white text-2xl font-bold" id="close-history-btn">×</button>
-        </div>
-        <div class="bg-[#111827] rounded-xl p-4 font-mono text-sm max-h-[50vh] overflow-y-auto" id="history-content">
-          ${renderHistory()}
-        </div>
-      </div>
-    </div>
     
     <!-- Info Modal -->
     <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm info-modal hidden" id="info-modal">
@@ -464,14 +448,6 @@ function createGameUI() {
           </div>
         </div>
         
-        <!-- Move History Section -->
-        <div class="bg-[#111827] rounded-xl p-4 mb-4 max-h-40 overflow-y-auto">
-          <h4 class="text-white/70 text-sm uppercase tracking-wide font-semibold mb-2 text-center">Your Solution</h4>
-          <div class="font-mono text-xs" id="success-history">
-            <!-- History will be populated here -->
-          </div>
-        </div>
-        
         <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-4 hidden">
           📈 <span id="difficulty-change-text"></span>
         </div>
@@ -484,47 +460,7 @@ function createGameUI() {
   `;
 }
 
-/**
- * Render game history
- */
-function renderHistory() {
-  if (gameState.history.length === 0) {
-    return `<div class="flex justify-between items-center opacity-70">
-      <div class="flex items-center gap-2">
-        <span class="text-gray-600">1.</span>
-        <span class="text-orange-500 font-bold ml-2">START</span>
-      </div>
-      <span class="text-emerald-500">[1]</span>
-    </div>`;
-  }
 
-  return gameState.history
-    .map((entry, index) => {
-      let iconHtml = '';
-      if (index > 0) { // Skip START entry
-        const operationKey = entry.action.toLowerCase().replace(' ', '');
-        const operationMap = {
-          'reverse': 'reverse',
-          'sum': 'sum', 
-          'sumdigits': 'sum',
-          'append1': 'append1',
-          'double': 'double'
-        };
-        const op = operationMap[operationKey] || operationMap[entry.action.toLowerCase()];
-        iconHtml = getOperationIcon(op, '#f97316'); // orange-500
-      }
-      
-      return `<div class="flex justify-between items-center opacity-70 ${index < gameState.history.length - 1 ? "border-b border-white/10 pb-2 mb-2" : ""}">
-        <div class="flex items-center gap-2">
-          <span class="text-gray-600">${index + 1}.</span>
-          ${iconHtml}
-          <span class="text-orange-500 font-bold">${entry.action}</span>
-        </div>
-        <span class="text-emerald-500">[${entry.value}]</span>
-      </div>`;
-    })
-    .join("");
-}
 
 /**
  * Render inline history with colored SVG icons
@@ -555,16 +491,7 @@ function renderInlineHistory() {
     .join("");
 }
 
-/**
- * Update the history modal content
- */
-function updateHistoryModal() {
-  const historyContent = document.getElementById("history-content");
-  if (historyContent) {
-    historyContent.innerHTML = renderHistory();
-    historyContent.scrollTop = historyContent.scrollHeight; // Auto-scroll to bottom
-  }
-}
+
 
 /**
  * Update the game display
@@ -694,7 +621,6 @@ function showSuccessModal() {
   const difficultyChangeText = document.getElementById(
     "difficulty-change-text",
   );
-  const successHistory = document.getElementById("success-history");
 
   if (modal && finalMoves) {
     // Process exercise completion with game manager
@@ -706,11 +632,6 @@ function showSuccessModal() {
     finalMoves.textContent = gameState.moves;
     finalOptimal.textContent = exercise.optimalMoves;
     finalEfficiency.textContent = `${efficiency}%`;
-
-    // Update history in success modal
-    if (successHistory) {
-      successHistory.innerHTML = renderHistory();
-    }
 
     // Set grade-based content
     const gradeData = completionResult.grade;
@@ -896,11 +817,6 @@ function setupGlobalEventListeners() {
       const levelBtn = e.target.closest(".level-btn");
       const difficulty = parseInt(levelBtn.dataset.level);
       handleDifficultySelect(difficulty);
-    } else if (e.target.closest("#history-btn")) {
-      document.getElementById("history-modal").classList.remove("hidden");
-      updateHistoryModal();
-    } else if (e.target.closest("#close-history-btn")) {
-      document.getElementById("history-modal").classList.add("hidden");
     } else if (e.target.closest("#preview-toggle-btn")) {
       togglePreviews();
     }
