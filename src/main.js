@@ -512,32 +512,34 @@ function setupGlobalEventListeners() {
   
   // Single global click handler using event delegation
   document.addEventListener('click', (e) => {
-    if (e.target.matches('.operation-btn')) {
-      const operation = e.target.dataset.operation;
+    if (e.target.closest('.operation-btn')) {
+      const operationBtn = e.target.closest('.operation-btn');
+      const operation = operationBtn.dataset.operation;
       handleOperationClick(operation);
-    } else if (e.target.matches('#reset-btn')) {
+    } else if (e.target.closest('#reset-btn')) {
       handleReset();
-    } else if (e.target.matches('#new-exercise-btn')) {
+    } else if (e.target.closest('#new-exercise-btn')) {
       handleNewExercise();
-    } else if (e.target.matches('#hint-btn')) {
+    } else if (e.target.closest('#hint-btn')) {
       showHint();
-    } else if (e.target.matches('#close-hint-btn')) {
+    } else if (e.target.closest('#close-hint-btn')) {
       document.getElementById('hint-modal').classList.add('hidden');
-    } else if (e.target.matches('#info-btn')) {
+    } else if (e.target.closest('#info-btn')) {
       showInfoModal();
-    } else if (e.target.matches('#next-exercise-btn')) {
+    } else if (e.target.closest('#next-exercise-btn')) {
       document.getElementById('success-modal').classList.add('hidden');
       handleNextExercise();
-    } else if (e.target.matches('#retry-exercise-btn')) {
+    } else if (e.target.closest('#retry-exercise-btn')) {
       document.getElementById('success-modal').classList.add('hidden');
       handleRetryExercise();
-    } else if (e.target.matches('.level-btn')) {
-      const difficulty = parseInt(e.target.dataset.level);
+    } else if (e.target.closest('.level-btn')) {
+      const levelBtn = e.target.closest('.level-btn');
+      const difficulty = parseInt(levelBtn.dataset.level);
       handleDifficultySelect(difficulty);
-    } else if (e.target.matches('#history-btn')) {
+    } else if (e.target.closest('#history-btn')) {
       document.getElementById('history-modal').classList.remove('hidden');
       updateHistoryModal();
-    } else if (e.target.matches('#close-history-btn')) {
+    } else if (e.target.closest('#close-history-btn')) {
       document.getElementById('history-modal').classList.add('hidden');
     }
   });
