@@ -11,11 +11,6 @@ const CACHE_NAME = `number-puzzle-v${CACHE_VERSION}-${BUILD_TIMESTAMP}`;
 const urlsToCache = [
   './',
   './index.html',
-  './src/main.js',
-  './src/game.js', 
-  './src/operations.js',
-  './src/exerciseGenerator.js',
-  './src/style.css',
   './manifest.json'
 ];
 
@@ -73,7 +68,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - serve from cache with network fallback
+// Fetch event - serve from cache with network fallback and dynamic caching
 self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') {
@@ -99,11 +94,19 @@ self.addEventListener('fetch', (event) => {
             // Clone the response
             const responseToCache = response.clone();
             
-            // Add to cache for future requests
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
+            // Cache assets dynamically (JS, CSS, images)
+            const url = new URL(event.request.url);
+            if (url.pathname.includes('/assets/') || 
+                url.pathname.endsWith('.js') || 
+                url.pathname.endsWith('.css') ||
+                url.pathname.endsWith('.png') ||
+                url.pathname.endsWith('.svg')) {
+              
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(event.request, responseToCache);
+                });
+            }
             
             return response;
           })
