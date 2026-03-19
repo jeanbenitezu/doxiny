@@ -5,7 +5,7 @@
 
 // Generate cache version based on current timestamp for automatic updates
 const CACHE_VERSION = '1.0.0';
-const BUILD_TIMESTAMP = 1773957273947; // Built on: 2026-03-19T00:58:30.397Z
+const BUILD_TIMESTAMP = 1773958920565; // Built on: 2026-03-19T00:58:30.397Z
 const CACHE_NAME = `number-puzzle-v${CACHE_VERSION}-${BUILD_TIMESTAMP}`;
 
 const urlsToCache = [
