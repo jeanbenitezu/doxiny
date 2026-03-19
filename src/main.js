@@ -1,23 +1,121 @@
 /**
  * Number Puzzle PWA - Main Entry Point
- * Mobile-first mathematical puzzle game
+ * Mobile-first mathematical puzzle game with dynamic exercise generation
  */
 
 import { createGameState, applyMove, resetGame, getHints, getOptimalMoves, getLevelCompletionData } from './game.js';
 import { operationLabels } from './operations.js';
+import { generateExercise, getDifficultyLevels } from './exerciseGenerator.js';
 import './style.css';
 
-// Game state with progressive levels
-const levels = [
-  { goal: 10, name: "Beginner", description: "Master the basics" },
-  { goal: 25, name: "Intermediate", description: "Strategic thinking" }, 
-  { goal: 128, name: "Expert", description: "Ultimate challenge" }
-];
+// Dynamic game manager with exercise generation
+class GameManager {
+  constructor() {
+    this.currentDifficulty = 1;
+    this.currentExercise = null;
+    this.playerStats = {
+      exercisesCompleted: 0,
+      totalMoves: 0,
+      perfectSolutions: 0,
+      recentPerformance: [] // Last 5 exercises
+    };
+    this.generateNewExercise();
+  }
 
-let currentLevel = 0;
-let gameState = createGameState(levels[currentLevel].goal, currentLevel + 1);
+  generateNewExercise() {
+    this.currentExercise = generateExercise(this.currentDifficulty);
+    console.log(`🎯 New Exercise: 1 → ${this.currentExercise.goal} (${this.currentExercise.optimalMoves} moves optimal)`);
+    return this.currentExercise;
+  }
+
+  onExerciseComplete(moves) {
+    const optimal = this.currentExercise.optimalMoves;
+    const efficiency = optimal / moves;
+    const isPerfect = moves <= optimal;
+
+    // Update stats
+    this.playerStats.exercisesCompleted++;
+    this.playerStats.totalMoves += moves;
+    if (isPerfect) this.playerStats.perfectSolutions++;
+
+    // Track recent performance
+    this.playerStats.recentPerformance.push({
+      moves,
+      optimal,
+      efficiency,
+      isPerfect
+    });
+    
+    // Keep only last 5 exercises
+    if (this.playerStats.recentPerformance.length > 5) {
+      this.playerStats.recentPerformance.shift();
+    }
+
+    // Calculate level change
+    const levelChange = this.moveToNextLevel();
+
+    return {
+      efficiency,
+      isPerfect,
+      grade: this.getPerformanceGrade(efficiency),
+      levelChange
+    };
+  }
+
+  moveToNextLevel() {
+    const maxLevel = 6;
+    if (this.currentDifficulty < maxLevel) {
+      const oldDifficulty = this.currentDifficulty;
+      this.currentDifficulty++;
+      
+      console.log(`🎯 Advanced to level ${this.currentDifficulty}!`);
+      
+      return {
+        changed: true,
+        oldDifficulty,
+        newDifficulty: this.currentDifficulty,
+        direction: 'increased'
+      };
+    }
+    
+    return { changed: false };
+  }
+
+  getPerformanceGrade(efficiency) {
+    if (efficiency >= 1.0) return { grade: 'Perfect', emoji: '🏆', description: 'Optimal solution!' };
+    if (efficiency >= 0.85) return { grade: 'Excellent', emoji: '⭐', description: 'Amazing efficiency!' };
+    if (efficiency >= 0.7) return { grade: 'Great', emoji: '👍', description: 'Well done!' };
+    if (efficiency >= 0.55) return { grade: 'Good', emoji: '😊', description: 'Nice job!' };
+    return { grade: 'Keep trying', emoji: '💪', description: 'You can do better!' };
+  }
+
+  setDifficulty(newDifficulty) {
+    if (newDifficulty >= 1 && newDifficulty <= 6) {
+      this.currentDifficulty = newDifficulty;
+      this.generateNewExercise();
+      return true;
+    }
+    return false;
+  }
+
+  getCurrentExerciseInfo() {
+    const difficultyInfo = getDifficultyLevels().find(d => d.level === this.currentDifficulty);
+    return {
+      exercise: this.currentExercise,
+      difficulty: difficultyInfo,
+      stats: this.playerStats
+    };
+  }
+}
+
+// Initialize game manager
+const gameManager = new GameManager();
+let gameState = createGameState(gameManager.currentExercise.goal, gameManager.currentDifficulty);
 let hintsUsed = 0;
 let maxHints = 3;
+
+// Get available difficulty levels for UI
+const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
 
 // DOM elements
 const app = document.querySelector('#app');
@@ -43,36 +141,34 @@ function registerServiceWorker() {
  * Create the main game UI
  */
 function createGameUI() {
-  const level = levels[currentLevel];
-  const optimal = getOptimalMoves(currentLevel);
+  const exerciseInfo = gameManager.getCurrentExerciseInfo();
+  const exercise = exerciseInfo.exercise;
+  const difficultyInfo = exerciseInfo.difficulty;
   
   return `
     <!-- BEGIN: MainHeader -->
-    <header class="w-full max-w-md flex flex-col items-center mb-6 pt-4" data-purpose="app-header">
-      <div class="flex items-center gap-2 mb-6">
+    <header class="w-full max-w-md flex flex-col items-center pt-4" data-purpose="app-header">
+      <div class="flex items-center gap-2 mb-2">
         <span class="text-3xl">🧩</span>
         <h1 class="text-2xl font-bold tracking-widest uppercase">Number Puzzle</h1>
       </div>
       
-      <!-- Level Selector Segmented Control -->
+      <!-- Level Selector -->
       <nav class="w-full flex justify-between gap-2 mb-6" data-purpose="level-selector">
-        ${levels.map((lvl, idx) => 
-          `<button class="flex-1 ${idx === currentLevel ? 'bg-orange-600 border-2 border-orange-400 glow-active' : 'bg-[#2a2f3a] border border-white/10 opacity-60'} rounded-xl p-3 flex flex-col items-center transition-all active:scale-95 level-btn" 
-                   data-level="${idx}" ${idx > currentLevel ? 'disabled' : ''}>
-            <span class="text-xl font-bold">${idx + 1}</span>
+        ${availableLevels.map((lvl) => 
+          `<button class="flex-1 ${lvl.level === gameManager.currentDifficulty ? 'bg-orange-600 border-2 border-orange-400' : 'bg-[#2a2f3a] border border-white/10 opacity-60'} rounded-xl p-3 flex flex-col items-center transition-all active:scale-95 level-btn" 
+                   data-level="${lvl.level}">
+            <span class="text-xl font-bold">${lvl.level}</span>
             <span class="text-[10px] uppercase font-bold">${lvl.name}</span>
-            <span class="text-[10px] opacity-80">→ ${lvl.goal}</span>
           </button>`
         ).join('')}
       </nav>
       
-      <!-- Current Goal Badge -->
-      <div class="flex flex-col items-center gap-1">
-        <div class="bg-orange-600 px-6 py-1 rounded-full text-sm font-bold uppercase tracking-wider glow-orange border border-orange-400">
-          Level ${currentLevel + 1}: ${level.name}
-        </div>
-        <p class="text-gray-400 text-xs mt-2">${level.description}</p>
-        <p class="text-emerald-400 text-xs font-semibold">Target: ≤ ${optimal} moves</p>
+      <!-- Goal Display - CLEAR AND SIMPLE -->
+      <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-4 mb-4 text-center border-2 border-emerald-500">
+        <div class="text-white text-sm font-semibold uppercase tracking-wide mb-1">Goal</div>
+        <div class="text-white text-4xl font-black tracking-tight">Reach ${exercise.goal}</div>
+        <div class="text-emerald-200 text-xs mt-1">Transform 1 into ${exercise.goal}</div>
       </div>
     </header>
     <!-- END: MainHeader -->
@@ -107,15 +203,18 @@ function createGameUI() {
         </button>
       </section>
       
-      <!-- Stats Bar -->
-      <section class="border border-orange-900/50 bg-orange-900/10 rounded-xl p-3 flex justify-between items-center" data-purpose="stats-display">
-        <div class="text-orange-500 font-bold">
-          Moves: <span id="moves-count">${gameState.moves}</span>
+      <!-- Stats Bar - SIMPLIFIED -->
+      <section class="border border-orange-900/50 bg-orange-900/10 rounded-xl p-3 flex justify-center items-center" data-purpose="stats-display">
+        <div class="text-orange-400 text-lg font-bold">
+          Moves: <span id="moves-count" class="text-white">${gameState.moves}</span>
         </div>
-        <div class="bg-emerald-900/30 border border-emerald-500/50 rounded-full px-3 py-1 flex items-center gap-1">
-          <span class="text-[10px]">🎯</span>
-          <span class="text-emerald-400 text-xs font-bold">${gameState.moves <= optimal ? 'Perfect' : gameState.moves <= optimal + 2 ? 'Great' : 'Good'}</span>
-        </div>
+      </section>
+      
+      <!-- New Exercise Button -->
+      <section class="w-full">
+        <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 rounded-2xl shadow-lg uppercase tracking-wide transition-all active:scale-95" id="new-exercise-btn">
+          🎲 New Exercise
+        </button>
       </section>
     </main>
     <!-- END: GameBoard -->
@@ -144,19 +243,26 @@ function createGameUI() {
         <div class="text-6xl mb-4 celebration-emoji" id="celebration-emoji">🎉</div>
         <h2 class="text-3xl font-bold text-emerald-400 mb-4 drop-shadow-lg" id="success-title">Level Complete!</h2>
         <p class="text-white/90 text-xl mb-6" id="success-message">Great job!</p>
-        <div class="flex gap-8 justify-center mb-8">
+        <div class="flex gap-8 justify-center mb-4">
           <div class="flex flex-col items-center">
             <span class="text-white/70 text-sm uppercase tracking-wide font-semibold">Moves</span>
             <span class="text-emerald-400 text-2xl font-bold drop-shadow-lg" id="final-moves">0</span>
           </div>
           <div class="flex flex-col items-center">
             <span class="text-white/70 text-sm uppercase tracking-wide font-semibold">Target</span>
-            <span class="text-emerald-400 text-2xl font-bold drop-shadow-lg">${optimal}</span>
+            <span class="text-emerald-400 text-2xl font-bold drop-shadow-lg" id="final-optimal">0</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-white/70 text-sm uppercase tracking-wide font-semibold">Efficiency</span>
+            <span class="text-yellow-400 text-2xl font-bold drop-shadow-lg" id="final-efficiency">100%</span>
           </div>
         </div>
+        <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-4 hidden">
+          📈 <span id="difficulty-change-text"></span>
+        </div>
         <div class="flex gap-4 justify-center flex-wrap">
-          ${currentLevel < levels.length - 1 ? '<button class="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-bold px-6 py-3 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-orange-500/30 next-level-btn" id="next-level-btn">Next Level 🚀</button>' : ''}
-          <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-6 py-3 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 play-again-btn" id="play-again-btn">Play Again</button>
+          <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-6 py-3 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">Next Exercise 🎯</button>
+          <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-6 py-3 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">Retry Exercise</button>
         </div>
       </div>
     </div>
@@ -218,33 +324,60 @@ function updateDisplay() {
 }
 
 /**
- * Show success modal with enhanced celebration
+ * Show success modal with enhanced celebration and exercise completion tracking
  */
 function showSuccessModal() {
   const modal = document.getElementById('success-modal');
   const finalMoves = document.getElementById('final-moves');
+  const finalOptimal = document.getElementById('final-optimal');
+  const finalEfficiency = document.getElementById('final-efficiency');
   const title = document.getElementById('success-title');
   const message = document.getElementById('success-message');
   const emoji = document.getElementById('celebration-emoji');
+  const difficultyChangeMessage = document.getElementById('difficulty-change-message');
+  const difficultyChangeText = document.getElementById('difficulty-change-text');
   
   if (modal && finalMoves) {
-    const completionData = getLevelCompletionData(currentLevel, gameState.moves);
+    // Process exercise completion with game manager
+    const completionResult = gameManager.onExerciseComplete(gameState.moves);
+    const exercise = gameManager.currentExercise;
+    const efficiency = Math.round(completionResult.efficiency * 100);
     
+    // Update modal content
     finalMoves.textContent = gameState.moves;
-    title.textContent = completionData.title;
-    message.textContent = completionData.message;
-    emoji.textContent = completionData.emoji;
+    finalOptimal.textContent = exercise.optimalMoves;
+    finalEfficiency.textContent = `${efficiency}%`;
+    
+    // Set grade-based content
+    const gradeData = completionResult.grade;
+    title.textContent = `${gradeData.grade} ${gradeData.emoji}`;
+    message.textContent = gradeData.description;
+    emoji.textContent = gradeData.emoji;
+    
+    // Check for level progression
+    const levelChange = completionResult.levelChange;
+    if (levelChange.changed) {
+      difficultyChangeText.textContent = `Advanced to Level ${levelChange.newDifficulty}!`;
+      difficultyChangeMessage.classList.remove('hidden');
+    } else if (gameManager.currentDifficulty === 6) {
+      difficultyChangeText.textContent = `🏆 You've mastered all levels!`;
+      difficultyChangeMessage.classList.remove('hidden');
+    } else {
+      difficultyChangeMessage.classList.add('hidden');
+    }
     
     modal.classList.remove('hidden');
     
-    // Enhanced celebration effects
-    if ('vibrate' in navigator) {
-      navigator.vibrate([200, 100, 200, 100, 300]);
+    // Enhanced celebration effects based on performance
+    if (completionResult.isPerfect && 'vibrate' in navigator) {
+      navigator.vibrate([200, 100, 200, 100, 300]); // Perfect solution vibration
+    } else if ('vibrate' in navigator) {
+      navigator.vibrate([200, 100, 200]); // Standard completion vibration
     }
     
     // Animate celebration emoji
     setTimeout(() => {
-      emoji.style.animation = 'bounce 1s ease-in-out infinite';
+      emoji.style.animation = completionResult.isPerfect ? 'bounce 1s ease-in-out infinite' : 'pulse 2s ease-in-out infinite';
     }, 100);
   }
 }
@@ -267,38 +400,50 @@ function handleOperationClick(operation) {
  * Handle reset button click
  */
 function handleReset() {
-  gameState = resetGame(levels[currentLevel].goal, currentLevel + 1);
+  gameState = resetGame(gameManager.currentExercise.goal, gameManager.currentDifficulty);
   hintsUsed = 0;
   updateDisplay();
 }
 
 /**
- * Go to next level
+ * Generate new exercise
  */
-function handleNextLevel() {
-  if (currentLevel < levels.length - 1) {
-    currentLevel++;
+function handleNewExercise() {
+  gameManager.generateNewExercise();
+  hintsUsed = 0;
+  gameState = createGameState(gameManager.currentExercise.goal, gameManager.currentDifficulty);
+  // Re-render UI (event listeners are already set up globally)
+  app.innerHTML = createGameUI();
+}
+
+/**
+ * Handle next exercise from success modal
+ */
+function handleNextExercise() {
+  handleNewExercise();
+}
+
+/**
+ * Handle retry exercise from success modal
+ */
+function handleRetryExercise() {
+  handleReset();
+}
+
+/**
+ * Handle difficulty level selection
+ */
+function handleDifficultySelect(difficulty) {
+  if (gameManager.setDifficulty(difficulty)) {
     hintsUsed = 0;
-    gameState = createGameState(levels[currentLevel].goal, currentLevel + 1);
-    // Re-render entire UI for new level
+    gameState = createGameState(gameManager.currentExercise.goal, gameManager.currentDifficulty);
+    // Re-render UI (event listeners are already set up globally)
     app.innerHTML = createGameUI();
   }
 }
 
 /**
- * Handle level selection
- */
-function handleLevelSelect(level) {
-  if (level <= currentLevel) { // Only allow selecting unlocked levels
-    currentLevel = level;
-    hintsUsed = 0;
-    gameState = createGameState(levels[currentLevel].goal, currentLevel + 1);
-    app.innerHTML = createGameUI();
-  }
-}
-
-/**
- * Show hint modal
+ * Show hint modal with context-aware hints
  */
 function showHint() {
   if (hintsUsed >= maxHints) return;
@@ -307,7 +452,7 @@ function showHint() {
   const hintText = document.getElementById('hint-text');
   
   if (modal && hintText) {
-    const hint = getHints(currentLevel, gameState.current);
+    const hint = getHints(gameManager.currentDifficulty - 1, gameState.current);
     hintText.textContent = hint;
     modal.classList.remove('hidden');
     hintsUsed++;
@@ -315,26 +460,86 @@ function showHint() {
     // Update hint button
     const hintBtn = document.getElementById('hint-btn');
     if (hintBtn) {
-      hintBtn.textContent = `💡 Hint (${hintsUsed}/${maxHints})`;
+      const hintBtnContent = hintBtn.querySelector('span:first-child');
+      const hintCounter = hintBtn.querySelector('span:last-child');
+      if (hintCounter) hintCounter.textContent = `(${hintsUsed}/${maxHints})`;
+      
       if (hintsUsed >= maxHints) {
         hintBtn.disabled = true;
+        hintBtn.classList.add('opacity-50');
       }
     }
   }
 }
 
 /**
- * Show info modal (rules)
+ * Show info modal with simple exercise info
  */
 function showInfoModal() {
-  const level = levels[currentLevel];
-  const hints = {
-    0: "💡 Tip: Use ×2 to grow quickly, then SUM to reduce if needed!",
-    1: "💡 Strategy: Try to get to 24 or 25, then use ×2 sparingly.", 
-    2: "💡 Expert level: Think about powers of 2 (64→128) and digit manipulation."
+  const exercise = gameManager.currentExercise;
+  const difficultyInfo = gameManager.getCurrentExerciseInfo().difficulty;
+  
+  const difficultyTips = {
+    1: "💡 Beginner: Use ×2 to grow quickly, experiment with all operations!",
+    2: "💡 Easy: Try combining operations creatively.",
+    3: "💡 Medium: Look for patterns and plan your moves.",
+    4: "💡 Hard: Think strategically about operation sequences.",
+    5: "💡 Expert: Master-level puzzles require creative thinking!",
+    6: "💡 Insane: The ultimate challenge!"
   };
   
-  alert(`🧩 Number Puzzle - Level ${currentLevel + 1}\n\n• Start: 1, Goal: ${level.goal}\n• MIRROR: Reverse digits (12 → 21)\n• SUM: Add digits (123 → 6)\n• ADD 1: Append 1 (4 → 41)\n• ×2: Double the number (8 → 16)\n\n${hints[currentLevel]}\n\nOptimize for fewest moves!`);
+  alert(`🧩 Number Puzzle - ${difficultyInfo.name}\n\n• Start: 1\n• Goal: ${exercise.goal}\n\nOperations:\n• MIRROR: Reverse digits (12 → 21)\n• SUM: Add digits (123 → 6)\n• ADD 1: Append 1 (4 → 41)\n• ×2: Double the number (8 → 16)\n\n${difficultyTips[gameManager.currentDifficulty]}\n\nTip: Use keyboard shortcuts 1-4 for operations, R for reset!`);
+}
+
+// Global event handler - only set up once
+let globalEventListenerSetup = false;
+
+/**
+ * Setup global event listeners (only once)
+ */
+function setupGlobalEventListeners() {
+  if (globalEventListenerSetup) return;
+  
+  // Single global click handler using event delegation
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('.operation-btn')) {
+      const operation = e.target.dataset.operation;
+      handleOperationClick(operation);
+    } else if (e.target.matches('#reset-btn')) {
+      handleReset();
+    } else if (e.target.matches('#new-exercise-btn')) {
+      handleNewExercise();
+    } else if (e.target.matches('#hint-btn')) {
+      showHint();
+    } else if (e.target.matches('#close-hint-btn')) {
+      document.getElementById('hint-modal').classList.add('hidden');
+    } else if (e.target.matches('#info-btn')) {
+      showInfoModal();
+    } else if (e.target.matches('#next-exercise-btn')) {
+      document.getElementById('success-modal').classList.add('hidden');
+      handleNextExercise();
+    } else if (e.target.matches('#retry-exercise-btn')) {
+      document.getElementById('success-modal').classList.add('hidden');
+      handleRetryExercise();
+    } else if (e.target.matches('.level-btn')) {
+      const difficulty = parseInt(e.target.dataset.level);
+      handleDifficultySelect(difficulty);
+    }
+  });
+
+  // Global keyboard support
+  document.addEventListener('keydown', (e) => {
+    switch(e.key) {
+      case '1': handleOperationClick('mirror'); break;
+      case '2': handleOperationClick('sum'); break; 
+      case '3': handleOperationClick('add1Right'); break;
+      case '4': handleOperationClick('double'); break;
+      case 'r': case 'R': handleReset(); break;
+      case 'n': case 'N': handleNewExercise(); break;
+    }
+  });
+  
+  globalEventListenerSetup = true;
 }
 
 /**
@@ -344,47 +549,16 @@ function init() {
   // Register service worker first
   registerServiceWorker();
   
+  // Set up global event listeners (only once)
+  setupGlobalEventListeners();
+  
   // Render initial UI
   app.innerHTML = createGameUI();
   
-  // Add event listeners
-  document.addEventListener('click', (e) => {
-    if (e.target.matches('.operation-btn')) {
-      const operation = e.target.dataset.operation;
-      handleOperationClick(operation);
-    } else if (e.target.matches('#reset-btn')) {
-      handleReset();
-    } else if (e.target.matches('#hint-btn')) {
-      showHint();
-    } else if (e.target.matches('#close-hint-btn')) {
-      document.getElementById('hint-modal').classList.add('hidden');
-    } else if (e.target.matches('#info-btn')) {
-      showInfoModal();
-    } else if (e.target.matches('#next-level-btn')) {
-      document.getElementById('success-modal').classList.add('hidden');
-      handleNextLevel();
-    } else if (e.target.matches('#play-again-btn')) {
-      document.getElementById('success-modal').classList.add('hidden');
-      handleReset();
-    } else if (e.target.matches('.level-btn')) {
-      const level = parseInt(e.target.dataset.level);
-      handleLevelSelect(level);
-    }
-  });
-  
-  // Add keyboard support
-  document.addEventListener('keydown', (e) => {
-    switch(e.key) {
-      case '1': handleOperationClick('mirror'); break;
-      case '2': handleOperationClick('sum'); break; 
-      case '3': handleOperationClick('add1Right'); break;
-      case '4': handleOperationClick('double'); break;
-      case 'r': case 'R': handleReset(); break;
-    }
-  });
-  
-  console.log('🧮 Number Puzzle loaded! Level:', currentLevel + 1, 'Goal:', gameState.goal);
-  console.log('💡 Use keys 1-4 for operations, R for reset');
+  const exercise = gameManager.currentExercise;
+  console.log(`🧮 Number Puzzle loaded! Difficulty: ${gameManager.currentDifficulty}, Goal: 1 → ${exercise.goal}`);
+  console.log(`🎯 This exercise: ${exercise.optimalMoves} moves optimal`);
+  console.log('💡 Keys: 1-4 for operations, R for reset, N for new exercise');
 }
 
 // Start the game
