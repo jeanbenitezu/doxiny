@@ -141,29 +141,6 @@ export function generateExercise(difficulty = 3) {
 }
 
 /**
- * Generate a batch of exercises for a difficulty level (simplified)
- */
-export function generateExerciseBatch(difficulty, count = 10) {
-  const exercises = [];
-  const usedGoals = new Set();
-  
-  for (let i = 0; i < count * 2 && exercises.length < count; i++) {
-    const exercise = generateExercise(difficulty);
-    
-    if (!usedGoals.has(exercise.goal)) {
-      usedGoals.add(exercise.goal);
-      exercises.push({
-        ...exercise,
-        id: `${difficulty}-${exercises.length + 1}`,
-        index: exercises.length + 1
-      });
-    }
-  }
-  
-  return exercises;
-}
-
-/**
  * Get available difficulty levels
  */
 export function getDifficultyLevels() {
@@ -171,22 +148,4 @@ export function getDifficultyLevels() {
     level: parseInt(level),
     ...config
   }));
-}
-
-/**
- * Simple difficulty suggestion based on performance
- */
-export function suggestNextDifficulty(currentLevel, averageMoves, averageOptimal, successRate) {
-  // If doing well, suggest higher difficulty
-  if (successRate > 0.8 && averageMoves <= averageOptimal * 1.3) {
-    return Math.min(currentLevel + 1, 6);
-  }
-  
-  // If struggling, suggest staying or going lower  
-  if (successRate < 0.4 || averageMoves > averageOptimal * 2.0) {
-    return Math.max(currentLevel - 1, 1);
-  }
-  
-  // Otherwise, stay at current level
-  return currentLevel;
 }

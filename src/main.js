@@ -3,7 +3,7 @@
  * Mobile-first mathematical puzzle game with dynamic exercise generation
  */
 
-import { createGameState, applyMove, resetGame, getOptimalMoves, getLevelCompletionData } from './game.js';
+import { createGameState, applyMove, resetGame } from './game.js';
 import { operationLabels } from './operations.js';
 import { generateExercise, getDifficultyLevels } from './exerciseGenerator.js';
 import './style.css';
