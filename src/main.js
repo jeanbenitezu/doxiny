@@ -278,6 +278,15 @@ function createGameUI() {
             <span class="text-yellow-400 text-2xl font-bold drop-shadow-lg" id="final-efficiency">100%</span>
           </div>
         </div>
+        
+        <!-- Move History Section -->
+        <div class="bg-[#111827] rounded-xl p-4 mb-4 max-h-40 overflow-y-auto">
+          <h4 class="text-white/70 text-sm uppercase tracking-wide font-semibold mb-2 text-center">Your Solution</h4>
+          <div class="font-mono text-xs" id="success-history">
+            <!-- History will be populated here -->
+          </div>
+        </div>
+        
         <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-4 hidden">
           📈 <span id="difficulty-change-text"></span>
         </div>
@@ -361,6 +370,7 @@ function showSuccessModal() {
   const emoji = document.getElementById('celebration-emoji');
   const difficultyChangeMessage = document.getElementById('difficulty-change-message');
   const difficultyChangeText = document.getElementById('difficulty-change-text');
+  const successHistory = document.getElementById('success-history');
   
   if (modal && finalMoves) {
     // Process exercise completion with game manager
@@ -372,6 +382,11 @@ function showSuccessModal() {
     finalMoves.textContent = gameState.moves;
     finalOptimal.textContent = exercise.optimalMoves;
     finalEfficiency.textContent = `${efficiency}%`;
+    
+    // Update history in success modal
+    if (successHistory) {
+      successHistory.innerHTML = renderHistory();
+    }
     
     // Set grade-based content
     const gradeData = completionResult.grade;
