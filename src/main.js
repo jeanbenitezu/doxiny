@@ -476,6 +476,10 @@ function updateDisplay() {
   // Update current number with animation and dynamic scaling
   const currentEl = document.getElementById("current-number");
   if (currentEl) {
+    const newValue = gameState.current.toString();
+    const previousValue = currentEl.textContent;
+    const hasChanged = newValue !== previousValue;
+    
     currentEl.textContent = gameState.current;
 
     // Apply dynamic scaling based on digit count
@@ -491,8 +495,12 @@ function updateDisplay() {
     }
 
     currentEl.style.transform = `scale(${scale})`;
-    currentEl.classList.add("updated");
-    setTimeout(() => currentEl.classList.remove("updated"), 300);
+    
+    // Only animate if the number actually changed
+    if (hasChanged) {
+      currentEl.classList.add("updated");
+      setTimeout(() => currentEl.classList.remove("updated"), 300);
+    }
   }
 
   // Update moves counter with dynamic color
