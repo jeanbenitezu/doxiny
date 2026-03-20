@@ -320,63 +320,64 @@ function createGameUI() {
 
   return `
     <!-- BEGIN: MainHeader -->
-    <header class="w-full max-w-md flex flex-col items-center pt-4" data-purpose="app-header">
-      <div class="flex items-center gap-2 mb-2">
-        <span class="text-3xl">🔢</span>
-        <h1 class="text-2xl font-bold tracking-widest uppercase">Doxiny</h1>
+    <header class="w-full max-w-md flex flex-row items-center justify-between pt-4 pb-2" data-purpose="app-header">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🔢</span>
+        <h1 class="text-lg font-bold tracking-widest uppercase">Doxiny</h1>
+        <div class="text-xs text-white/60 ml-2">${translate("tagline")}</div>
       </div>
-      <div class="text-sm text-white/60 mb-3">${translate("tagline")}</div>
       
-      <!-- Language Switcher -->
-      <div class="flex gap-2 mb-3">
+      <!-- Language Switcher - Compact -->
+      <div class="flex gap-1">
         ${Object.values(languages)
           .map(
             (lang) => `
-          <button class="language-btn ${getCurrentLanguage() === lang.code ? "bg-blue-600 border-2 border-blue-400" : "bg-gray-600/50 border border-white/20"} 
-                         rounded-lg px-3 py-1 text-xs font-semibold transition-all active:scale-95"
+          <button class="language-btn ${getCurrentLanguage() === lang.code ? "bg-blue-600 border border-blue-400" : "bg-gray-600/50 border border-white/20"} 
+                         rounded px-2 py-1 text-xs font-semibold transition-all active:scale-95 flex items-center gap-1"
                   data-lang="${lang.code}">
-            ${lang.flag} ${lang.name}
+            <span class="text-xs">${lang.flag}</span>
+            <span class="text-xs">${lang.code.toUpperCase()}</span>
           </button>
         `,
           )
           .join("")}
       </div>
-      
-      <!-- Level Selector -->
-      <nav class="w-full mb-4" data-purpose="level-selector">
-        <div class="grid grid-cols-6 gap-1 sm:gap-2">
-          ${availableLevels
-            .map(
-              (lvl) =>
-                `<button class="${lvl.level === gameManager.currentDifficulty ? "bg-orange-600 border-2 border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60"} rounded-lg sm:rounded-xl p-1 sm:p-3 flex flex-col items-center transition-all active:scale-95 level-btn" 
-                     data-level="${lvl.level}">
-              <span class="text-sm sm:text-xl font-bold">${lvl.level}</span>
-              <span class="text-[8px] sm:text-[10px] uppercase font-bold leading-tight">${translate(`difficultyLevels.${lvl.nameKey}`)}</span>
-            </button>`,
-            )
-            .join("")}
-        </div>
-      </nav>
-      
-      <!-- Goal Display with Moves and New Exercise on the right -->  
-      <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-4 mb-4 border-2 border-emerald-500 flex justify-between items-center">
-        <div class="text-center flex-1">
-          <div class="text-white text-sm font-semibold uppercase tracking-wide mb-1">${translate("targetNumber")}</div>
-          <div class="text-white text-4xl font-black tracking-tight">${translate("reach")} ${exercise.goal}</div>
-          <div class="text-emerald-200 text-xs mt-1">${translate("transformInto")} ${exercise.goal}</div>
-        </div>
-        <div class="flex flex-col gap-2 ml-4">
-          <div class="text-center">
-            <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">${translate("moves")}</div>
-            <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
-          </div>
-          <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all active:scale-95" id="new-exercise-btn">
-            🎲 ${translate("gameStates.newGame").replace("🎯 ", "")}
-          </button>
-        </div>
-      </div>
     </header>
     <!-- END: MainHeader -->
+    
+    <!-- Level Selector -->
+    <nav class="w-full max-w-md mb-4" data-purpose="level-selector">
+      <div class="grid grid-cols-6 gap-1 sm:gap-2">
+        ${availableLevels
+          .map(
+            (lvl) =>
+              `<button class="${lvl.level === gameManager.currentDifficulty ? "bg-orange-600 border-2 border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60"} rounded-lg sm:rounded-xl p-1 sm:p-3 flex flex-col items-center transition-all active:scale-95 level-btn" 
+                   data-level="${lvl.level}">
+            <span class="text-sm sm:text-xl font-bold">${lvl.level}</span>
+            <span class="text-[8px] sm:text-[10px] uppercase font-bold leading-tight">${translate(`difficultyLevels.${lvl.nameKey}`)}</span>
+          </button>`,
+          )
+          .join("")}
+      </div>
+    </nav>
+    
+    <!-- Goal Display with Moves and New Exercise on the right -->  
+    <div class="w-full max-w-md bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-4 mb-4 border-2 border-emerald-500 flex justify-between items-center">
+      <div class="text-center flex-1">
+        <div class="text-white text-sm font-semibold uppercase tracking-wide mb-1">${translate("targetNumber")}</div>
+        <div class="text-white text-4xl font-black tracking-tight">${translate("reach")} ${exercise.goal}</div>
+        <div class="text-emerald-200 text-xs mt-1">${translate("transformInto")} ${exercise.goal}</div>
+      </div>
+      <div class="flex flex-col gap-2 ml-4">
+        <div class="text-center">
+          <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">${translate("moves")}</div>
+          <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
+        </div>
+        <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all active:scale-95" id="new-exercise-btn">
+          🎲 ${translate("gameStates.newGame").replace("🎯 ", "")}
+        </button>
+      </div>
+    </div>
     
     <!-- BEGIN: GameBoard -->
     <main class="w-full max-w-md flex-1 flex flex-col gap-2">
