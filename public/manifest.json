@@ -1,7 +1,7 @@
 {
-  "name": "Number Puzzle - Mathematical Game",
-  "short_name": "Number Puzzle",
-  "description": "Transform numbers using 4 operations to reach the goal. A minimalist mathematical puzzle game.",
+  "name": "Doxiny - Mathematical Puzzle Game",
+  "short_name": "Doxiny",
+  "description": "Do X in Y moves. Transform numbers using 4 operations to reach your goal in the fewest moves possible.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#1a1a1a",

@@ -6,42 +6,42 @@
 import { operations } from "./operations.js";
 
 /**
- * Simple difficulty configuration
+ * Simple difficulty configuration with i18n keys
  */
 const difficultyLevels = {
   1: {
-    name: "Beginner",
-    description: "Learn the basics",
+    nameKey: "beginner",
+    descriptionKey: "beginner", 
     targetMoves: [3, 6],
     goalRange: [5, 20],
   },
   2: {
-    name: "Easy",
-    description: "Building confidence",
+    nameKey: "easy",
+    descriptionKey: "easy",
     targetMoves: [4, 8],
     goalRange: [10, 50],
   },
   3: {
-    name: "Medium",
-    description: "Strategic thinking",
+    nameKey: "medium", 
+    descriptionKey: "medium",
     targetMoves: [5, 10],
     goalRange: [20, 100],
   },
   4: {
-    name: "Hard",
-    description: "Advanced tactics",
+    nameKey: "hard",
+    descriptionKey: "hard", 
     targetMoves: [6, 12],
     goalRange: [50, 200],
   },
   5: {
-    name: "Expert",
-    description: "Master level",
+    nameKey: "expert",
+    descriptionKey: "expert",
     targetMoves: [7, 15],
     goalRange: [100, 500],
   },
   6: {
-    name: "Insane",
-    description: "Ultimate challenge",
+    nameKey: "insane",
+    descriptionKey: "insane",
     targetMoves: [8, 18],
     goalRange: [300, 999],
   },
@@ -144,20 +144,22 @@ export function generateExercise(difficulty = 3) {
   return {
     goal: result.goal,
     level: difficulty,
-    levelName: config.name,
-    description: config.description,
+    levelNameKey: config.nameKey,
+    levelDescriptionKey: config.descriptionKey,
     optimalMoves: result.optimalMoves,
-    difficulty: config.name.toLowerCase(),
     solutionPath: result.solutionPath,
   };
 }
 
 /**
- * Get available difficulty levels
+ * Get available difficulty levels with i18n keys
  */
 export function getDifficultyLevels() {
   return Object.entries(difficultyLevels).map(([level, config]) => ({
     level: parseInt(level),
-    ...config,
+    nameKey: config.nameKey,
+    descriptionKey: config.descriptionKey,
+    targetMoves: config.targetMoves,
+    goalRange: config.goalRange,
   }));
 }

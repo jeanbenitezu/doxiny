@@ -1,11 +1,18 @@
 /**
- * Number Puzzle PWA - Main Entry Point
- * Mobile-first mathematical puzzle game with dynamic exercise generation
+ * Doxiny - Do X in Y moves
+ * Mathematical puzzle game with elegant solutions
  */
 
 import { createGameState, applyMove, resetGame } from "./game.js";
 import { operations, operationLabels } from "./operations.js";
 import { generateExercise, getDifficultyLevels } from "./exerciseGenerator.js";
+import {
+  translate,
+  t,
+  getCurrentLanguage,
+  setLanguage,
+  languages,
+} from "./i18n.js";
 import "./style.css";
 
 // Dynamic game manager with exercise generation
@@ -96,24 +103,32 @@ class GameManager {
   getPerformanceGrade(efficiency) {
     if (efficiency >= 1.0)
       return {
-        grade: "Perfect",
+        grade: translate("performanceGrades.perfect"),
         emoji: "🏆",
-        description: "Optimal solution!",
+        description: translate("performanceDescriptions.optimalSolution"),
       };
     if (efficiency >= 0.85)
       return {
-        grade: "Excellent",
+        grade: translate("performanceGrades.excellent"),
         emoji: "⭐",
-        description: "Amazing efficiency!",
+        description: translate("performanceDescriptions.amazingEfficiency"),
       };
     if (efficiency >= 0.7)
-      return { grade: "Great", emoji: "👍", description: "Well done!" };
+      return {
+        grade: translate("performanceGrades.great"),
+        emoji: "👍",
+        description: translate("performanceDescriptions.wellDone"),
+      };
     if (efficiency >= 0.55)
-      return { grade: "Good", emoji: "😊", description: "Nice job!" };
+      return {
+        grade: translate("performanceGrades.good"),
+        emoji: "😊",
+        description: translate("performanceDescriptions.niceJob"),
+      };
     return {
-      grade: "Keep trying",
+      grade: translate("performanceGrades.keepTrying"),
       emoji: "💪",
-      description: "You can do better!",
+      description: translate("performanceDescriptions.youCanDoBetter"),
     };
   }
 
@@ -299,14 +314,29 @@ function showUpdateNotification() {
 function createGameUI() {
   const exerciseInfo = gameManager.getCurrentExerciseInfo();
   const exercise = exerciseInfo.exercise;
-  const difficultyInfo = exerciseInfo.difficulty;
 
   return `
     <!-- BEGIN: MainHeader -->
     <header class="w-full max-w-md flex flex-col items-center pt-4" data-purpose="app-header">
       <div class="flex items-center gap-2 mb-2">
-        <span class="text-3xl">🧩</span>
-        <h1 class="text-2xl font-bold tracking-widest uppercase">Number Puzzle</h1>
+        <span class="text-3xl">🔢</span>
+        <h1 class="text-2xl font-bold tracking-widest uppercase">Doxiny</h1>
+      </div>
+      <div class="text-sm text-white/60 mb-3">${translate("tagline")}</div>
+      
+      <!-- Language Switcher -->
+      <div class="flex gap-2 mb-3">
+        ${Object.values(languages)
+          .map(
+            (lang) => `
+          <button class="language-btn ${getCurrentLanguage() === lang.code ? "bg-blue-600 border-2 border-blue-400" : "bg-gray-600/50 border border-white/20"} 
+                         rounded-lg px-3 py-1 text-xs font-semibold transition-all active:scale-95"
+                  data-lang="${lang.code}">
+            ${lang.flag} ${lang.name}
+          </button>
+        `,
+          )
+          .join("")}
       </div>
       
       <!-- Level Selector -->
@@ -318,7 +348,7 @@ function createGameUI() {
                 `<button class="${lvl.level === gameManager.currentDifficulty ? "bg-orange-600 border-2 border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60"} rounded-lg sm:rounded-xl p-1 sm:p-3 flex flex-col items-center transition-all active:scale-95 level-btn" 
                      data-level="${lvl.level}">
               <span class="text-sm sm:text-xl font-bold">${lvl.level}</span>
-              <span class="text-[8px] sm:text-[10px] uppercase font-bold leading-tight">${lvl.name}</span>
+              <span class="text-[8px] sm:text-[10px] uppercase font-bold leading-tight">${translate(`difficultyLevels.${lvl.nameKey}`)}</span>
             </button>`,
             )
             .join("")}
@@ -328,17 +358,17 @@ function createGameUI() {
       <!-- Goal Display with Moves and New Exercise on the right -->  
       <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-4 mb-4 border-2 border-emerald-500 flex justify-between items-center">
         <div class="text-center flex-1">
-          <div class="text-white text-sm font-semibold uppercase tracking-wide mb-1">Goal</div>
-          <div class="text-white text-4xl font-black tracking-tight">Reach ${exercise.goal}</div>
-          <div class="text-emerald-200 text-xs mt-1">Transform 1 into ${exercise.goal}</div>
+          <div class="text-white text-sm font-semibold uppercase tracking-wide mb-1">${translate("targetNumber")}</div>
+          <div class="text-white text-4xl font-black tracking-tight">${translate("reach")} ${exercise.goal}</div>
+          <div class="text-emerald-200 text-xs mt-1">${translate("transformInto")} ${exercise.goal}</div>
         </div>
         <div class="flex flex-col gap-2 ml-4">
           <div class="text-center">
-            <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">Moves</div>
+            <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">${translate("moves")}</div>
             <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
           </div>
           <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all active:scale-95" id="new-exercise-btn">
-            🎲 New
+            🎲 ${translate("gameStates.newGame").replace("🎯 ", "")}
           </button>
         </div>
       </div>
@@ -356,7 +386,7 @@ function createGameUI() {
       <section class="mb-4" data-purpose="inline-history">
         <div class="bg-[#1a1a1a] rounded-2xl p-3 border border-white/10 transition-all duration-300" id="history-container">
           <div class="flex items-center justify-between mb-2">
-            <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold">Move History</h4>
+            <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("history")}</h4>
           </div>
           <div class="flex overflow-x-scroll gap-2 items-start transition-all duration-300 pb-3" id="inline-history-content">
             ${renderInlineHistory()}
@@ -366,21 +396,25 @@ function createGameUI() {
       
       <!-- Operation Buttons Grid -->
       <section class="grid grid-cols-2 gap-3" data-purpose="game-controls">
-        ${Object.entries(operationLabels)
-          .map(([op, label]) => {
+        ${["reverse", "sumDigits", "append1", "double"]
+          .map((op) => {
             const previews = getOperationPreviews(gameState.current);
             const isBlocked = gameState.moves >= moveLimit;
             const buttonClass = isBlocked
               ? "bg-gray-600 text-gray-400 cursor-not-allowed"
               : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
-            const previewText = isBlocked ? "Blocked" : previews[op];
+            const previewText = isBlocked
+              ? "Blocked"
+              : previews[op === "sumDigits" ? "sum" : op];
             const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
-            return `<button class="${buttonClass} font-black py-3 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1 h-20" data-operation="${op}" aria-label="${label} operation" ${isBlocked ? "disabled" : ""}>
+            const operationKey = op === "sumDigits" ? "sum" : op;
+            const translatedLabel = translate(`operations.${op}`);
+            return `<button class="${buttonClass} font-black py-3 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1 h-20" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""}>
             <div class="flex items-center gap-2">
-              ${getOperationIcon(op, iconColor)}
-              <span class="text-sm">${label}</span>
+              ${getOperationIcon(operationKey, iconColor)}
+              <span class="text-sm">${translatedLabel}</span>
             </div>
-            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text" data-operation="${op}">${previewText}</span>
+            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text" data-operation="${operationKey}">${previewText}</span>
           </button>`;
           })
           .join("")}
@@ -389,10 +423,10 @@ function createGameUI() {
       <!-- Utility Row -->
       <section class="grid grid-cols-3 gap-2" data-purpose="utility-controls">
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= moveLimit ? "ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn">
-          <span>🔄</span> Reset
+          ${translate("gameStates.reset")}
         </button>
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
-          <span>ℹ️</span> Help
+          <span>ℹ️</span> ${translate("help")}
         </button>
       </section>
     </main>
@@ -401,30 +435,33 @@ function createGameUI() {
     <!-- Info Modal -->
     <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm info-modal hidden" id="info-modal">
       <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-3xl p-8 max-w-md w-11/12 text-center shadow-2xl">
-        <h3 class="text-2xl font-bold text-white mb-4">ℹ️ Game Help</h3>
+        <h3 class="text-2xl font-bold text-white mb-4">ℹ️ ${translate("howToPlay")}</h3>
         <div class="text-white/95 text-sm text-left leading-relaxed mb-6" id="info-content">
           <div class="mb-4">
             <div class="text-center mb-3">
-              <span class="text-lg font-bold text-blue-300">Operations:</span>
+              <span class="text-lg font-bold text-blue-300">${translate("operations.sumDigits").split(" ")[1]}:</span>
             </div>
             <div class="space-y-2">
-              <div>• <span class="font-bold text-yellow-300">REVERSE:</span> Reverse digits (12 → 21)</div>
-              <div>• <span class="font-bold text-yellow-300">SUM DIGITS:</span> Add digits (123 → 6)</div>
-              <div>• <span class="font-bold text-yellow-300">APPEND 1:</span> Append 1 (4 → 41)</div>
-              <div>• <span class="font-bold text-yellow-300">DOUBLE:</span> Double the number (8 → 16)</div>
+              <div>• <span class="font-bold text-yellow-300">${translate("operations.reverse")}:</span> ${translate("operationDescriptions.reverse")}</div>
+              <div>• <span class="font-bold text-yellow-300">${translate("operations.sumDigits")}:</span> ${translate("operationDescriptions.sumDigits")}</div>
+              <div>• <span class="font-bold text-yellow-300">${translate("operations.append1")}:</span> ${translate("operationDescriptions.append1")}</div>
+              <div>• <span class="font-bold text-yellow-300">${translate("operations.double")}:</span> ${translate("operationDescriptions.double")}</div>
             </div>
+          </div>
+          <div class="mb-4 text-center">
+            <p class="text-white/80 text-sm">${translate("instructions")}</p>
           </div>
           <div class="mb-4">
             <div class="text-center mb-2">
-              <span class="text-lg font-bold text-blue-300">Keyboard Shortcuts:</span>
+              <span class="text-lg font-bold text-blue-300">${translate("keyboardShortcuts").split(":")[0]}:</span>
             </div>
             <div class="text-center text-sm">
-              <span class="bg-gray-700 px-2 py-1 rounded mx-1">1-4</span> Operations • <span class="bg-gray-700 px-2 py-1 rounded mx-1">R</span> Reset • <span class="bg-gray-700 px-2 py-1 rounded mx-1">N</span> New
+              <span class="bg-gray-700 px-2 py-1 rounded mx-1">1-4</span> ${translate("operations.sumDigits").split(" ")[1]} • <span class="bg-gray-700 px-2 py-1 rounded mx-1">R</span> ${translate("gameStates.reset").replace("↻ ", "")} • <span class="bg-gray-700 px-2 py-1 rounded mx-1">N</span> ${translate("gameStates.newGame").replace("🎯 ", "").split(" ")[0]}
             </div>
           </div>
           <div class="text-center text-emerald-300 font-semibold" id="difficulty-tip"></div>
         </div>
-        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-6 py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1" id="close-info-btn">Got it!</button>
+        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-6 py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1" id="close-info-btn">${translate("close")}</button>
       </div>
     </div>
     
@@ -433,16 +470,16 @@ function createGameUI() {
       <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-t-4 border-emerald-500 rounded-t-3xl p-3 max-w-md mx-auto text-center shadow-2xl shadow-emerald-500/30">
         <div class="flex items-center justify-center gap-3 mb-2">
           <div class="text-4xl celebration-emoji" id="celebration-emoji">🎉</div>
-          <h2 class="text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">Level Complete!</h2>
+          <h2 class="text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">${translate("levelComplete")}</h2>
         </div>
         <p class="text-white/90 text-lg mb-2" id="success-message">Great job!</p>
         <div class="flex gap-6 justify-center mb-2">
           <div class="flex flex-col items-center">
-            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">Moves</span>
+            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("moves")}</span>
             <span class="text-emerald-400 text-xl font-bold drop-shadow-lg" id="final-moves">0</span>
           </div>
           <div class="flex flex-col items-center">
-            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">Target</span>
+            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("targetNumber")}</span>
             <span class="text-emerald-400 text-xl font-bold drop-shadow-lg" id="final-optimal">0</span>
           </div>
           <div class="flex flex-col items-center">
@@ -455,8 +492,8 @@ function createGameUI() {
           📈 <span id="difficulty-change-text"></span>
         </div>
         <div class="flex gap-4 justify-center">
-          <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">Next 🎯</button>
-          <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">Retry</button>
+          <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")} 🎯</button>
+          <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
         </div>
       </div>
     </div>
@@ -468,7 +505,7 @@ function createGameUI() {
  */
 function renderInlineHistory() {
   if (gameState.history.length === 0) {
-    return `<div class="text-white/50 text-xs">No moves yet</div>`;
+    return `<div class="text-white/50 text-xs">${translate("noMovesYet")}</div>`;
   }
 
   return gameState.history
@@ -705,12 +742,12 @@ function showSuccessModal() {
       }, 3000);
     }
 
-  const inlineHistoryContent = document.getElementById(
-    "inline-history-content",
-  );
-  if (inlineHistoryContent) {
-    inlineHistoryContent.classList.add("flex-wrap");
-  }
+    const inlineHistoryContent = document.getElementById(
+      "inline-history-content",
+    );
+    if (inlineHistoryContent) {
+      inlineHistoryContent.classList.add("flex-wrap");
+    }
 
     // Enhanced celebration effects based on performance
     if (completionResult.isPerfect && "vibrate" in navigator) {
@@ -808,26 +845,30 @@ function handleDifficultySelect(difficulty) {
  * Show info modal with game help
  */
 function showInfoModal() {
-  const exercise = gameManager.currentExercise;
-  const difficultyInfo = gameManager.getCurrentExerciseInfo().difficulty;
-
-  const difficultyTips = {
-    1: "💡 Beginner: Use ×2 to grow quickly, experiment with all operations!",
-    2: "💡 Easy: Try combining operations creatively.",
-    3: "💡 Medium: Look for patterns and plan your moves.",
-    4: "💡 Hard: Think strategically about operation sequences.",
-    5: "💡 Expert: Master-level puzzles require creative thinking!",
-    6: "💡 Insane: The ultimate challenge!",
-  };
 
   // Update difficulty tip
   const difficultyTip = document.getElementById("difficulty-tip");
   if (difficultyTip) {
-    difficultyTip.textContent = difficultyTips[gameManager.currentDifficulty];
+    difficultyTip.textContent = translate(
+      `difficultyTips.${gameManager.currentDifficulty}`,
+    );
   }
 
   // Show modal
   document.getElementById("info-modal").classList.remove("hidden");
+}
+
+/**
+ * Handle language change
+ */
+function handleLanguageChange(langCode) {
+  if (setLanguage(langCode)) {
+    // Re-render the entire UI with new language
+    const app = document.getElementById("app");
+    app.innerHTML = createGameUI();
+    // Set up event listeners again after re-render
+    updateDisplay();
+  }
 }
 
 // Global event handler - only set up once
@@ -863,6 +904,10 @@ function setupGlobalEventListeners() {
       const levelBtn = e.target.closest(".level-btn");
       const difficulty = parseInt(levelBtn.dataset.level);
       handleDifficultySelect(difficulty);
+    } else if (e.target.closest(".language-btn")) {
+      const langBtn = e.target.closest(".language-btn");
+      const langCode = langBtn.dataset.lang;
+      handleLanguageChange(langCode);
     }
   });
 

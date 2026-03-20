@@ -1,5 +1,6 @@
 /**
- * Number Puzzle PWA - Custom Styles for Tailwind
+ * Doxiny - Do X in Y moves
+ * Custom Styles for Tailwind with brand visual identity
  * Only essential custom styles that Tailwind doesn't provide
  */
 
@@ -23,19 +24,27 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Custom glow effects that work with Tailwind */
+/* Custom glow effects with Doxiny brand colors */
 .glow-orange {
-  box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 0 15px rgba(30, 58, 138, 0.4); /* Doxiny Blue */
 }
 
 .glow-active {
-  box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+  box-shadow: 0 0 20px rgba(30, 58, 138, 0.6); /* Doxiny Blue Active */
+}
+
+.glow-success {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); /* Success Green */
+}
+
+.glow-transform {
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); /* Transform Orange */
 }
 
 .glass-panel {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(30, 58, 138, 0.05); /* Subtle Doxiny Blue tint */
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(30, 58, 138, 0.1);
 }
 
 /* Celebration animations */

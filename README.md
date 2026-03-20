@@ -1,25 +1,43 @@
-# 🧮 Number Puzzle PWA
+# 🔢 Doxiny - Do X in Y moves
 
-A minimalist mathematical puzzle game where you transform numbers using 4 operations to reach your goal.
+> *"The elegance is in efficiency"*
+
+A minimalist mathematical puzzle game where you transform numbers using 4 operations to reach your goal in the fewest moves possible.
+
+**DOXINY** = **"Do X in Y moves"** - Transform number X into target Y with optimal strategy.
 
 ## 🎮 How to Play
 
 - **Goal**: Transform numbers using 4 operations to reach the target
-- **Progressive Levels**:
-- **Operations**:
-  - **REVERSE**: Reverse all digits (12 → 21)
-  - **SUM DIGITS**: Add all digits (128 → 11)
-  - **APPEND 1**: Append 1 to the end (4 → 41)
-  - **DOUBLE**: Double the number (8 → 16)
+- **Challenge**: Do it in the **minimum moves possible**  
+- **Strategy**: Think ahead, plan your path, optimize your solution
+
+### The 4 Operations:
+- 🔄 **REVERSE**: Reverse all digits (12 → 21)
+- ➕ **SUM DIGITS**: Add all digits (128 → 11) 
+- 1️⃣ **APPEND 1**: Append 1 to the end (4 → 41)
+- ✖️ **DOUBLE**: Double the number (8 → 16)
+
+## 🌍 Multi-Language Support
+
+Doxiny supports multiple languages with a simple language switcher:
+
+- **🇺🇸 English** - "Do X in Y moves" 
+- **🇪🇸 Español** - "Haz X en Y movimientos"
+
+The game automatically detects your browser language and provides seamless translation of all interface elements, operation labels, and instructions.
 
 ## ✨ Features
 
+- � **Doxiny Branding** - "Do X in Y moves" with elegant visual identity
+- 🌍 **Multi-language Support** - English and Spanish localization
 - 📱 **Mobile-first design** with touch-optimized controls
 - 🌐 **Progressive Web App (PWA)** - works offline
 - 📊 **Move history tracking** for learning patterns
 - ⌨️ **Keyboard shortcuts** (1-4 for operations, R for reset)
 - 🎯 **Multiple goals** and difficulty levels
 - 🏆 **Optimized for fewest moves**
+- 🎨 **Doxiny Blue color scheme** with visual consistency
 
 ## 🚀 Development
 
