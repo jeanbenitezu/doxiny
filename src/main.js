@@ -160,6 +160,9 @@ let gameState = createGameState(
   gameManager.currentDifficulty,
 );
 
+// UI state for preview visibility
+let showPreviews = true;
+
 // Dynamic move limit based on exercise difficulty
 let moveLimit = 12;
 
@@ -414,7 +417,7 @@ function createGameUI() {
               ${getOperationIcon(operationKey, iconColor)}
               <span class="text-sm">${translatedLabel}</span>
             </div>
-            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text" data-operation="${operationKey}">${previewText}</span>
+            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? "" : "display-none"}" data-operation="${operationKey}">${previewText}</span>
           </button>`;
           })
           .join("")}
@@ -427,6 +430,9 @@ function createGameUI() {
         </button>
         <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
           <span>ℹ️</span> ${translate("help")}
+        </button>
+        <button class="bg-[#6b46c1] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn">
+          <span>${showPreviews ? "👁️" : "🙈"}</span> Preview
         </button>
       </section>
     </main>
@@ -596,6 +602,11 @@ function updateDisplay() {
     // Update preview text and visibility
     if (previewEl) {
       previewEl.textContent = isBlocked ? "Blocked" : previews[operation];
+      if (showPreviews) {
+        previewEl.classList.remove("invisible");
+      } else {
+        previewEl.classList.add("invisible");
+      }
     }
 
     // Update button styling
@@ -812,6 +823,19 @@ function handleNewExercise() {
 }
 
 /**
+ * Toggle preview visibility
+ */
+function togglePreviews() {
+  showPreviews = !showPreviews;
+  
+  // Re-render UI to update all button states and toggle button appearance
+  app.innerHTML = createGameUI();
+
+  // Reapply dynamic scaling and other display updates after re-render
+  updateDisplay();
+}
+
+/**
  * Handle next exercise from success modal
  */
 function handleNextExercise() {
@@ -908,6 +932,8 @@ function setupGlobalEventListeners() {
       const langBtn = e.target.closest(".language-btn");
       const langCode = langBtn.dataset.lang;
       handleLanguageChange(langCode);
+    } else if (e.target.closest("#preview-toggle-btn")) {
+      togglePreviews();
     }
   });
 
