@@ -236,7 +236,7 @@ export const translations = {
   // Game Actions
   reach: {
     en: "Reach",
-    es: "Alcanza",
+    es: "Obtén",
   },
 
   transformInto: {
