@@ -320,15 +320,15 @@ function createGameUI() {
 
   return `
     <!-- BEGIN: MainHeader -->
-    <header class="w-full max-w-md flex flex-row items-center justify-between pt-4 pb-2" data-purpose="app-header">
-      <div class="flex items-center gap-2">
-        <span class="text-2xl">🔢</span>
-        <h1 class="text-lg font-bold tracking-widest uppercase">Doxiny</h1>
-        <div class="text-xs text-white/60 ml-2">${translate("tagline")}</div>
+    <header class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 pb-2" data-purpose="app-header">
+      <div class="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 mb-1 sm:mb-0">
+        <span class="text-xl sm:text-2xl">🔢</span>
+        <h1 class="text-sm sm:text-lg font-bold tracking-wide uppercase">Doxiny</h1>
+        <div class="text-xs text-white/60 hidden xs:block">${translate("tagline")}</div>
       </div>
       
       <!-- Language Switcher - Compact -->
-      <div class="flex gap-1">
+      <div class="flex gap-1 justify-center sm:justify-end">
         ${Object.values(languages)
           .map(
             (lang) => `
@@ -346,15 +346,15 @@ function createGameUI() {
     <!-- END: MainHeader -->
     
     <!-- Level Selector -->
-    <nav class="w-full max-w-md mb-4" data-purpose="level-selector">
-      <div class="grid grid-cols-6 gap-1 sm:gap-2">
+    <nav class="w-full mb-3" data-purpose="level-selector">
+      <div class="grid grid-cols-6 gap-1">
         ${availableLevels
           .map(
             (lvl) =>
-              `<button class="${lvl.level === gameManager.currentDifficulty ? "bg-orange-600 border-2 border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60"} rounded-lg sm:rounded-xl p-1 sm:p-3 flex flex-col items-center transition-all active:scale-95 level-btn" 
+              `<button class="${lvl.level === gameManager.currentDifficulty ? "bg-orange-600 border border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60"} rounded-lg p-1 sm:p-2 flex flex-col items-center transition-all active:scale-95 level-btn min-h-[2.5rem] sm:min-h-[3rem]" 
                    data-level="${lvl.level}">
-            <span class="text-sm sm:text-xl font-bold">${lvl.level}</span>
-            <span class="text-[8px] sm:text-[10px] uppercase font-bold leading-tight">${translate(`difficultyLevels.${lvl.nameKey}`)}</span>
+            <span class="text-xs sm:text-lg font-bold">${lvl.level}</span>
+            <span class="text-[7px] sm:text-[9px] uppercase font-bold leading-tight">${translate(`difficultyLevels.${lvl.nameKey}`)}</span>
           </button>`,
           )
           .join("")}
@@ -362,37 +362,37 @@ function createGameUI() {
     </nav>
     
     <!-- Goal Display with Moves and New Exercise on the right -->  
-    <div class="w-full max-w-md bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-4 mb-4 border-2 border-emerald-500 flex justify-between items-center">
+    <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-3 mb-3 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
       <div class="text-center flex-1">
-        <div class="text-white text-sm font-semibold uppercase tracking-wide mb-1">${translate("targetNumber")}</div>
-        <div class="text-white text-4xl font-black tracking-tight">${translate("reach")} ${exercise.goal}</div>
-        <div class="text-emerald-200 text-xs mt-1">${translate("transformInto")} ${exercise.goal}</div>
+        <div class="text-white text-xs sm:text-sm font-semibold uppercase tracking-wide mb-1">${translate("targetNumber")}</div>
+        <div class="text-white text-2xl sm:text-3xl font-black tracking-tight">${translate("reach")} ${exercise.goal}</div>
+        <div class="text-emerald-200 text-xs mt-1 hidden sm:block">${translate("transformInto")} ${exercise.goal}</div>
       </div>
-      <div class="flex flex-col gap-2 ml-4">
+      <div class="flex flex-row sm:flex-col justify-between sm:justify-center gap-2 sm:gap-1 sm:ml-3">
         <div class="text-center">
           <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">${translate("moves")}</div>
-          <div id="moves-count" class="text-white text-2xl font-bold">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
+          <div id="moves-count" class="text-white text-lg sm:text-xl font-bold">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
         </div>
-        <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all active:scale-95" id="new-exercise-btn">
-          🎲 ${translate("gameStates.newGame").replace("🎯 ", "")}
+        <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-2 sm:px-3 py-2 rounded-lg transition-all active:scale-95 whitespace-nowrap" id="new-exercise-btn">
+          🎲 <span class="hidden xs:inline">${translate("gameStates.newGame").replace("🎯 ", "")}</span><span class="xs:hidden">New</span>
         </button>
       </div>
     </div>
     
     <!-- BEGIN: GameBoard -->
-    <main class="w-full max-w-md flex-1 flex flex-col gap-2">
+    <main class="w-full flex-1 flex flex-col gap-2">
       <!-- Central Number Display -->
-      <section class="glass-panel rounded-3xl p-6 flex justify-center items-center mb-2" data-purpose="number-display">
-        <span class="text-8xl font-black text-white tracking-tighter current-number" id="current-number">${gameState.current}</span>
+      <section class="glass-panel rounded-2xl p-4 sm:p-6 flex justify-center items-center mb-2" data-purpose="number-display">
+        <span class="text-5xl sm:text-6xl lg:text-8xl font-black text-white tracking-tighter current-number" id="current-number">${gameState.current}</span>
       </section>
       
       <!-- Inline History -->
-      <section class="mb-4" data-purpose="inline-history">
-        <div class="bg-[#1a1a1a] rounded-2xl p-3 border border-white/10 transition-all duration-300" id="history-container">
-          <div class="flex items-center justify-between mb-2">
+      <section class="mb-3" data-purpose="inline-history">
+        <div class="bg-[#1a1a1a] rounded-xl p-2 sm:p-3 border border-white/10 transition-all duration-300" id="history-container">
+          <div class="flex items-center justify-between mb-1 sm:mb-2">
             <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("history")}</h4>
           </div>
-          <div class="flex overflow-x-scroll gap-2 items-start transition-all duration-300 pb-3" id="inline-history-content">
+          <div class="flex overflow-x-scroll gap-1 sm:gap-2 items-start transition-all duration-300 pb-2 sm:pb-3" id="inline-history-content">
             ${renderInlineHistory()}
           </div>
         </div>
@@ -413,10 +413,10 @@ function createGameUI() {
             const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
             const operationKey = op === "sumDigits" ? "sum" : op;
             const translatedLabel = translate(`operations.${op}`);
-            return `<button class="${buttonClass} font-black py-3 px-2 rounded-2xl shadow-lg uppercase tracking-widest operation-btn flex flex-col items-center gap-1 h-20" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""}>
-            <div class="flex items-center gap-2">
+            return `<button class="${buttonClass} font-black py-2 sm:py-3 px-2 rounded-xl shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center gap-1 min-h-[4rem] sm:min-h-[5rem]" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""}>
+            <div class="flex items-center gap-1 sm:gap-2">
               ${getOperationIcon(operationKey, iconColor)}
-              <span class="text-sm">${translatedLabel}</span>
+              <span class="text-xs sm:text-sm">${translatedLabel}</span>
             </div>
             <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? "" : "display-none"}" data-operation="${operationKey}">${previewText}</span>
           </button>`;
@@ -426,72 +426,72 @@ function createGameUI() {
       
       <!-- Utility Row -->
       <section class="grid grid-cols-3 gap-2" data-purpose="utility-controls">
-        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= moveLimit ? "ring-4 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn">
+        <button class="bg-[#374151] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn">
           ${translate("gameStates.reset")}
         </button>
-        <button class="bg-[#374151] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
-          <span>ℹ️</span> ${translate("help")}
+        <button class="bg-[#374151] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
+          <span>ℹ️</span> <span class="hidden sm:inline">${translate("help")}</span>
         </button>
-        <button class="bg-[#6b46c1] border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn">
-          <span>${showPreviews ? "👁️" : "🙈"}</span> Preview
+        <button class="bg-[#6b46c1] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn">
+          <span>${showPreviews ? "👁️" : "🙈"}</span> <span class="hidden sm:inline">Preview</span>
         </button>
       </section>
     </main>
     <!-- END: GameBoard -->
     
     <!-- Info Modal -->
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm info-modal hidden" id="info-modal">
-      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-3xl p-8 max-w-md w-11/12 text-center shadow-2xl">
-        <h3 class="text-2xl font-bold text-white mb-4">ℹ️ ${translate("howToPlay")}</h3>
-        <div class="text-white/95 text-sm text-left leading-relaxed mb-6" id="info-content">
-          <div class="mb-4">
-            <div class="text-center mb-3">
-              <span class="text-lg font-bold text-blue-300">${translate("operations.sumDigits").split(" ")[1]}:</span>
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm info-modal hidden p-4" id="info-modal">
+      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-2xl p-4 sm:p-6 max-w-sm w-full text-center shadow-2xl max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">ℹ️ ${translate("howToPlay")}</h3>
+        <div class="text-white/95 text-sm text-left leading-relaxed mb-4 sm:mb-6" id="info-content">
+          <div class="mb-3 sm:mb-4">
+            <div class="text-center mb-2 sm:mb-3">
+              <span class="text-base sm:text-lg font-bold text-blue-300">${translate("operations.sumDigits").split(" ")[1]}:</span>
             </div>
-            <div class="space-y-2">
+            <div class="space-y-1 sm:space-y-2">
               <div>• <span class="font-bold text-yellow-300">${translate("operations.reverse")}:</span> ${translate("operationDescriptions.reverse")}</div>
               <div>• <span class="font-bold text-yellow-300">${translate("operations.sumDigits")}:</span> ${translate("operationDescriptions.sumDigits")}</div>
               <div>• <span class="font-bold text-yellow-300">${translate("operations.append1")}:</span> ${translate("operationDescriptions.append1")}</div>
               <div>• <span class="font-bold text-yellow-300">${translate("operations.double")}:</span> ${translate("operationDescriptions.double")}</div>
             </div>
           </div>
-          <div class="mb-4 text-center">
+          <div class="mb-3 sm:mb-4 text-center">
             <p class="text-white/80 text-sm">${translate("instructions")}</p>
           </div>
-          <div class="mb-4">
+          <div class="mb-3 sm:mb-4">
             <div class="text-center mb-2">
-              <span class="text-lg font-bold text-blue-300">${translate("keyboardShortcuts").split(":")[0]}:</span>
+              <span class="text-base sm:text-lg font-bold text-blue-300">${translate("keyboardShortcuts").split(":")[0]}:</span>
             </div>
-            <div class="text-center text-sm">
-              <span class="bg-gray-700 px-2 py-1 rounded mx-1">1-4</span> ${translate("operations.sumDigits").split(" ")[1]} • <span class="bg-gray-700 px-2 py-1 rounded mx-1">R</span> ${translate("gameStates.reset").replace("↻ ", "")} • <span class="bg-gray-700 px-2 py-1 rounded mx-1">N</span> ${translate("gameStates.newGame").replace("🎯 ", "").split(" ")[0]}
+            <div class="text-center text-xs sm:text-sm">
+              <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">1-4</span> ${translate("operations.sumDigits").split(" ")[1]} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">R</span> ${translate("gameStates.reset").replace("↻ ", "")} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">N</span> ${translate("gameStates.newGame").replace("🎯 ", "").split(" ")[0]}
             </div>
           </div>
-          <div class="text-center text-emerald-300 font-semibold" id="difficulty-tip"></div>
+          <div class="text-center text-emerald-300 font-semibold text-sm" id="difficulty-tip"></div>
         </div>
-        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-6 py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1" id="close-info-btn">${translate("close")}</button>
+        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm" id="close-info-btn">${translate("close")}</button>
       </div>
     </div>
     
     <!-- Success Modal -->
-    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40" id="success-modal">
-      <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-t-4 border-emerald-500 rounded-t-3xl p-3 max-w-md mx-auto text-center shadow-2xl shadow-emerald-500/30">
-        <div class="flex items-center justify-center gap-3 mb-2">
-          <div class="text-4xl celebration-emoji" id="celebration-emoji">🎉</div>
-          <h2 class="text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">${translate("levelComplete")}</h2>
+    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40 p-2" id="success-modal">
+      <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-t-4 border-emerald-500 rounded-t-2xl p-3 sm:p-4 max-w-sm mx-auto text-center shadow-2xl shadow-emerald-500/30">
+        <div class="flex items-center justify-center gap-2 sm:gap-3 mb-2">
+          <div class="text-3xl sm:text-4xl celebration-emoji" id="celebration-emoji">🎉</div>
+          <h2 class="text-xl sm:text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">${translate("levelComplete")}</h2>
         </div>
-        <p class="text-white/90 text-lg mb-2" id="success-message">Great job!</p>
-        <div class="flex gap-6 justify-center mb-2">
+        <p class="text-white/90 text-base sm:text-lg mb-2" id="success-message">Great job!</p>
+        <div class="flex gap-4 sm:gap-6 justify-center mb-2">
           <div class="flex flex-col items-center">
             <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("moves")}</span>
-            <span class="text-emerald-400 text-xl font-bold drop-shadow-lg" id="final-moves">0</span>
+            <span class="text-emerald-400 text-lg sm:text-xl font-bold drop-shadow-lg" id="final-moves">0</span>
           </div>
           <div class="flex flex-col items-center">
             <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("targetNumber")}</span>
-            <span class="text-emerald-400 text-xl font-bold drop-shadow-lg" id="final-optimal">0</span>
+            <span class="text-emerald-400 text-lg sm:text-xl font-bold drop-shadow-lg" id="final-optimal">0</span>
           </div>
           <div class="flex flex-col items-center">
             <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">Efficiency</span>
-            <span class="text-yellow-400 text-xl font-bold drop-shadow-lg" id="final-efficiency">100%</span>
+            <span class="text-yellow-400 text-lg sm:text-xl font-bold drop-shadow-lg" id="final-efficiency">100%</span>
           </div>
         </div>
         
