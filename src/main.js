@@ -193,7 +193,7 @@ function calculateProgress(currentNumber, targetNumber) {
  * Get progress indicator with smooth color transitions
  */
 function getProgressIndicator(currentNumber, targetNumber) {
-  const progress = calculateProgress(currentNumber, targetNumber);
+  const progress = currentNumber === 1 ? 0 : calculateProgress(currentNumber, targetNumber);
   
   // Define RGB values for smooth transitions
   let color1, color2;
