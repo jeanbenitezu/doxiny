@@ -62,16 +62,6 @@ Mathematical beauty through minimal moves.
 3. **Universal Language** - Numbers speak to everyone
 4. **Infinite Replayability** - Always room to optimize
 
-### Taglines by Language
-
-| Language | Primary Tagline | Secondary |
-|----------|----------------|-----------|
-| English | "Do X in Y moves" | "The elegance is in efficiency" |
-| Spanish | "Haz X en Y movimientos" | "La elegancia está en la eficiencia" |
-| French | "Fais X en Y coups" | "L'élégance réside dans l'efficacité" |
-| German | "Mache X in Y Zügen" | "Eleganz liegt in der Eficienz" |
-| Portuguese | "Faça X em Y jogadas" | "A elegância está na eficiência" |
-
 ## Operation Icons & Labels
 
 ### Universal Icons
@@ -85,9 +75,6 @@ Mathematical beauty through minimal moves.
 const operations = {
   en: ["REVERSE", "SUM DIGITS", "APPEND 1", "DOUBLE"],
   es: ["INVERTIR", "SUMAR DÍGITOS", "AGREGAR 1", "DUPLICAR"],
-  fr: ["INVERSER", "ADDITIONNER", "AJOUTER 1", "DOUBLER"],
-  de: ["UMKEHREN", "ZIFFERN ADDIEREN", "1 ANHÄNGEN", "VERDOPPELN"],
-  pt: ["INVERTER", "SOMAR DÍGITOS", "ADICIONAR 1", "DUPLICAR"]
 };
 ```
 

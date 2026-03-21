@@ -21,14 +21,6 @@ export const translations = {
   appName: {
     en: "Doxiny",
     es: "Doxiny",
-    fr: "Doxiny",
-    de: "Doxiny",
-    pt: "Doxiny",
-  },
-
-  tagline: {
-    en: "Do X in Y moves",
-    es: "Haz X en Y movimientos",
   },
 
   subtitle: {
@@ -103,8 +95,12 @@ export const translations = {
       es: "↻ Reiniciar",
     },
     newGame: {
-      en: "🎯 New Challenge",
-      es: "🎯 Nuevo Desafío",
+      en: "New Challenge",
+      es: "Nuevo Desafío",
+    },
+    newGameShort: {
+      en: "New",
+      es: "Nuevo",
     },
   },
 
