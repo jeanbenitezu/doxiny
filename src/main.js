@@ -195,37 +195,46 @@ function calculateProgress(currentNumber, targetNumber) {
 function getProgressIndicator(currentNumber, targetNumber) {
   const progress = calculateProgress(currentNumber, targetNumber);
   
-  // Smooth color transitions based on progress
-  let bgColor = "";
+  // Define RGB values for smooth transitions
+  let color1, color2;
   
   if (progress == 100) {
-    bgColor = "from-emerald-500 to-green-500";
+    color1 = "16, 185, 129"; // emerald-500
+    color2 = "34, 197, 94";  // green-500
   } else if (progress >= 80) {
-    bgColor = "from-orange-500 to-yellow-500";
+    color1 = "249, 115, 22"; // orange-500
+    color2 = "234, 179, 8";  // yellow-500
   } else if (progress >= 60) {
-    bgColor = "from-blue-500 to-cyan-500";
+    color1 = "59, 130, 246"; // blue-500
+    color2 = "6, 182, 212";  // cyan-500
   } else if (progress >= 40) {
-    bgColor = "from-purple-500 to-blue-500";
+    color1 = "168, 85, 247"; // purple-500
+    color2 = "59, 130, 246"; // blue-500
   } else if (progress >= 20) {
-    bgColor = "from-pink-500 to-purple-500";
+    color1 = "236, 72, 153"; // pink-500
+    color2 = "168, 85, 247"; // purple-500
   } else {
-    bgColor = "from-gray-500 to-slate-500";
+    color1 = "107, 114, 128"; // gray-500
+    color2 = "100, 116, 139"; // slate-500
   }
   
-  return { progress, bgColor };
+  return { progress, color1, color2 };
 }
 
 /**
  * Generate compact progress bar with smooth animations
  */
 function getProgressHTML(currentNumber, targetNumber) {
-  const { progress, bgColor } = getProgressIndicator(currentNumber, targetNumber);
+  const { progress, color1, color2 } = getProgressIndicator(currentNumber, targetNumber);
   
   return `
-    <div class="relative bg-gray-800/50 rounded-full h-3 border border-white/10 overflow-hidden">
-      <div class="bg-gradient-to-r ${bgColor} h-full rounded-full transition-all duration-700 ease-out" 
-           style="width: ${progress}%"></div>
-      <div class="absolute inset-0 flex items-center justify-center text-white font-bold text-xs">
+    <div class="relative bg-gray-800/50 rounded-full h-6 border border-white/10 overflow-hidden">
+      <div id="progress-bar-fill" class="h-full rounded-full transition-all duration-700 ease-out" 
+           style="
+             width: ${progress}%;
+             background: linear-gradient(to right, rgb(${color1}), rgb(${color2}));
+           "></div>
+      <div id="progress-percentage" class="absolute inset-0 flex items-center justify-center text-white font-bold text-sm drop-shadow-lg">
         ${progress}%
       </div>
     </div>
@@ -434,7 +443,13 @@ function createGameUI() {
     
     <!-- Progress Indicator -->
     <div class="w-full p-1" id="progress-container">
-      ${getProgressHTML(gameState.current, exercise.goal)}
+      <div class="relative bg-gray-800/50 rounded-full h-6 border border-white/10 overflow-hidden">
+        <div id="progress-bar-fill" class="h-full rounded-full transition-all duration-700 ease-out" 
+             style="width: 0%; background: linear-gradient(to right, rgb(107, 114, 128), rgb(100, 116, 139));"></div>
+        <div id="progress-percentage" class="absolute inset-0 flex items-center justify-center text-white font-bold text-sm drop-shadow-lg">
+          0%
+        </div>
+      </div>
     </div>
     
     <!-- BEGIN: GameBoard -->
@@ -654,7 +669,20 @@ function updateDisplay() {
   const progressContainer = document.getElementById("progress-container");
   if (progressContainer) {
     const exerciseInfo = gameManager.getCurrentExerciseInfo();
-    progressContainer.innerHTML = getProgressHTML(gameState.current, exerciseInfo.exercise.goal);
+    const progressBarFill = document.getElementById("progress-bar-fill");
+    const progressPercentage = document.getElementById("progress-percentage");
+    
+    if (progressBarFill && progressPercentage) {
+      // Update existing elements for smooth transitions
+      const { progress, color1, color2 } = getProgressIndicator(gameState.current, exerciseInfo.exercise.goal);
+      
+      progressBarFill.style.width = `${progress}%`;
+      progressBarFill.style.background = `linear-gradient(to right, rgb(${color1}), rgb(${color2}))`;
+      progressPercentage.textContent = `${progress}%`;
+    } else {
+      // Fallback: recreate if elements don't exist
+      progressContainer.innerHTML = getProgressHTML(gameState.current, exerciseInfo.exercise.goal);
+    }
   }
 
   // Update operation preview text and button states
@@ -789,10 +817,11 @@ function showSuccessModal() {
     // Check for level progression
     const levelChange = completionResult.levelChange;
     if (levelChange.changed) {
-      difficultyChangeText.textContent = `Advanced to Level ${levelChange.nextDifficulty}!`;
+      const levelText = translate("levelProgression.advancedToLevel").replace("{level}", levelChange.nextDifficulty);
+      difficultyChangeText.textContent = levelText;
       difficultyChangeMessage.classList.remove("hidden");
     } else if (gameManager.currentDifficulty === 6) {
-      difficultyChangeText.textContent = `🏆 You've mastered all levels!`;
+      difficultyChangeText.textContent = translate("levelProgression.masteredAllLevels");
       difficultyChangeMessage.classList.remove("hidden");
     } else {
       difficultyChangeMessage.classList.add("hidden");

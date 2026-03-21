@@ -169,6 +169,18 @@ export const translations = {
     es: "Sin movimientos aún",
   },
 
+  // Level Progression Messages
+  levelProgression: {
+    advancedToLevel: {
+      en: "Advanced to Level {level}!",
+      es: "¡Avanzaste al Nivel {level}!",
+    },
+    masteredAllLevels: {
+      en: "🏆 You've mastered all levels!",
+      es: "🏆 ¡Has dominado todos los niveles!",
+    },
+  },
+
   // Difficulty Levels
   difficultyLevels: {
     beginner: {
