@@ -41,12 +41,6 @@ body {
   box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); /* Transform Orange */
 }
 
-.glass-panel {
-  background: rgba(30, 58, 138, 0.05); /* Subtle Doxiny Blue tint */
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(30, 58, 138, 0.1);
-}
-
 /* Celebration animations */
 @keyframes bounce {
   0%,
@@ -176,37 +170,5 @@ button:active:not(:disabled) {
   .current-number.updated {
     transform: none;
     transition: none;
-  }
-}
-
-/* Dark mode support for better system integration */
-@media (prefers-color-scheme: dark) {
-  /* Already optimized for dark themes */
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-  }
-
-  button {
-    border-width: 2px;
-  }
-}
-
-/* Large text support */
-@media (prefers-reduced-data: reduce) {
-  .glass-panel {
-    backdrop-filter: none;
-  }
-}
-
-/* Print styles */
-@media print {
-  .hint-modal,
-  .success-modal {
-    display: none !important;
   }
 }

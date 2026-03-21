@@ -382,7 +382,7 @@ function createGameUI() {
     <!-- BEGIN: GameBoard -->
     <main class="w-full flex-1 flex flex-col" style="height: 74vh; height: 74svh; gap: 1vh; gap: 1svh;">
       <!-- Central Number Display -->
-      <section class="glass-panel rounded-xl flex justify-center items-center" style="height: 18vh; height: 18svh; min-height: 4rem;" data-purpose="number-display">
+      <section class="rounded-xl flex justify-center items-center" style="height: 18vh; height: 18svh; min-height: 4rem;" data-purpose="number-display">
         <span class="font-black text-white tracking-tighter current-number" id="current-number" style="font-size: clamp(2.5rem, 8vh, 5rem); font-size: clamp(2.5rem, 8svh, 5rem);">${gameState.current}</span>
       </section>
       
