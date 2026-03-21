@@ -413,7 +413,7 @@ function createGameUI() {
             const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
             const operationKey = op === "sumDigits" ? "sum" : op;
             const translatedLabel = translate(`operations.${op}`);
-            return `<button class="${buttonClass} font-black rounded-xl shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="height: 13dvh; max-height: 7rem; font-size: clamp(0.6rem, 1.8vh, 0.9rem); font-size: clamp(0.6rem, 1.8svh, 0.9rem);">
+            return `<button class="${buttonClass} font-black rounded-xl shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="height: 13vh; height: 13svh; max-height: 7rem; font-size: clamp(0.6rem, 1.8vh, 0.9rem); font-size: clamp(0.6rem, 1.8svh, 0.9rem);">
             <div class="flex items-center gap-1">
               ${getOperationIcon(operationKey, iconColor)}
               <span>${translatedLabel}</span>
