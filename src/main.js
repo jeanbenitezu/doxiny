@@ -388,7 +388,7 @@ function createGameUI() {
       </section>
       
       <!-- Inline History -->
-      <section class="flex-shrink-0" style="height: 12vh; min-height: 3rem;" data-purpose="inline-history">
+      <section class="flex-shrink-0" style="min-height: 3rem;" data-purpose="inline-history">
         <div class="bg-[#1a1a1a] rounded-lg p-2 border border-white/10 transition-all duration-300 h-full" id="history-container">
           <div class="flex items-center justify-between mb-1">
             <h4 class="text-white/70 uppercase tracking-wide font-semibold" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem);">${translate("history")}</h4>
