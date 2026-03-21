@@ -418,7 +418,7 @@ function createGameUI() {
               ${getOperationIcon(operationKey, iconColor)}
               <span class="text-xs sm:text-sm">${translatedLabel}</span>
             </div>
-            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text ${showPreviews ? "" : "display-none"}" data-operation="${operationKey}">${previewText}</span>
+            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text truncate w-full ${showPreviews ? "" : "display-none"}" data-operation="${operationKey}">${previewText}</span>
           </button>`;
           })
           .join("")}
@@ -607,6 +607,11 @@ function updateDisplay() {
         previewEl.classList.remove("invisible");
       } else {
         previewEl.classList.add("invisible");
+      }
+
+      if (previewEl.scrollWidth > previewEl.clientWidth) {
+        // If text is too long, truncate and add ellipsis
+        previewEl.textContent = "..." + previewEl.textContent.slice(20);
       }
     }
 
