@@ -400,7 +400,7 @@ function createGameUI() {
       </section>
       
       <!-- Operation Buttons Grid -->
-      <section class="grid grid-cols-2 gap-2 flex-1" style="min-height: 25vh; min-height: 25svh;" data-purpose="game-controls">
+      <section class="grid grid-cols-2 gap-2 flex-1" data-purpose="game-controls">
         ${["reverse", "sumDigits", "append1", "double"]
           .map((op) => {
             const previews = getOperationPreviews(gameState.current);
@@ -414,7 +414,7 @@ function createGameUI() {
             const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
             const operationKey = op === "sumDigits" ? "sum" : op;
             const translatedLabel = translate(`operations.${op}`);
-            return `<button class="${buttonClass} font-black rounded-xl shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="min-height: 12vh; min-height: 12svh; max-height: 12vh; max-height: s12vh; font-size: clamp(0.6rem, 1.8vh, 0.9rem); font-size: clamp(0.6rem, 1.8svh, 0.9rem);">
+            return `<button class="${buttonClass} font-black rounded-xl shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="min-height: 3rem; font-size: clamp(0.6rem, 1.8vh, 0.9rem); font-size: clamp(0.6rem, 1.8svh, 0.9rem);">
             <div class="flex items-center gap-1">
               ${getOperationIcon(operationKey, iconColor)}
               <span>${translatedLabel}</span>
@@ -426,7 +426,7 @@ function createGameUI() {
       </section>
       
       <!-- Utility Row -->
-      <section class="grid grid-cols-3 gap-2 flex-shrink-0" style="height: 8vh; height: 8svh; min-height: 2.5rem; max-height: 3.5rem;" data-purpose="utility-controls">
+      <section class="grid grid-cols-3 gap-2 flex-1 flex-shrink-0" style="max-height: 8vh; max-height: 8svh;" data-purpose="utility-controls">
         <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           ${translate("gameStates.reset")}
         </button>
