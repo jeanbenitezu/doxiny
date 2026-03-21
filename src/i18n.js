@@ -172,7 +172,7 @@ export const translations = {
   // Difficulty Levels
   difficultyLevels: {
     beginner: {
-      en: "Beginner",
+      en: "New",
       es: "Nuevo",
     },
     easy: {
