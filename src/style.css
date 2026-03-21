@@ -58,6 +58,114 @@ body {
   }
 }
 
+@keyframes rainbow-celebration {
+  0%, 66.67%, 100% {
+    background: linear-gradient(45deg, 
+      #ff0000, #ff7700, #ffff00, #00ff00, 
+      #0099ff, #6633ff, #ff00ff
+    );
+    background-size: 400% 400%;
+    background-position: 0% 50%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transform: scale(1) rotate(0deg);
+  }
+  8.33% {
+    background-position: 100% 50%;
+    transform: scale(1.2) rotate(10deg);
+  }
+  16.67% {
+    background-position: 50% 100%;
+    transform: scale(1.1) rotate(-6deg);
+  }
+  25% {
+    background-position: 0% 0%;
+    transform: scale(1.16) rotate(4deg);
+  }
+  33.33% {
+    background-position: 100% 100%;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.rainbow-celebrate {
+  animation: rainbow-celebration 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+}
+
+/* Confetti explosion animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  z-index: 9999;
+  animation: confetti-fall 3s ease-in forwards;
+  pointer-events: none;
+}
+
+.confetti-square {
+  background: #f39c12;
+}
+
+.confetti-circle {
+  background: #e74c3c;
+  border-radius: 50%;
+}
+
+.confetti-triangle {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid #3498db;
+  background: transparent;
+}
+
+.confetti-star {
+  background: #9b59b6;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.confetti-heart {
+  background: #e91e63;
+  width: 8px;
+  height: 6px;
+  border-radius: 4px 4px 0 0;
+  transform: rotate(45deg);
+}
+
+.confetti-heart:before,
+.confetti-heart:after {
+  content: '';
+  width: 8px;
+  height: 6px;
+  position: absolute;
+  left: -4px;
+  top: 0;
+  background: #e91e63;
+  border-radius: 4px 4px 0 0;
+  transform: rotate(-45deg);
+  transform-origin: 0 6px;
+}
+
+.confetti-heart:after {
+  left: 0;
+  transform: rotate(45deg);
+  transform-origin: 4px 6px;
+}
+
 .celebration-emoji {
   animation: bounce 1s ease-in-out infinite;
 }

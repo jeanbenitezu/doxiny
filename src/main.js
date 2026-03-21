@@ -867,12 +867,97 @@ function showSuccessModal() {
       navigator.vibrate([200, 100, 200]); // Standard completion vibration
     }
 
+    // Add rainbow animation to current number
+    const currentNumberEl = document.getElementById("current-number");
+    if (currentNumberEl) {
+      currentNumberEl.classList.add("rainbow-celebrate");
+      
+      // Remove rainbow animation after 30 seconds for extended celebration
+      setTimeout(() => {
+        if (currentNumberEl) {
+          currentNumberEl.classList.remove("rainbow-celebrate");
+        }
+      }, 30000);
+    }
+
     // Animate celebration emoji
     setTimeout(() => {
       emoji.style.animation = completionResult.isPerfect
         ? "bounce 1s ease-in-out infinite"
         : "pulse 2s ease-in-out infinite";
     }, 100);
+
+    // Create confetti explosion
+    createConfettiExplosion();
+  }
+}
+
+/**
+ * Create spectacular confetti explosion
+ */
+function createConfettiExplosion() {
+  const colors = ['#ff0000', '#ff7700', '#ffff00', '#00ff00', '#0099ff', '#6633ff', '#ff00ff', '#ff1493', '#00ced1'];
+  const shapes = ['square', 'circle', 'triangle', 'star', 'heart'];
+  const confettiCount = 100;
+  
+  for (let i = 0; i < confettiCount; i++) {
+    const confetti = document.createElement('div');
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    
+    confetti.className = `confetti confetti-${shape}`;
+    
+    // Random position across screen width
+    confetti.style.left = Math.random() * 100 + '%';
+    
+    // Random delay for staggered effect
+    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+    
+    // Random duration for varied fall speed
+    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    
+    // Random color for non-shaped confetti
+    if (shape === 'square' || shape === 'circle') {
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+    }
+    
+    // Random size variation
+    const size = Math.random() * 6 + 8;
+    confetti.style.width = size + 'px';
+    confetti.style.height = size + 'px';
+    
+    document.body.appendChild(confetti);
+    
+    // Remove confetti after animation completes
+    setTimeout(() => {
+      if (confetti.parentNode) {
+        confetti.parentNode.removeChild(confetti);
+      }
+    }, 4000);
+  }
+}
+
+/**
+ * Clean up success celebration animations
+ */
+function cleanupSuccessAnimations() {
+  // Remove rainbow animation from current number
+  const currentNumberEl = document.getElementById("current-number");
+  if (currentNumberEl && currentNumberEl.classList.contains("rainbow-celebrate")) {
+    currentNumberEl.classList.remove("rainbow-celebrate");
+  }
+  
+  // Clean up any remaining confetti
+  const remainingConfetti = document.querySelectorAll('.confetti');
+  remainingConfetti.forEach(confetti => {
+    if (confetti.parentNode) {
+      confetti.parentNode.removeChild(confetti);
+    }
+  });
+  
+  // Reset celebration emoji animation
+  const emoji = document.getElementById("celebration-emoji");
+  if (emoji) {
+    emoji.style.animation = "";
   }
 }
 
@@ -901,6 +986,7 @@ function handleOperationClick(operation) {
  * Handle reset button click
  */
 function handleReset() {
+  cleanupSuccessAnimations();
   gameState = resetGame(
     gameManager.currentExercise.goal,
     gameManager.currentDifficulty,
@@ -912,6 +998,7 @@ function handleReset() {
  * Generate new exercise
  */
 function handleNewExercise() {
+  cleanupSuccessAnimations();
   gameManager.generateNewExercise();
   updateMoveLimit();
   gameState = createGameState(
@@ -955,6 +1042,7 @@ function handleRetryExercise() {
  */
 function handleDifficultySelect(difficulty) {
   if (gameManager.setDifficulty(difficulty)) {
+    cleanupSuccessAnimations();
     updateMoveLimit();
     gameState = createGameState(
       gameManager.currentExercise.goal,
@@ -987,6 +1075,7 @@ function showInfoModal() {
  */
 function handleLanguageChange(langCode) {
   if (setLanguage(langCode)) {
+    cleanupSuccessAnimations();
     // Re-render the entire UI with new language
     const app = document.getElementById("app");
     app.innerHTML = createGameUI();
@@ -1019,9 +1108,11 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#info-btn")) {
       showInfoModal();
     } else if (e.target.closest("#next-exercise-btn")) {
+      cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
       handleNextExercise();
     } else if (e.target.closest("#retry-exercise-btn")) {
+      cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
       handleRetryExercise();
     } else if (e.target.closest(".level-btn")) {
