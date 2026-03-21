@@ -320,11 +320,11 @@ function createGameUI() {
 
   return `
     <!-- BEGIN: MainHeader -->
-    <header class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 pb-2" data-purpose="app-header">
-      <div class="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 mb-1 sm:mb-0">
-        <span class="text-xl sm:text-2xl">🔢</span>
-        <h1 class="text-sm sm:text-lg font-bold tracking-wide uppercase">Doxiny</h1>
-        <div class="text-xs text-white/60 hidden xs:block">${translate("tagline")}</div>
+    <header class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between py-1" style="height: 8vh; min-height: 3rem;" data-purpose="app-header">
+      <div class="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
+        <span class="text-base sm:text-xl" style="font-size: clamp(1rem, 2.5vh, 1.5rem)">🔢</span>
+        <h1 class="font-bold tracking-wide uppercase" style="font-size: clamp(0.8rem, 2vh, 1.2rem)">Doxiny</h1>
+        <div class="text-white/60 hidden xs:block" style="font-size: clamp(0.6rem, 1.5vh, 0.8rem)">${translate("tagline")}</div>
       </div>
       
       <!-- Language Switcher - Compact -->
@@ -333,10 +333,11 @@ function createGameUI() {
           .map(
             (lang) => `
           <button class="language-btn ${getCurrentLanguage() === lang.code ? "bg-blue-600 border border-blue-400" : "bg-gray-600/50 border border-white/20"} 
-                         rounded px-2 py-1 text-xs font-semibold transition-all active:scale-95 flex items-center gap-1"
+                         rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1"
+                  style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); height: clamp(1.5rem, 3vh, 2rem);"
                   data-lang="${lang.code}">
-            <span class="text-xs">${lang.flag}</span>
-            <span class="text-xs">${lang.code.toUpperCase()}</span>
+            <span>${lang.flag}</span>
+            <span>${lang.code.toUpperCase()}</span>
           </button>
         `,
           )
@@ -346,15 +347,15 @@ function createGameUI() {
     <!-- END: MainHeader -->
     
     <!-- Level Selector -->
-    <nav class="w-full mb-3" data-purpose="level-selector">
-      <div class="grid grid-cols-6 gap-1">
+    <nav class="w-full mb-3" style="height: 6vh; min-height: 2.5rem; max-height: 4rem;" data-purpose="level-selector">
+      <div class="grid grid-cols-6 gap-1 h-full">
         ${availableLevels
           .map(
             (lvl) =>
-              `<button class="${lvl.level === gameManager.currentDifficulty ? "bg-orange-600 border border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60"} rounded-lg p-1 sm:p-2 flex flex-col items-center transition-all active:scale-95 level-btn min-h-[2.5rem] sm:min-h-[3rem]" 
+              `<button class="${lvl.level === gameManager.currentDifficulty ? "bg-orange-600 border border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60"} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
                    data-level="${lvl.level}">
-            <span class="text-xs sm:text-lg font-bold">${lvl.level}</span>
-            <span class="text-[7px] sm:text-[9px] uppercase font-bold leading-tight">${translate(`difficultyLevels.${lvl.nameKey}`)}</span>
+            <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem);">${lvl.level}</span>
+            <span class="uppercase font-bold leading-tight" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem);">${translate(`difficultyLevels.${lvl.nameKey}`)}</span>
           </button>`,
           )
           .join("")}
@@ -362,44 +363,44 @@ function createGameUI() {
     </nav>
     
     <!-- Goal Display with Moves and New Exercise on the right -->  
-    <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-3 mb-3 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+    <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-2 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1" style="height: 7rem;">
       <div class="text-center flex-1">
-        <div class="text-white text-xs sm:text-sm font-semibold uppercase tracking-wide mb-1">${translate("targetNumber")}</div>
-        <div class="text-white text-2xl sm:text-3xl font-black tracking-tight">${translate("reach")} ${exercise.goal}</div>
-        <div class="text-emerald-200 text-xs mt-1 hidden sm:block">${translate("transformInto")} ${exercise.goal}</div>
+        <div class="text-white font-semibold uppercase tracking-wide mb-1" style="font-size: clamp(0.6rem, 1.5vh, 0.8rem);">${translate("targetNumber")}</div>
+        <div class="text-white font-black tracking-tight" style="font-size: clamp(1.2rem, 3vh, 1.8rem);">${translate("reach")} ${exercise.goal}</div>
+        <div class="text-emerald-200 mt-1 hidden sm:block" style="font-size: clamp(0.6rem, 1.2vh, 0.7rem);">${translate("transformInto")} ${exercise.goal}</div>
       </div>
       <div class="flex flex-row sm:flex-col justify-between sm:justify-center gap-2 sm:gap-1 sm:ml-3">
         <div class="text-center">
-          <div class="text-emerald-200 text-xs uppercase tracking-wide font-semibold">${translate("moves")}</div>
-          <div id="moves-count" class="text-white text-lg sm:text-xl font-bold">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
+          <div class="text-emerald-200 uppercase tracking-wide font-semibold" style="font-size: clamp(0.6rem, 1.3vh, 0.8rem);">${translate("moves")}</div>
+          <div id="moves-count" class="text-white font-bold" style="font-size: clamp(0.9rem, 2.2vh, 1.3rem);">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
         </div>
-        <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white text-xs font-bold px-2 sm:px-3 py-2 rounded-lg transition-all active:scale-95 whitespace-nowrap" id="new-exercise-btn">
+        <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem);" id="new-exercise-btn">
           🎲 <span class="hidden xs:inline">${translate("gameStates.newGame").replace("🎯 ", "")}</span><span class="xs:hidden">New</span>
         </button>
       </div>
     </div>
     
     <!-- BEGIN: GameBoard -->
-    <main class="w-full flex-1 flex flex-col gap-2">
+    <main class="w-full flex-1 flex flex-col" style="height: 74vh; gap: 1vh;">
       <!-- Central Number Display -->
-      <section class="glass-panel rounded-2xl p-4 sm:p-6 flex justify-center items-center mb-2" data-purpose="number-display">
-        <span class="text-5xl sm:text-6xl lg:text-8xl font-black text-white tracking-tighter current-number" id="current-number">${gameState.current}</span>
+      <section class="glass-panel rounded-xl flex justify-center items-center" style="height: 18vh; min-height: 4rem;" data-purpose="number-display">
+        <span class="font-black text-white tracking-tighter current-number" id="current-number" style="font-size: clamp(2.5rem, 8vh, 5rem);">${gameState.current}</span>
       </section>
       
       <!-- Inline History -->
-      <section class="mb-3" data-purpose="inline-history">
-        <div class="bg-[#1a1a1a] rounded-xl p-2 sm:p-3 border border-white/10 transition-all duration-300" id="history-container">
-          <div class="flex items-center justify-between mb-1 sm:mb-2">
-            <h4 class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("history")}</h4>
+      <section class="flex-shrink-0" style="height: 12vh; min-height: 3rem;" data-purpose="inline-history">
+        <div class="bg-[#1a1a1a] rounded-lg p-2 border border-white/10 transition-all duration-300 h-full" id="history-container">
+          <div class="flex items-center justify-between mb-1">
+            <h4 class="text-white/70 uppercase tracking-wide font-semibold" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem);">${translate("history")}</h4>
           </div>
-          <div class="flex overflow-x-scroll gap-1 sm:gap-2 items-start transition-all duration-300 pb-2 sm:pb-3" id="inline-history-content">
+          <div class="flex overflow-x-scroll gap-1 items-start transition-all duration-300 pb-1 h-4/5" id="inline-history-content">
             ${renderInlineHistory()}
           </div>
         </div>
       </section>
       
       <!-- Operation Buttons Grid -->
-      <section class="grid grid-cols-2 gap-3" data-purpose="game-controls">
+      <section class="grid grid-cols-2 gap-2 flex-1" style="min-height: 25vh;" data-purpose="game-controls">
         ${["reverse", "sumDigits", "append1", "double"]
           .map((op) => {
             const previews = getOperationPreviews(gameState.current);
@@ -413,26 +414,26 @@ function createGameUI() {
             const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
             const operationKey = op === "sumDigits" ? "sum" : op;
             const translatedLabel = translate(`operations.${op}`);
-            return `<button class="${buttonClass} font-black py-2 sm:py-3 px-2 rounded-xl shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center gap-1 min-h-[4rem] sm:min-h-[5rem]" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""}>
-            <div class="flex items-center gap-1 sm:gap-2">
+            return `<button class="${buttonClass} font-black rounded-xl shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="min-height: 12vh; font-size: clamp(0.6rem, 1.8vh, 0.9rem);">
+            <div class="flex items-center gap-1">
               ${getOperationIcon(operationKey, iconColor)}
-              <span class="text-xs sm:text-sm">${translatedLabel}</span>
+              <span>${translatedLabel}</span>
             </div>
-            <span class="text-xs font-normal lowercase tracking-normal opacity-75 preview-text truncate w-full ${showPreviews ? "" : "display-none"}" data-operation="${operationKey}">${previewText}</span>
+            <span class="font-normal lowercase tracking-normal opacity-75 preview-text truncate w-full ${showPreviews ? "" : "display-none"}" data-operation="${operationKey}" style="font-size: clamp(0.5rem, 1.4vh, 0.7rem);">${previewText}</span>
           </button>`;
           })
           .join("")}
       </section>
       
       <!-- Utility Row -->
-      <section class="grid grid-cols-3 gap-2" data-purpose="utility-controls">
-        <button class="bg-[#374151] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-1 text-xs font-bold transition-all active:scale-95 reset-btn ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn">
+      <section class="grid grid-cols-3 gap-2 flex-shrink-0" style="height: 8vh; min-height: 2.5rem; max-height: 3.5rem;" data-purpose="utility-controls">
+        <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem);">
           ${translate("gameStates.reset")}
         </button>
-        <button class="bg-[#374151] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 info-btn" id="info-btn">
+        <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 info-btn h-full" id="info-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem);">
           <span>ℹ️</span> <span class="hidden sm:inline">${translate("help")}</span>
         </button>
-        <button class="bg-[#6b46c1] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-1 text-xs font-bold transition-transform active:scale-95 ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn">
+        <button class="bg-[#6b46c1] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem);">
           <span>${showPreviews ? "👁️" : "🙈"}</span> <span class="hidden sm:inline">Preview</span>
         </button>
       </section>
