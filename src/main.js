@@ -320,11 +320,10 @@ function createGameUI() {
 
   return `
     <!-- BEGIN: MainHeader -->
-    <header class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between py-1" style="height: 8vh; height: 8svh; min-height: 3rem;" data-purpose="app-header">
+    <header class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between py-1" data-purpose="app-header">
       <div class="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
         <span class="text-base sm:text-xl" style="font-size: clamp(1rem, 2.5vh, 1.5rem); font-size: clamp(1rem, 2.5svh, 1.5rem)">🔢</span>
         <h1 class="font-bold tracking-wide uppercase" style="font-size: clamp(0.8rem, 2vh, 1.2rem); font-size: clamp(0.8rem, 2svh, 1.2rem)">Doxiny</h1>
-        <div class="text-white/60 hidden xs:block" style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem)">${translate("tagline")}</div>
       </div>
       
       <!-- Language Switcher - Compact -->
@@ -375,7 +374,7 @@ function createGameUI() {
           <div id="moves-count" class="text-white font-bold" style="font-size: clamp(0.9rem, 2.2vh, 1.3rem); font-size: clamp(0.9rem, 2.2svh, 1.3rem);">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
         </div>
         <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="new-exercise-btn">
-          🎲 <span class="hidden xs:inline">${translate("gameStates.newGame").replace("🎯 ", "")}</span><span class="xs:hidden">New</span>
+          🎲 <span>${translate("gameStates.newGame")}</span>
         </button>
       </div>
     </div>
@@ -464,7 +463,7 @@ function createGameUI() {
               <span class="text-base sm:text-lg font-bold text-blue-300">${translate("keyboardShortcuts").split(":")[0]}:</span>
             </div>
             <div class="text-center text-xs sm:text-sm">
-              <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">1-4</span> ${translate("operations.sumDigits").split(" ")[1]} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">R</span> ${translate("gameStates.reset").replace("↻ ", "")} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">N</span> ${translate("gameStates.newGame").replace("🎯 ", "").split(" ")[0]}
+              <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">1-4</span> ${translate("operations.sumDigits").split(" ")[1]} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">R</span> ${translate("gameStates.reset").replace("↻ ", "")} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">N</span> ${translate("gameStates.newGame")}
             </div>
           </div>
           <div class="text-center text-emerald-300 font-semibold text-sm" id="difficulty-tip"></div>

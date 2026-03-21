@@ -95,10 +95,6 @@ export const translations = {
       es: "↻ Reiniciar",
     },
     newGame: {
-      en: "New Challenge",
-      es: "Nuevo Desafío",
-    },
-    newGameShort: {
       en: "New",
       es: "Nuevo",
     },
