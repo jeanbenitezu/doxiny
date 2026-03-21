@@ -5,7 +5,7 @@
 
 import { createGameState, applyMove, resetGame } from "./game.js";
 import { operations, operationLabels } from "./operations.js";
-import { generateExercise, getDifficultyLevels } from "./exerciseGenerator.js";
+import { generateExercise, getDifficultyLevels, calculateProgressToTarget } from "./exerciseGenerator.js";
 import {
   translate,
   t,
@@ -178,6 +178,59 @@ function updateMoveLimit() {
 
 // Get available difficulty levels for UI
 const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
+
+/**
+ * Calculate progress toward goal as percentage (0-100) using dynamic path calculation
+ */
+function calculateProgress(currentNumber, targetNumber) {
+  const exerciseInfo = gameManager.getCurrentExerciseInfo();
+  const optimalMoves = exerciseInfo.exercise.optimalMoves || 10;
+  
+  return calculateProgressToTarget(currentNumber, targetNumber, gameState.moves, optimalMoves);
+}
+
+/**
+ * Get progress indicator with smooth color transitions
+ */
+function getProgressIndicator(currentNumber, targetNumber) {
+  const progress = calculateProgress(currentNumber, targetNumber);
+  
+  // Smooth color transitions based on progress
+  let bgColor = "";
+  
+  if (progress == 100) {
+    bgColor = "from-emerald-500 to-green-500";
+  } else if (progress >= 80) {
+    bgColor = "from-orange-500 to-yellow-500";
+  } else if (progress >= 60) {
+    bgColor = "from-blue-500 to-cyan-500";
+  } else if (progress >= 40) {
+    bgColor = "from-purple-500 to-blue-500";
+  } else if (progress >= 20) {
+    bgColor = "from-pink-500 to-purple-500";
+  } else {
+    bgColor = "from-gray-500 to-slate-500";
+  }
+  
+  return { progress, bgColor };
+}
+
+/**
+ * Generate compact progress bar with smooth animations
+ */
+function getProgressHTML(currentNumber, targetNumber) {
+  const { progress, bgColor } = getProgressIndicator(currentNumber, targetNumber);
+  
+  return `
+    <div class="relative bg-gray-800/50 rounded-full h-3 border border-white/10 overflow-hidden">
+      <div class="bg-gradient-to-r ${bgColor} h-full rounded-full transition-all duration-700 ease-out" 
+           style="width: ${progress}%"></div>
+      <div class="absolute inset-0 flex items-center justify-center text-white font-bold text-xs">
+        ${progress}%
+      </div>
+    </div>
+  `;
+}
 
 /**
  * Generate preview text for what each operation will do to current number
@@ -379,8 +432,13 @@ function createGameUI() {
       </div>
     </div>
     
+    <!-- Progress Indicator -->
+    <div class="w-full p-1" id="progress-container">
+      ${getProgressHTML(gameState.current, exercise.goal)}
+    </div>
+    
     <!-- BEGIN: GameBoard -->
-    <main class="w-full flex-1 flex flex-col" style="height: 74vh; height: 74svh; gap: 1vh; gap: 1svh;">
+    <main class="w-full flex-1 flex flex-col" style="height: 70vh; height: 70svh; gap: 1vh; gap: 1svh;">
       <!-- Central Number Display -->
       <section class="rounded-xl flex justify-center items-center" style="height: 18vh; height: 18svh; min-height: 4rem;" data-purpose="number-display">
         <span class="font-black text-white tracking-tighter current-number" id="current-number" style="font-size: clamp(2.5rem, 8vh, 5rem); font-size: clamp(2.5rem, 8svh, 5rem);">${gameState.current}</span>
@@ -590,6 +648,13 @@ function updateDisplay() {
     } else {
       movesEl.classList.add("text-red-400");
     }
+  }
+
+  // Update progress indicator
+  const progressContainer = document.getElementById("progress-container");
+  if (progressContainer) {
+    const exerciseInfo = gameManager.getCurrentExerciseInfo();
+    progressContainer.innerHTML = getProgressHTML(gameState.current, exerciseInfo.exercise.goal);
   }
 
   // Update operation preview text and button states

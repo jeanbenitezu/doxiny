@@ -131,6 +131,71 @@ function validateExercise(goal, maxMoves = 20) {
 }
 
 /**
+ * Find shortest path from any start number to target using BFS
+ */
+export function findShortestPath(start, target, maxMoves = 15) {
+  if (start === target) return [];
+  
+  const queue = [{ current: start, moves: 0, path: [] }];
+  const visited = new Set([start]);
+  
+  while (queue.length > 0) {
+    const { current, moves, path } = queue.shift();
+    
+    if (moves >= maxMoves || visited.size > 5000) continue;
+    
+    for (const [opName, opFunc] of Object.entries(operations)) {
+      const next = opFunc(current);
+      
+      if (next === target) {
+        return [...path, { operation: opName, from: current, to: next }];
+      }
+      
+      if (next > 0 && next <= 10000 && !visited.has(next)) {
+        visited.add(next);
+        queue.push({
+          current: next,
+          moves: moves + 1,
+          path: [...path, { operation: opName, from: current, to: next }],
+        });
+      }
+    }
+  }
+  
+  return []; // No path found
+}
+
+/**
+ * Calculate dynamic progress based on current position and remaining path
+ */
+export function calculateProgressToTarget(currentNumber, targetNumber, movesMade, optimalMoves) {
+  if (currentNumber === targetNumber) return 100;
+  
+  // Calculate shortest path from current number to target
+  const pathFromCurrent = findShortestPath(currentNumber, targetNumber);
+  
+  if (pathFromCurrent.length === 0) {
+    // If no path found, give minimal progress based on starting position
+    return currentNumber === 1 ? 0 : 5;
+  }
+  
+  // Calculate progress based on:
+  // - How many moves have been made from start (movesMade)
+  // - How many moves remain from current position (pathFromCurrent.length)
+  const totalEstimatedMoves = movesMade + pathFromCurrent.length;
+  
+  // Progress is based on moves completed vs estimated total
+  const progress = Math.round((movesMade / totalEstimatedMoves) * 100);
+  
+  // Bonus for being on or better than optimal path
+  if (totalEstimatedMoves <= optimalMoves) {
+    return Math.min(100, progress + 10); // 10% bonus for efficiency
+  }
+  
+  return Math.max(0, Math.min(95, progress)); // Cap at 95% until completion
+}
+
+/**
  * Main function: Generate a complete exercise
  */
 export function generateExercise(difficulty = 3) {
