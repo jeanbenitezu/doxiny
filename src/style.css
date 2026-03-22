@@ -108,6 +108,7 @@ body {
 
 .confetti {
   position: fixed;
+  top: -20px;
   width: 10px;
   height: 10px;
   z-index: 9999;
