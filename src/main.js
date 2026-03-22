@@ -1333,6 +1333,7 @@ function init() {
   if (typeof window !== 'undefined') {
     window.doxinyDev = {
       validateExercise: validateExercise,
+      calculateProgress: calculateProgress,
       gameManager: gameManager,
       gameState: () => gameState,
       operations: operations,

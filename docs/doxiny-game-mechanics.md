@@ -118,7 +118,7 @@ const progress = calculateProgressToTarget(currentNumber, goal, movesSoFar);
 // 1. Moves made vs shortest path from current position
 // 2. Distance remaining to goal (BFS calculation)
 // 3. Bonus: +10% for staying on optimal path
-// 4. Ceiling: 95% until exact completion (100% only when goal reached)
+// 4. Ceiling: 99% until exact completion (100% only when goal reached)
 ```
 
 ### Performance Grading

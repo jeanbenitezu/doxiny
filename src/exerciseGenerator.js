@@ -568,10 +568,10 @@ export function calculateProgressToTarget(currentNumber, targetNumber, movesMade
   
   // Bonus for being on or better than optimal path
   if (totalEstimatedMoves <= optimalMoves) {
-    return Math.min(100, progress + 10); // 10% bonus for efficiency
+    return Math.min(99, progress + 10); // 10% bonus for efficiency
   }
   
-  return Math.max(0, Math.min(95, progress)); // Cap at 95% until completion
+  return Math.max(0, Math.min(99, progress)); // Cap at 99% until completion
 }
 
 /**
