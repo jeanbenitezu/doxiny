@@ -1115,7 +1115,8 @@ function showHintModal(hint, hintsUsed, maxHints) {
   };
   
   hintIcon.textContent = icons[hint.type] || "💡";
-  hintLevel.textContent = `${translate("hint")} #${hintsUsed} (${hint.type})`;
+  const hintTypeCopy = translate(`hints.ui.types.${hint.type}`) || hint.type;
+  hintLevel.textContent = `${translate("hint")} #${hintsUsed} (${hintTypeCopy})`;
   hintMessage.textContent = hint.message;
   
   const remaining = maxHints - hintsUsed;

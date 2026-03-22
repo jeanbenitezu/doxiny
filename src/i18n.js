@@ -474,6 +474,20 @@ export const translations = {
         en: "This was your final hint for this exercise.",
         es: "Esta fue tu última pista para este ejercicio.",
       },
+      types: {
+        strategic: {
+          en: "Strategic",
+          es: "Estratégica",
+        },
+        tactical: {
+          en: "Tactical",
+          es: "Táctica",
+        },
+        direct: {
+          en: "Direct",
+          es: "Directa",
+        },
+      }
     },
   },
 
