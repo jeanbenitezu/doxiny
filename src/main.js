@@ -1329,12 +1329,23 @@ function init() {
   // Render initial UI
   app.innerHTML = createGameUI();
 
+  // Expose functions for dev tools testing
+  if (typeof window !== 'undefined') {
+    window.doxinyDev = {
+      validateExercise: validateExercise,
+      gameManager: gameManager,
+      gameState: () => gameState,
+      operations: operations,
+      generateExercise: generateExercise
+    };
+    console.log('🔧 Dev tools available: window.doxinyDev');
+  }
+
   const exercise = gameManager.currentExercise;
   console.log(
     `🧮 Number Puzzle loaded! Difficulty: ${gameManager.currentDifficulty}, Goal: 1 → ${exercise.goal}`,
   );
   console.log(`🎯 This exercise: ${exercise.optimalMoves} moves optimal`);
-  console.log("💡 Keys: 1-4 for operations, R for reset, N for new exercise");
 }
 
 // Start the game
