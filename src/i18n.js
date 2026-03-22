@@ -545,6 +545,10 @@ export const translations = {
         en: "You can still try to solve it!",
         es: "¡Aún puedes intentar resolverlo!",
       },
+      detectedLevel: {
+        en: "Detected level: {level}",
+        es: "Nivel detectado: {level}",
+      },
     },
   },
 };

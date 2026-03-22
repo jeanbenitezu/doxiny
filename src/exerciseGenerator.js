@@ -815,6 +815,51 @@ function generateFallbackHints(current, target, hintsUsed) {
 }
 
 /**
+ * Determine difficulty level for a custom exercise based on goal and optimal moves
+ * Returns level number (1-6) with fallback to level 6 (insane)
+ */
+export function detectCustomExerciseLevel(goal, optimalMoves) {
+  if (optimalMoves < 5) return 1;
+
+  // Check each difficulty level to see if the exercise fits
+  for (const [level, config] of Object.entries(difficultyLevels)) {
+    const levelNum = parseInt(level);
+    const [minGoal, maxGoal] = config.goalRange;
+    const [minMoves, maxMoves] = config.targetMoves;
+    
+    // Check if goal and moves fall within this level's range
+    // Allow some flexibility (+3 moves) for edge cases
+    if (goal >= minGoal && goal <= maxGoal && 
+        optimalMoves >= minMoves && optimalMoves <= maxMoves + 3) {
+      return levelNum;
+    }
+  }
+  
+  // Fallback: check by goal range only (if moves don't fit perfectly)
+  for (const [level, config] of Object.entries(difficultyLevels)) {
+    const levelNum = parseInt(level);
+    const [minGoal, maxGoal] = config.goalRange;
+    
+    if (goal >= minGoal && goal <= maxGoal) {
+      return levelNum;
+    }
+  }
+  
+  // Fallback: check by moves only
+  for (const [level, config] of Object.entries(difficultyLevels)) {
+    const levelNum = parseInt(level);
+    const [minMoves, maxMoves] = config.targetMoves;
+    
+    if (optimalMoves >= minMoves && optimalMoves <= maxMoves + 3) {
+      return levelNum;
+    }
+  }
+  
+  // Final fallback to insane level (6)
+  return 6;
+}
+
+/**
  * Get available difficulty levels with i18n keys
  */
 export function getDifficultyLevels() {

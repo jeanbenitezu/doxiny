@@ -5,7 +5,7 @@
 
 import { createGameState, applyMove, resetGame } from "./game.js";
 import { operations } from "./operations.js";
-import { generateExercise, generateHints, getDifficultyLevels, calculateProgressToTarget, validateExercise } from "./exerciseGenerator.js";
+import { generateExercise, generateHints, getDifficultyLevels, calculateProgressToTarget, validateExercise, detectCustomExerciseLevel } from "./exerciseGenerator.js";
 import {
   translate,
   t,
@@ -20,6 +20,8 @@ class GameManager {
   constructor() {
     this.currentDifficulty = 1;
     this.currentExercise = null;
+    this.isCustomExercise = false;
+    this.customExerciseLevel = null;
     this.playerStats = {
       exercisesCompleted: 0,
       totalMoves: 0,
@@ -31,6 +33,8 @@ class GameManager {
 
   generateNewExercise() {
     this.currentExercise = generateExercise(this.currentDifficulty);
+    this.isCustomExercise = false;
+    this.customExerciseLevel = null;
     console.log(
       `🎯 New Exercise: 1 → ${this.currentExercise.goal} (${this.currentExercise.optimalMoves} moves optimal)`,
     );
@@ -139,6 +143,23 @@ class GameManager {
       return true;
     }
     return false;
+  }
+
+  setCustomExercise(goal, optimalMoves, solutionPath = []) {
+    // Detect appropriate level for this custom exercise
+    this.customExerciseLevel = detectCustomExerciseLevel(goal, optimalMoves);
+    
+    this.currentExercise = {
+      goal: goal,
+      optimalMoves: optimalMoves,
+      solutionPath: solutionPath,
+      isCustom: true
+    };
+    
+    this.isCustomExercise = true;
+    
+    console.log(`🎯 Custom Exercise: 1 → ${goal} (detected level: ${this.customExerciseLevel}, ${optimalMoves} moves optimal)`);
+    return this.currentExercise;
   }
 
   getCurrentExerciseInfo() {
@@ -445,10 +466,23 @@ function createGameUI() {
           .map(
             (lvl) => {
               const isCustom = lvl.level === "custom";
-              const isActive = isCustom ? false : (lvl.level === gameManager.currentDifficulty);
-              const buttonClass = isCustom 
-                ? "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500" 
-                : (isActive ? "bg-orange-600 border border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60");
+              // For custom exercises, highlight the detected level
+              const isCustomActive = gameManager.isCustomExercise && !isCustom && lvl.level === gameManager.customExerciseLevel;
+              const isRegularActive = !gameManager.isCustomExercise && !isCustom && lvl.level === gameManager.currentDifficulty;
+              const isActive = isCustomActive || isRegularActive;
+              
+              let buttonClass;
+              if (isCustom) {
+                // Custom button - purple when not active, orange when a custom exercise is loaded
+                buttonClass = gameManager.isCustomExercise 
+                  ? "bg-orange-600 border border-orange-400 text-white" 
+                  : "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500";
+              } else {
+                // Regular level buttons
+                buttonClass = isActive 
+                  ? "bg-orange-600 border border-orange-400" 
+                  : "bg-[#2a2f3a] border border-white/10 opacity-60";
+              }
               
               return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
                    data-level="${lvl.level}">
@@ -1344,12 +1378,18 @@ function setupCustomExerciseModal() {
     
     const validation = validateExercise(targetValue);
     
+    // Detect difficulty level for display
+    const detectedLevel = detectCustomExerciseLevel(targetValue, validation.solvable ? validation.minMoves : 15);
+    const levelConfig = getDifficultyLevels().find(d => d.level === detectedLevel);
+    const levelName = levelConfig ? translate(`difficultyLevels.${levelConfig.nameKey}`) : translate('difficultyLevels.insane');
+    
     if (validation.solvable) {
       validationContent.innerHTML = `
         <div class="text-emerald-300">
           ✅ <strong>${t('customExerciseModal.validation.solvable')}</strong><br>
           ${t('customExerciseModal.validation.optimalSolution', { moves: validation.minMoves })}<br>
-          <span class="text-xs text-white/70">${t('customExerciseModal.validation.reachableFrom')}</span>
+          <span class="text-xs text-white/70">${t('customExerciseModal.validation.reachableFrom')}</span><br>
+          <span class="text-xs text-blue-300 font-semibold">${t('customExerciseModal.validation.detectedLevel', { level: levelName })}</span>
         </div>
       `;
       validationContent.className = "p-3 rounded-lg text-sm bg-emerald-900/20 border border-emerald-500/30";
@@ -1358,7 +1398,8 @@ function setupCustomExerciseModal() {
         <div class="text-yellow-300">
           ❓ <strong>${t('customExerciseModal.validation.unknownSolvability')}</strong><br>
           ${t('customExerciseModal.validation.notReachable')}<br>
-          <span class="text-xs text-white/70">${t('customExerciseModal.validation.canStillTry')}</span>
+          <span class="text-xs text-white/70">${t('customExerciseModal.validation.canStillTry')}</span><br>
+          <span class="text-xs text-blue-300 font-semibold">${t('customExerciseModal.validation.detectedLevel', { level: levelName })}</span>
         </div>
       `;
       validationContent.className = "p-3 rounded-lg text-sm bg-yellow-900/20 border border-yellow-500/30";
@@ -1379,13 +1420,12 @@ function setupCustomExerciseModal() {
     // Allow loading any number, even if not solvable
     const validation = validateExercise(targetValue);
     
-    // Create custom exercise
-    gameManager.currentExercise = {
-      goal: targetValue,
-      optimalMoves: validation.solvable ? validation.minMoves : Infinity,
-      solutionPath: validation.solutionPath || [],
-      isCustom: true
-    };
+    // Create custom exercise using GameManager
+    gameManager.setCustomExercise(
+      targetValue,
+      validation.solvable ? validation.minMoves : Infinity,
+      validation.solutionPath || []
+    );
     
     // Reset game state with new target
     gameState = createGameState(targetValue, gameManager.currentDifficulty);
@@ -1397,8 +1437,6 @@ function setupCustomExerciseModal() {
     const app = document.getElementById("app");
     app.innerHTML = createGameUI();
     updateDisplay();
-    
-    console.log(`🎯 Loaded custom exercise: 1 → ${targetValue} ${validation.solvable ? `(${validation.minMoves} moves optimal)` : '(unknown solvability)'}`);
     
     closeModal();
   });
