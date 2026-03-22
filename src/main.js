@@ -1093,6 +1093,10 @@ function handleHintRequest() {
   console.log(`💡 Hint ${gameState.hints.used}/${gameState.hints.maxHints} provided:`, nextHint.message);
 }
 
+// Global variables for managing hint timeouts
+let hintDisplayTimeout = null;
+let hintBlinkTimeout = null;
+
 /**
  * Show hint modal with hint information
  */
@@ -1135,9 +1139,15 @@ function showHintDisplay(hint, hintsUsed, maxHints) {
   
   display.classList.remove("hidden");
   
+  // Clear any existing timeout and set new one
+  if (hintDisplayTimeout) {
+    clearTimeout(hintDisplayTimeout);
+  }
+  
   // Auto-hide after 8 seconds for non-direct hints
-  setTimeout(() => {
+  hintDisplayTimeout = setTimeout(() => {
     display.classList.add("hidden");
+    hintDisplayTimeout = null;
   }, 8000);
 }
 
@@ -1150,9 +1160,15 @@ function blinkOperationButton(hint) {
     if (targetButton) {
       targetButton.classList.add('hint-blink');
       
+      // Clear any existing timeout and set new one
+      if (hintBlinkTimeout) {
+        clearTimeout(hintBlinkTimeout);
+      }
+      
       // Remove blink class after 3 seconds
-      setTimeout(() => {
+      hintBlinkTimeout = setTimeout(() => {
         targetButton.classList.remove('hint-blink');
+        hintBlinkTimeout = null;
       }, 3000);
     }
   }
@@ -1162,6 +1178,17 @@ function blinkOperationButton(hint) {
  * Clear all active hint effects (blinking and display)
  */
 function clearHintEffects() {
+  // Cancel any active timeouts
+  if (hintDisplayTimeout) {
+    clearTimeout(hintDisplayTimeout);
+    hintDisplayTimeout = null;
+  }
+  
+  if (hintBlinkTimeout) {
+    clearTimeout(hintBlinkTimeout);
+    hintBlinkTimeout = null;
+  }
+  
   // Remove blinking effect from operation buttons
   const blinkingButtons = document.querySelectorAll('.hint-blink');
   blinkingButtons.forEach(button => {
