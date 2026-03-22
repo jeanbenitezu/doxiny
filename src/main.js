@@ -1097,6 +1097,170 @@ function handleLanguageChange(langCode) {
   }
 }
 
+/**
+ * Show custom exercise modal
+ */
+function showCustomExerciseModal() {
+  // Create modal HTML
+  const modalHTML = `
+    <div id="custom-exercise-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-2xl shadow-2xl max-w-sm w-full text-center max-h-[90vh] max-h-[90svh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="p-4 sm:p-6">
+          <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center justify-center gap-2">
+            🎯 ${translate("customExercise") || "Custom Exercise"}
+          </h3>
+          <button id="close-custom-modal" class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors text-xl">
+            ✕
+          </button>
+          
+          <!-- Description -->
+          <div class="text-white/95 text-sm text-center leading-relaxed mb-4 sm:mb-6">
+            <p class="text-white/80">${translate("customExerciseDescription") || "Enter any target number between 2-10,000. We'll show if it's solvable, but you can load any number to try!"}</p>
+          </div>
+          
+          <!-- Input -->
+          <div class="mb-4">
+            <label for="custom-target" class="block text-white/95 font-semibold mb-2">
+              ${translate("targetNumber") || "Target Number"}
+            </label>
+            <input 
+              type="number" 
+              id="custom-target" 
+              class="w-full bg-white/10 border-2 border-white/20 focus:border-blue-300 rounded-xl px-4 py-3 text-white text-xl font-bold text-center transition-all outline-none"
+              placeholder="e.g., 128"
+              min="2"
+              max="10000"
+            />
+          </div>
+          
+          <!-- Validation Info -->
+          <div id="validation-info" class="mb-4 hidden">
+            <div id="validation-content" class="p-3 rounded-lg text-sm">
+              <!-- Validation info will go here -->
+            </div>
+          </div>
+          
+          <!-- Actions -->
+          <div class="flex gap-3 justify-center">
+            <button id="load-custom-btn" class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+              ${translate("loadExercise") || "Load Exercise"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add modal to page
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  // Set up modal functionality
+  setupCustomExerciseModal();
+}
+
+/**
+ * Setup custom exercise modal functionality
+ */
+function setupCustomExerciseModal() {
+  const modal = document.getElementById("custom-exercise-modal");
+  const input = document.getElementById("custom-target");
+  const loadBtn = document.getElementById("load-custom-btn");
+  const validationInfo = document.getElementById("validation-info");
+  const validationContent = document.getElementById("validation-content");
+  
+  // Close modal handlers
+  const closeModal = () => {
+    modal.remove();
+  };
+  
+  document.getElementById("close-custom-modal").addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+  
+  // Validate on input change with debouncing
+  let validationTimeout;
+  input.addEventListener("input", () => {
+    clearTimeout(validationTimeout);
+    validationTimeout = setTimeout(() => {
+      validateInput();
+    }, 500);
+  });
+  
+  function validateInput() {
+    const targetValue = parseInt(input.value);
+    
+    if (!targetValue || targetValue < 2 || targetValue > 10000) {
+      validationInfo.classList.add("hidden");
+      return;
+    }
+    
+    const validation = validateExercise(targetValue);
+    
+    if (validation.solvable) {
+      validationContent.innerHTML = `
+        <div class="text-emerald-300">
+          ✅ <strong>Solvable!</strong><br>
+          Optimal solution: ${validation.minMoves} moves<br>
+          <span class="text-xs text-white/70">This number can be reached from 1</span>
+        </div>
+      `;
+      validationContent.className = "p-3 rounded-lg text-sm bg-emerald-900/20 border border-emerald-500/30";
+    } else {
+      validationContent.innerHTML = `
+        <div class="text-yellow-300">
+          ❓ <strong>Unknown solvability</strong><br>
+          Not reachable with our 4 operations<br>
+          <span class="text-xs text-white/70">You can still try to solve it!</span>
+        </div>
+      `;
+      validationContent.className = "p-3 rounded-lg text-sm bg-yellow-900/20 border border-yellow-500/30";
+    }
+    
+    validationInfo.classList.remove("hidden");
+  }
+  
+  // Load button
+  loadBtn.addEventListener("click", () => {
+    const targetValue = parseInt(input.value);
+    
+    if (!targetValue || targetValue < 2 || targetValue > 10000) {
+      alert("Please enter a number between 2 and 10,000");
+      return;
+    }
+    
+    // Allow loading any number, even if not solvable
+    const validation = validateExercise(targetValue);
+    
+    // Create custom exercise
+    gameManager.currentExercise = {
+      goal: targetValue,
+      optimalMoves: validation.solvable ? validation.minMoves : Infinity,
+      solutionPath: validation.solutionPath || [],
+      isCustom: true
+    };
+    
+    // Reset game state with new target
+    gameState = createGameState(targetValue, gameManager.currentDifficulty);
+    
+    // Update move limit
+    updateMoveLimit();
+    
+    // Re-render UI
+    const app = document.getElementById("app");
+    app.innerHTML = createGameUI();
+    updateDisplay();
+    
+    console.log(`🎯 Loaded custom exercise: 1 → ${targetValue} ${validation.solvable ? `(${validation.minMoves} moves optimal)` : '(unknown solvability)'}`);
+    
+    closeModal();
+  });
+  
+  // Focus input
+  input.focus();
+}
+
 // Global event handler - only set up once
 let globalEventListenerSetup = false;
 
@@ -1130,8 +1294,13 @@ function setupGlobalEventListeners() {
       handleRetryExercise();
     } else if (e.target.closest(".level-btn")) {
       const levelBtn = e.target.closest(".level-btn");
-      const difficulty = parseInt(levelBtn.dataset.level);
-      handleDifficultySelect(difficulty);
+      const level = levelBtn.dataset.level;
+      if (level === "custom") {
+        showCustomExerciseModal();
+      } else {
+        const difficulty = parseInt(level);
+        handleDifficultySelect(difficulty);
+      }
     } else if (e.target.closest(".language-btn")) {
       const langBtn = e.target.closest(".language-btn");
       const langCode = langBtn.dataset.lang;

@@ -332,7 +332,7 @@ export const translations = {
   // Custom Exercise Modal
   custom: {
     en: "Custom",
-    es: "Personalizado",
+    es: "Crear",
   },
 
   customExercise: {
