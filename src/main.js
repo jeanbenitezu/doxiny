@@ -494,7 +494,7 @@ function createGameUI() {
               ? "bg-gray-600 text-gray-400 cursor-not-allowed"
               : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
             const previewText = isBlocked
-              ? "Blocked"
+              ? translate("blocked")
               : previews[op === "sumDigits" ? "sum" : op];
             const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
             const operationKey = op === "sumDigits" ? "sum" : op;

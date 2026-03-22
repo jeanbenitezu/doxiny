@@ -253,6 +253,11 @@ export const translations = {
     es: "Transforma 1 en",
   },
 
+  blocked: {
+    en: "Blocked",
+    es: "Bloqueado",
+  },
+
   retry: {
     en: "Retry",
     es: "Reintentar",
