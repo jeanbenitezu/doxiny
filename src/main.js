@@ -4,8 +4,8 @@
  */
 
 import { createGameState, applyMove, resetGame } from "./game.js";
-import { operations, operationLabels } from "./operations.js";
-import { generateExercise, getDifficultyLevels, calculateProgressToTarget, validateExercise } from "./exerciseGenerator.js";
+import { operations } from "./operations.js";
+import { generateExercise, generateHints, getDifficultyLevels, calculateProgressToTarget, validateExercise } from "./exerciseGenerator.js";
 import {
   translate,
   t,
@@ -511,7 +511,7 @@ function createGameUI() {
       </section>
       
       <!-- Utility Row -->
-      <section class="grid grid-cols-3 gap-2 flex-1 flex-shrink-0" style="max-height: 8vh; max-height: 8svh;" data-purpose="utility-controls">
+      <section class="grid grid-cols-4 gap-2 flex-1 flex-shrink-0" style="max-height: 8vh; max-height: 8svh;" data-purpose="utility-controls">
         <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           ${translate("gameStates.reset")}
         </button>
@@ -520,6 +520,9 @@ function createGameUI() {
         </button>
         <button class="bg-[#6b46c1] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           <span>${showPreviews ? "👁️" : "🙈"}</span> <span>${translate("preview")}</span>
+        </button>
+        <button class="${gameState.hints.used >= gameState.hints.maxHints ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-500"} border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full" id="hint-btn" ${gameState.hints.used >= gameState.hints.maxHints ? "disabled" : ""} style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
+          <span>💡</span> <span>${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})</span>
         </button>
       </section>
     </main>
@@ -588,6 +591,26 @@ function createGameUI() {
           <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")} 🎯</button>
           <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
         </div>
+      </div>
+    </div>
+    
+    <!-- Hint Modal -->
+    <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm hint-modal hidden p-4" id="hint-modal">
+      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-2xl p-4 sm:p-6 max-w-md w-full text-center shadow-2xl max-h-[90vh] max-h-[90svh] overflow-y-auto">
+        <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">💡 ${translate("hint")}</h3>
+        <div class="text-white/95 text-sm text-left leading-relaxed mb-4 sm:mb-6" id="hint-content">
+          <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-3">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-lg" id="hint-icon">💡</span>
+              <span class="font-bold text-amber-300" id="hint-level">${translate("hint")} #1</span>
+            </div>
+            <p class="text-white/90" id="hint-message">...</p>
+          </div>
+          <div class="text-center text-amber-300/70 text-xs" id="hint-remaining">
+            ...
+          </div>
+        </div>
+        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm" id="close-hint-btn">${translate("close")}</button>
       </div>
     </div>
   `;
@@ -1036,6 +1059,77 @@ function togglePreviews() {
 }
 
 /**
+ * Handle hint request from user
+ */
+function handleHintRequest() {
+  // Check if hints are available
+  if (gameState.hints.used >= gameState.hints.maxHints) {
+    console.log("💡 No more hints available for this exercise");
+    return;
+  }
+  
+  // Generate hint based on current state
+  const hints = generateHints(
+    gameState.current, 
+    gameState.goal, 
+    gameState.moves, 
+    gameState.hints.used
+  );
+  
+  if (hints.length === 0) {
+    console.log("💡 No hints available for current state");
+    return;
+  }
+  
+  // Get the next hint (based on how many have been used)
+  const nextHint = hints[gameState.hints.used] ?? hints[hints.length - 1]; // Fallback to last hint if out of range
+  
+  // Update game state
+  gameState.hints.used += 1;
+  gameState.hints.hintsData.push(nextHint);
+  
+  // Show hint modal
+  showHintModal(nextHint, gameState.hints.used, gameState.hints.maxHints);
+  
+  // Update UI to reflect hint usage
+  updateDisplay();
+  
+  console.log(`💡 Hint ${gameState.hints.used}/${gameState.hints.maxHints} provided:`, nextHint.message);
+}
+
+/**
+ * Show hint modal with hint information
+ */
+function showHintModal(hint, hintsUsed, maxHints) {
+  const modal = document.getElementById("hint-modal");
+  const hintIcon = document.getElementById("hint-icon");
+  const hintLevel = document.getElementById("hint-level");
+  const hintMessage = document.getElementById("hint-message");
+  const hintRemaining = document.getElementById("hint-remaining");
+  
+  // Set hint icon based on type
+  const icons = {
+    strategic: "💡",
+    tactical: "🎯", 
+    direct: "⚡"
+  };
+  
+  hintIcon.textContent = icons[hint.type] || "💡";
+  hintLevel.textContent = `${translate("hint")} #${hintsUsed} (${hint.type})`;
+  hintMessage.textContent = hint.message;
+  
+  const remaining = maxHints - hintsUsed;
+  if (remaining > 0) {
+    const plural = remaining === 1 ? '' : 's';
+    hintRemaining.textContent = t('hints.ui.hintsRemaining', { count: remaining, plural });
+  } else {
+    hintRemaining.textContent = t('hints.ui.finalHint');
+  }
+  
+  modal.classList.remove("hidden");
+}
+
+/**
  * Handle next exercise from success modal
  */
 function handleNextExercise() {
@@ -1307,6 +1401,10 @@ function setupGlobalEventListeners() {
       handleLanguageChange(langCode);
     } else if (e.target.closest("#preview-toggle-btn")) {
       togglePreviews();
+    } else if (e.target.closest("#hint-btn")) {
+      handleHintRequest();
+    } else if (e.target.closest("#close-hint-btn")) {
+      document.getElementById("hint-modal").classList.add("hidden");
     }
   });
 
@@ -1334,6 +1432,7 @@ function init() {
     window.doxinyDev = {
       validateExercise: validateExercise,
       calculateProgress: calculateProgress,
+      generateHints: generateHints,
       gameManager: gameManager,
       gameState: () => gameState,
       operations: operations,

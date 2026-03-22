@@ -4,6 +4,7 @@
  */
 
 import { operations } from "./operations.js";
+import { t } from "./i18n.js";
 
 /**
  * Simple difficulty configuration with i18n keys
@@ -593,6 +594,224 @@ export function generateExercise(difficulty = 3) {
     optimalMoves: result.optimalMoves,
     solutionPath: result.solutionPath,
   };
+}
+
+/**
+ * Generate intelligent hints based on current game state and optimal path
+ */
+export function generateHints(currentNumber, targetNumber, movesMade, hintsUsed = 0) {
+  const optimalPath = findShortestPath(currentNumber, targetNumber);
+  
+  if (optimalPath.length === 0) {
+    return generateFallbackHints(currentNumber, targetNumber, hintsUsed);
+  }
+
+  const hints = [];
+  
+  // Hint 1: Strategic guidance (general direction)
+  if (hintsUsed < 1) {
+    hints.push(generateStrategicHint(currentNumber, targetNumber, optimalPath));
+  }
+  
+  // Hint 2: Tactical guidance (specific numbers or operations)
+  if (hintsUsed < 2) {
+    hints.push(generateTacticalHint(currentNumber, targetNumber, optimalPath));
+  }
+  
+  // Hint 3: Direct guidance (exact next move)
+  if (hintsUsed < 3) {
+    hints.push(generateDirectHint(currentNumber, targetNumber, optimalPath));
+  }
+  
+  return hints;
+}
+
+/**
+ * Generate strategic level hint (general guidance)
+ */
+function generateStrategicHint(current, target, path) {
+  const nextMove = path[0];
+  const remainingMoves = path.length;
+  
+  // Analyze the overall strategy
+  if (target > current && nextMove.operation === 'double') {
+    return {
+      level: 1,
+      type: 'strategic',
+      message: t('hints.strategic.targetLarger', { target, current }),
+      confidence: 'high'
+    };
+  }
+  
+  if (nextMove.operation === 'reverse') {
+    return {
+      level: 1,
+      type: 'strategic', 
+      message: t('hints.strategic.tryReverse', { current }),
+      confidence: 'high'
+    };
+  }
+  
+  if (nextMove.operation === 'sum') {
+    return {
+      level: 1,
+      type: 'strategic',
+      message: t('hints.strategic.breakDownDigits', { current }),
+      confidence: 'high'
+    };
+  }
+  
+  if (nextMove.operation === 'append1') {
+    return {
+      level: 1,
+      type: 'strategic',
+      message: t('hints.strategic.expandNumber'),
+      confidence: 'high'
+    };
+  }
+  
+  return {
+    level: 1,
+    type: 'strategic',
+    message: t('hints.strategic.movesRemaining', { moves: remainingMoves, target }),
+    confidence: 'medium'
+  };
+}
+
+/**
+ * Generate tactical level hint (specific guidance)
+ */
+function generateTacticalHint(current, target, path) {
+  const nextMove = path[0];
+  const nextResult = nextMove.to;
+  
+  if (nextMove.operation === 'double') {
+    return {
+      level: 2,
+      type: 'tactical',
+      message: t('hints.tactical.doubleResult', { current, result: nextResult, target }),
+      confidence: 'high'
+    };
+  }
+  
+  if (nextMove.operation === 'reverse') {
+    return {
+      level: 2,
+      type: 'tactical',
+      message: t('hints.tactical.reverseResult', { current, result: nextResult, target }),
+      confidence: 'high'
+    };
+  }
+  
+  if (nextMove.operation === 'sum') {
+    const digits = current.toString().split('').join(' + ');
+    return {
+      level: 2,
+      type: 'tactical',
+      message: t('hints.tactical.sumResult', { current, digits, result: nextResult }),
+      confidence: 'high'
+    };
+  }
+  
+  if (nextMove.operation === 'append1') {
+    return {
+      level: 2,
+      type: 'tactical',
+      message: t('hints.tactical.appendResult', { current, result: nextResult, target }),
+      confidence: 'high'
+    };
+  }
+  
+  return {
+    level: 2,
+    type: 'tactical', 
+    message: t('hints.tactical.optimalTransform', { current, result: nextResult }),
+    confidence: 'medium'
+  };
+}
+
+/**
+ * Generate direct level hint (exact next move)
+ */
+function generateDirectHint(current, target, path) {
+  const nextMove = path[0];
+  const operationKey = nextMove.operation;
+  
+  const operationName = t(`hints.operations.${operationKey}`);
+  
+  return {
+    level: 3,
+    type: 'direct',
+    message: t('hints.direct.nextMove', { 
+      operation: operationName, 
+      current, 
+      result: nextMove.to 
+    }),
+    confidence: 'maximum'
+  };
+}
+
+/**
+ * Generate fallback hints when optimal path is not available
+ */
+function generateFallbackHints(current, target, hintsUsed) {
+  const hints = [];
+  
+  if (hintsUsed < 1) {
+    if (target > current * 2) {
+      hints.push({
+        level: 1,
+        type: 'strategic',
+        message: t('hints.strategic.targetMuchLarger', { target, current }),
+        confidence: 'medium'
+      });
+    } else if (target < current) {
+      hints.push({
+        level: 1,
+        type: 'strategic',
+        message: t('hints.strategic.targetSmaller', { target, current }),
+        confidence: 'medium'
+      });
+    } else {
+      hints.push({
+        level: 1,
+        type: 'strategic',
+        message: t('hints.strategic.targetClose', { target, current }),
+        confidence: 'medium'
+      });
+    }
+  }
+  
+  if (hintsUsed < 2) {
+    const currentStr = current.toString();
+    
+    if (currentStr.length > 1) {
+      hints.push({
+        level: 2,
+        type: 'tactical',
+        message: t('hints.tactical.multiDigitOps', { count: currentStr.length }),
+        confidence: 'medium'
+      });
+    } else {
+      hints.push({
+        level: 2,
+        type: 'tactical',
+        message: t('hints.tactical.singleDigitOps', { current }),
+        confidence: 'medium'
+      });
+    }
+  }
+  
+  if (hintsUsed < 3) {
+    hints.push({
+      level: 3,
+      type: 'direct',
+      message: t('hints.direct.challenging', { target }),
+      confidence: 'low'
+    });
+  }
+  
+  return hints;
 }
 
 /**

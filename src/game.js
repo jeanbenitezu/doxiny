@@ -17,6 +17,11 @@ export function createGameState(goalNumber = 10, level = 1) {
     history: [{ action: "START", value: 1 }],
     isComplete: false,
     startTime: Date.now(),
+    hints: {
+      used: 0,
+      maxHints: 3,
+      hintsData: []
+    },
   };
 }
 

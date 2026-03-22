@@ -134,6 +134,11 @@ export const translations = {
     es: "Ayuda",
   },
 
+  hint: {
+    en: "Hint",
+    es: "Pista",
+  },
+
   close: {
     en: "Close",
     es: "Cerrar",
@@ -359,6 +364,117 @@ export const translations = {
   efficiency: {
     en: "Efficiency",
     es: "Eficiencia",
+  },
+
+  // Hint System Translations
+  hints: {
+    // Strategic hints (level 1)
+    strategic: {
+      targetLarger: {
+        en: "💡 The target ({target}) is larger than your current number ({current}). Consider operations that increase your number significantly.",
+        es: "💡 El objetivo ({target}) es mayor que tu número actual ({current}). Considera operaciones que aumenten tu número significativamente.",
+      },
+      tryReverse: {
+        en: "🔄 Try thinking about different forms of your current number ({current}). What if the digits were in a different order?",
+        es: "🔄 Intenta pensar en diferentes formas de tu número actual ({current}). ¿Qué pasaría si los dígitos estuvieran en diferente orden?",
+      },
+      breakDownDigits: {
+        en: "➕ Your current number has multiple digits ({current}). Consider what happens when you break it down to its components.",
+        es: "➕ Tu número actual tiene múltiples dígitos ({current}). Considera qué pasa cuando lo descompones en sus componentes.",
+      },
+      expandNumber: {
+        en: "🔢 Sometimes expanding your number by adding digits can create new possibilities. Think about building up your number.",
+        es: "🔢 A veces expandir tu número agregando dígitos puede crear nuevas posibilidades. Piensa en construir tu número.",
+      },
+      movesRemaining: {
+        en: "🎯 You need about {moves} more moves to reach {target}. Focus on operations that move you closer to the target range.",
+        es: "🎯 Necesitas aproximadamente {moves} movimientos más para llegar a {target}. Enfócate en operaciones que te acerquen al rango objetivo.",
+      },
+      targetMuchLarger: {
+        en: "💡 The target ({target}) is much larger than your current number ({current}). You'll likely need to increase your number significantly.",
+        es: "💡 El objetivo ({target}) es mucho mayor que tu número actual ({current}). Probablemente necesites incrementar tu número significativamente.",
+      },
+      targetSmaller: {
+        en: "⬇️ The target ({target}) is smaller than your current number ({current}). Consider operations that can reduce your number value.",
+        es: "⬇️ El objetivo ({target}) es menor que tu número actual ({current}). Considera operaciones que puedan reducir el valor de tu número.",
+      },
+      targetClose: {
+        en: "🎯 The target ({target}) is close to your current number ({current}). Look for operations that make fine adjustments.",
+        es: "🎯 El objetivo ({target}) está cerca de tu número actual ({current}). Busca operaciones que hagan ajustes finos.",
+      },
+    },
+    // Tactical hints (level 2)
+    tactical: {
+      doubleResult: {
+        en: "×️ Doubling your current number ({current}) would give you {result}. This gets you significantly closer to {target}!",
+        es: "×️ Duplicar tu número actual ({current}) te daría {result}. ¡Esto te acerca significativamente a {target}!",
+      },
+      reverseResult: {
+        en: "🔄 If you reverse the digits of {current}, you'll get {result}. This opens up a promising path to {target}!",
+        es: "🔄 Si inviertes los dígitos de {current}, obtienes {result}. ¡Esto abre un camino prometedor hacia {target}!",
+      },
+      sumResult: {
+        en: "➕ Adding the digits of {current} ({digits}) equals {result}. This smaller number has strategic value!",
+        es: "➕ Sumar los dígitos de {current} ({digits}) es igual a {result}. ¡Este número más pequeño tiene valor estratégico!",
+      },
+      appendResult: {
+        en: "🔢 Adding '1' to the end of {current} gives you {result}. This creates new opportunities for reaching {target}!",
+        es: "🔢 Agregar '1' al final de {current} te da {result}. ¡Esto crea nuevas oportunidades para llegar a {target}!",
+      },
+      optimalTransform: {
+        en: "🎯 Try the operation that transforms {current} into {result}. This puts you on the optimal path!",
+        es: "🎯 Intenta la operación que transforma {current} en {result}. ¡Esto te pone en el camino óptimo!",
+      },
+      multiDigitOps: {
+        en: "🔢 Your number has {count} digits. Try operations that work with digits: reverse them, sum them, or build upon them.",
+        es: "🔢 Tu número tiene {count} dígitos. Prueba operaciones que trabajen con dígitos: invertirlos, sumarlos, o construir sobre ellos.",
+      },
+      singleDigitOps: {
+        en: "🔢 You have a single digit ({current}). Consider operations that expand or multiply: doubling or appending.",
+        es: "🔢 Tienes un solo dígito ({current}). Considera operaciones que expandan o multipliquen: duplicar o agregar.",
+      },
+    },
+    // Direct hints (level 3)
+    direct: {
+      nextMove: {
+        en: "🎯 Next move: Use {operation} to transform {current} → {result}. This is the optimal next step!",
+        es: "🎯 Próximo movimiento: Usa {operation} para transformar {current} → {result}. ¡Este es el siguiente paso óptimo!",
+      },
+      challenging: {
+        en: "🤔 This is a challenging puzzle! Try each operation and see which result gets you closer to {target}. Sometimes the best path isn't obvious at first.",
+        es: "🤔 ¡Este es un rompecabezas desafiante! Prueba cada operación y ve cuál resultado te acerca más a {target}. A veces el mejor camino no es obvio al principio.",
+      },
+    },
+    // Operation names for hints
+    operations: {
+      double: {
+        en: "×️ DOUBLE",
+        es: "×️ DUPLICAR",
+      },
+      reverse: {
+        en: "🔄 REVERSE",
+        es: "🔄 INVERTIR",
+      },
+      sum: {
+        en: "➕ SUM DIGITS",
+        es: "➕ SUMAR DÍGITOS",
+      },
+      append1: {
+        en: "🔢 APPEND 1",
+        es: "🔢 AGREGAR 1",
+      },
+    },
+    // Hint UI messages
+    ui: {
+      hintsRemaining: {
+        en: "You have {count} hint{plural} remaining for this exercise.",
+        es: "Te quedan {count} pista{plural} para este ejercicio.",
+      },
+      finalHint: {
+        en: "This was your final hint for this exercise.",
+        es: "Esta fue tu última pista para este ejercicio.",
+      },
+    },
   },
 
   // Update Banner
