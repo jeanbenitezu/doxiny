@@ -26,6 +26,13 @@ This is a mathematical puzzle PWA game built with Vanilla JS + Vite.
 - Keep operations pure functions
 - Prioritize readability and maintainability
 
+## 🌍 Translation Requirements
+**MANDATORY RULE**: Always translate app UI copies and make new entries in the i18n file.
+- **All UI text** must use `translate()` function from `src/i18n.js`
+- **Console logs** can remain in English for development purposes
+- **New UI strings** must be added to both English and Spanish in `src/i18n.js` translations object
+- **No hardcoded strings** in UI components - use translation keys instead
+
 ## 📋 CRITICAL: Context Documentation Maintenance
 
 **MANDATORY RULE**: After ANY code change, IMMEDIATELY update the relevant context documentation files in `docs/`:

@@ -39,6 +39,25 @@ function updateGameHistory(moves) { /* Updates move history display */ }
 
 ## UI/UX Patterns
 
+### Internationalization (i18n)
+All UI text must use the translation system for Spanish/English support:
+```javascript
+// ✅ Correct - Using translate function
+<span>{translate("targetNumber")}</span>
+<button>{translate("gameStates.reset")}</button>
+
+// ❌ Incorrect - Hardcoded strings
+<span>Target Number</span>
+<button>Reset</button>
+
+// Adding new translations
+// In i18n.js:
+newUIText: {
+  en: "English Text",
+  es: "Texto en Español",
+}
+```
+
 ### Mobile-First Responsive Design
 ```css
 /* Base styles for mobile screens */
@@ -205,4 +224,4 @@ const testCases = [
 - Verify PWA functionality in network conditions
 - Check accessibility with screen readers
 
-Last Updated: March 21, 2026
+Last Updated: March 22, 2026

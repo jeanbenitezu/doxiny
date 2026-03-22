@@ -352,9 +352,9 @@ function showUpdateNotification() {
     "fixed top-0 left-0 right-0 bg-blue-600 text-white p-3 text-center z-50 shadow-lg";
   updateBanner.innerHTML = `
     <div class="flex items-center justify-between max-w-md mx-auto">
-      <span>🚀 New version available!</span>
+      <span>${translate("newVersionAvailable")}</span>
       <button id="update-btn" class="bg-white text-blue-600 px-3 py-1 rounded text-sm font-bold hover:bg-blue-50 transition-colors">
-        Update Now
+        ${translate("updateNow")}
       </button>
     </div>
   `;
@@ -519,7 +519,7 @@ function createGameUI() {
           <span>ℹ️</span> <span class="hidden sm:inline">${translate("help")}</span>
         </button>
         <button class="bg-[#6b46c1] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          <span>${showPreviews ? "👁️" : "🙈"}</span> <span class="hidden sm:inline">Preview</span>
+          <span>${showPreviews ? "👁️" : "🙈"}</span> <span class="hidden sm:inline">${translate("preview")}</span>
         </button>
       </section>
     </main>
@@ -565,7 +565,7 @@ function createGameUI() {
           <div class="text-3xl sm:text-4xl celebration-emoji" id="celebration-emoji">🎉</div>
           <h2 class="text-xl sm:text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">${translate("levelComplete")}</h2>
         </div>
-        <p class="text-white/90 text-base sm:text-lg mb-2" id="success-message">Great job!</p>
+        <p class="text-white/90 text-base sm:text-lg mb-2" id="success-message">${translate("congratulations")}</p>
         <div class="flex gap-4 sm:gap-6 justify-center mb-2">
           <div class="flex flex-col items-center">
             <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("moves")}</span>
@@ -576,7 +576,7 @@ function createGameUI() {
             <span class="text-emerald-400 text-lg sm:text-xl font-bold drop-shadow-lg" id="final-optimal">0</span>
           </div>
           <div class="flex flex-col items-center">
-            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">Efficiency</span>
+            <span class="text-white/70 text-xs uppercase tracking-wide font-semibold">${translate("efficiency")}</span>
             <span class="text-yellow-400 text-lg sm:text-xl font-bold drop-shadow-lg" id="final-efficiency">100%</span>
           </div>
         </div>
@@ -1226,7 +1226,7 @@ function setupCustomExerciseModal() {
     const targetValue = parseInt(input.value);
     
     if (!targetValue || targetValue < 2 || targetValue > 10000) {
-      alert("Please enter a number between 2 and 10,000");
+      alert(translate("invalidNumberAlert"));
       return;
     }
     

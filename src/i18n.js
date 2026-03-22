@@ -349,6 +349,40 @@ export const translations = {
     en: "Load Exercise",
     es: "Cargar Ejercicio",
   },
+
+  // Success Modal
+  congratulations: {
+    en: "Great job!",
+    es: "¡Buen trabajo!",
+  },
+
+  efficiency: {
+    en: "Efficiency",
+    es: "Eficiencia",
+  },
+
+  // Update Banner
+  newVersionAvailable: {
+    en: "🚀 New version available!",
+    es: "🚀 ¡Nueva versión disponible!",
+  },
+
+  updateNow: {
+    en: "Update Now",
+    es: "Actualizar Ahora",
+  },
+
+  // Preview Toggle
+  preview: {
+    en: "Preview",
+    es: "Vista Previa",
+  },
+
+  // Custom Exercise Validation
+  invalidNumberAlert: {
+    en: "Please enter a number between 2 and 10,000",
+    es: "Por favor ingresa un número entre 2 y 10,000",
+  },
 };
 
 // Utility functions for i18n
