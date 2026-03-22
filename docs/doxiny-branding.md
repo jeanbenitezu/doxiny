@@ -7,7 +7,7 @@
 - **Concept**: Mathematical puzzle focused on optimal solutions
 
 ## Color Palette
-- **Primary**: Doxiny Blue (#1E3A8A)
+- **Primary**: Doxiny Blue (#0099CC) - Updated March 21, 2026
 - **Action**: Transform Orange (#F97316) 
 - **Success**: Green (#10B981)
 - **Base**: Dark (#1A1A1A)

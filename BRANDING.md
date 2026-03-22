@@ -23,7 +23,7 @@ Mathematical beauty through minimal moves.
 ### Color Palette
 
 #### Primary Colors
-- **Doxiny Blue**: `#1E3A8A` - Trust, logic, depth
+- **Doxiny Blue**: `#0099CC` - Trust, logic, depth
 - **Transform Orange**: `#F97316` - Action, energy, progress  
 - **Success Green**: `#10B981` - Achievement, completion
 
