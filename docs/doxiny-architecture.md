@@ -41,11 +41,15 @@ const gameState = {
 const reverse = (num) => parseInt(num.toString().split('').reverse().join('')) || 0;
 ```
 
-### BFS Exercise Validation
+### Enhanced BFS Exercise Validation
 ```javascript
-// Breadth-first search ensures all exercises are solvable
-function validateExercise(goal, maxMoves = 20) {
-  // BFS implementation with visited set and move tracking
+// Multi-stage validation with strategic approaches
+function validateExercise(goal, maxMoves = null) {
+  // Dynamic move calculation: Math.min(25, Math.max(15, Math.floor(Math.log10(goal)) * 8))
+  // 1. Quick patterns (powers of 2, single digits)
+  // 2. Enhanced BFS with better pruning (Map-based visited tracking)
+  // 3. Strategic approaches (reverse search, digit manipulation)
+  // 4. Expanded search space (1 to 100,000)
   // Returns: { solvable, minMoves, solutionPath }
 }
 ```

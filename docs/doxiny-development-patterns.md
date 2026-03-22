@@ -192,7 +192,7 @@ t('game.success.perfect', { moves: 6, optimal: 6 });
 
 ### Manual Testing Checklist
 - [ ] All 4 operations work correctly with edge cases
-- [ ] BFS validation handles numbers 1-10,000
+- [ ] Enhanced BFS validation handles numbers 1-100,000 with strategic approaches
 - [ ] Responsive design on mobile/desktop
 - [ ] PWA install and offline functionality
 - [ ] Multi-language switching

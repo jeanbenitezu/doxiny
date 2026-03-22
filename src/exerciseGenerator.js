@@ -57,7 +57,7 @@ function generateSimpleExercise(difficulty) {
   // Try more goals with slightly more flexible criteria
   for (let attempt = 0; attempt < 25; attempt++) {
     const goal = Math.floor(Math.random() * (maxGoal - minGoal + 1)) + minGoal;
-    const validation = validateExercise(goal, 25); // Increased max moves for validation
+    const validation = validateExercise(goal); // Increased max moves for validation
 
     if (
       validation.solvable &&
@@ -99,7 +99,12 @@ function generateSimpleExercise(difficulty) {
 /**
  * Validate that an exercise is actually solvable with enhanced strategies
  */
-export function validateExercise(goal, maxMoves = 20) {
+export function validateExercise(goal, maxMoves = null) {
+  // Auto-calculate maxMoves based on goal size for better coverage
+  if (!maxMoves) {
+    maxMoves = Math.min(25, Math.max(15, Math.floor(Math.log10(goal)) * 8));
+  }
+
   // Quick pattern-based checks first
   const quickResult = checkQuickPatterns(goal);
   if (quickResult) return quickResult;
@@ -108,11 +113,9 @@ export function validateExercise(goal, maxMoves = 20) {
   const forwardResult = enhancedBFS(1, goal, maxMoves);
   if (forwardResult.solvable) return forwardResult;
 
-  // For odd numbers, try strategic approaches
-  if (goal % 2 === 1) {
-    const strategicResult = tryStrategicApproaches(goal, maxMoves);
-    if (strategicResult.solvable) return strategicResult;
-  }
+  // Try strategic approaches for all numbers, not just odd ones
+  const strategicResult = tryStrategicApproaches(goal, maxMoves + 5);
+  if (strategicResult.solvable) return strategicResult;
 
   return { solvable: false, minMoves: Infinity, solutionPath: [] };
 }
@@ -160,7 +163,7 @@ function enhancedBFS(start, goal, maxMoves) {
     for (const [opName, opFunc] of Object.entries(operations)) {
       const next = opFunc(current);
 
-      if (next > 0 && next <= 10000) {
+      if (next > 0 && next <= 100000) {
         const existingSteps = visited.get(next);
         if (!existingSteps || steps + 1 < existingSteps) {
           visited.set(next, steps + 1);
@@ -178,27 +181,10 @@ function enhancedBFS(start, goal, maxMoves) {
 }
 
 /**
- * Strategic approaches for hard-to-reach numbers (especially odd numbers)
+ * Strategic approaches for hard-to-reach numbers
  */
 function tryStrategicApproaches(goal, maxMoves) {
-  // Strategy 1: Try appending digits to make even, then work backwards
-  const evenVariants = generateStrategicVariants(goal);
-  
-  for (const variant of evenVariants) {
-    const pathToVariant = enhancedBFS(1, variant.number, maxMoves - 2);
-    if (pathToVariant.solvable) {
-      const pathFromVariant = findPathFromVariantToGoal(variant.number, goal, variant.operations);
-      if (pathFromVariant.length > 0) {
-        return {
-          solvable: true,
-          minMoves: pathToVariant.minMoves + pathFromVariant.length,
-          solutionPath: [...pathToVariant.solutionPath, ...pathFromVariant]
-        };
-      }
-    }
-  }
-
-  // Strategy 2: Look for numbers that can reach goal in 1-2 operations
+  // Strategy 1: Try numbers that can be transformed into the goal
   const reverseTargets = findReverseTargets(goal);
   for (const target of reverseTargets) {
     const pathToTarget = enhancedBFS(1, target.number, maxMoves - target.stepsToGoal);
@@ -211,41 +197,127 @@ function tryStrategicApproaches(goal, maxMoves) {
     }
   }
 
+  // Strategy 2: For larger odd numbers, try digit manipulation approaches
+  if (goal % 2 === 1 && goal > 100) {
+    const digitVariants = generateDigitManipulationVariants(goal);
+    for (const variant of digitVariants) {
+      const pathToVariant = enhancedBFS(1, variant.number, maxMoves - variant.stepsToGoal);
+      if (pathToVariant.solvable) {
+        return {
+          solvable: true,
+          minMoves: pathToVariant.minMoves + variant.stepsToGoal,
+          solutionPath: [...pathToVariant.solutionPath, ...variant.path]
+        };
+      }
+    }
+  }
+
+  // Strategy 3: Try composite number factorization approaches
+  const factorVariants = generateFactorVariants(goal);
+  for (const variant of factorVariants) {
+    const pathToVariant = enhancedBFS(1, variant.number, maxMoves - variant.stepsToGoal);
+    if (pathToVariant.solvable) {
+      return {
+        solvable: true,
+        minMoves: pathToVariant.minMoves + variant.stepsToGoal,
+        solutionPath: [...pathToVariant.solutionPath, ...variant.path]
+      };
+    }
+  }
+
   return { solvable: false, minMoves: Infinity, solutionPath: [] };
 }
 
 /**
- * Generate strategic number variants that might be easier to reach
+ * Generate strategic variants through digit manipulation
  */
-function generateStrategicVariants(goal) {
+function generateDigitManipulationVariants(goal) {
   const variants = [];
   
-  // For odd numbers like 333, try 3330 (append 0 conceptually via append1 then operations)
-  if (goal % 2 === 1) {
-    // Try number with 0 appended (conceptually)
-    const with0 = goal * 10;
-    if (with0 <= 10000) {
-      variants.push({
-        number: with0,
-        operations: [{ operation: 'sumDigits', from: with0, to: sumDigits(with0) }]
-      });
-    }
-    
-    // Try number with 1 appended
-    const with1 = goal * 10 + 1;
-    if (with1 <= 10000 && with1 % 2 === 0) {
-      variants.push({
-        number: with1,
-        operations: [{ operation: 'sumDigits', from: with1, to: sumDigits(with1) }]
-      });
+  // Try numbers whose sum of digits equals the goal
+  // For 3333, we look for numbers that sum to 3333 (impossible with 4 operations)
+  // But we can look for numbers that when processed give us stepping stones
+  
+  // Strategy: Find numbers that when sum-digits is applied give us a number
+  // that can then be manipulated to reach goal
+  const targetSum = sumDigits(goal);
+  
+  // Look for even numbers that sum to our target sum
+  for (let base = 1000; base <= 9999 && base <= 100000; base++) {
+    if (base % 2 === 0 && sumDigits(base) === targetSum) {
+      // Check if we can get from this sum back to our goal
+      const pathFromSum = findDirectPath(targetSum, goal);
+      if (pathFromSum.length > 0) {
+        variants.push({
+          number: base,
+          stepsToGoal: 1 + pathFromSum.length,
+          path: [
+            { operation: 'sum', from: base, to: targetSum },
+            ...pathFromSum
+          ]
+        });
+        break; // Found one good variant
+      }
     }
   }
-  
+
   return variants;
 }
 
 /**
- * Find numbers that can reach the goal in 1-2 operations
+ * Generate variants using factorization approaches
+ */
+function generateFactorVariants(goal) {
+  const variants = [];
+  
+  // Check if goal can be reached by doubling from a smaller number
+  if (goal % 2 === 0) {
+    const half = goal / 2;
+    variants.push({
+      number: half,
+      stepsToGoal: 1,
+      path: [{ operation: 'double', from: half, to: goal }]
+    });
+  }
+
+  // Check if goal can be reached by operations on its reverse
+  const reversed = reverseNumber(goal);
+  if (reversed !== goal && reversed > 0 && reversed <= 100000) {
+    variants.push({
+      number: reversed,
+      stepsToGoal: 1,
+      path: [{ operation: 'reverse', from: reversed, to: goal }]
+    });
+  }
+
+  return variants;
+}
+
+/**
+ * Find direct operational path between two numbers
+ */
+function findDirectPath(from, to) {
+  const paths = [];
+  
+  // Direct operations
+  if (operations.double(from) === to) {
+    paths.push({ operation: 'double', from: from, to: to });
+  }
+  if (operations.reverse(from) === to) {
+    paths.push({ operation: 'reverse', from: from, to: to });
+  }
+  if (operations.append1(from) === to) {
+    paths.push({ operation: 'append1', from: from, to: to });
+  }
+  if (operations.sum && operations.sum(from) === to) {
+    paths.push({ operation: 'sum', from: from, to: to });
+  }
+  
+  return paths;
+}
+
+/**
+ * Find numbers that can reach the goal in 1-2 operations (enhanced)
  */
 function findReverseTargets(goal) {
   const targets = [];
@@ -261,7 +333,7 @@ function findReverseTargets(goal) {
   
   // Numbers that when reversed give goal
   const reversed = reverseNumber(goal);
-  if (reversed !== goal && reversed > 0) {
+  if (reversed !== goal && reversed > 0 && reversed <= 100000) {
     targets.push({
       number: reversed,
       stepsToGoal: 1,
@@ -269,15 +341,31 @@ function findReverseTargets(goal) {
     });
   }
   
-  // Numbers that when sum-digits applied give goal
-  for (let candidate = goal * 9; candidate >= goal * 2 && candidate <= 10000; candidate--) {
+  // Numbers that when sum-digits applied give goal (expanded search)
+  const maxSearchRange = Math.min(100000, goal * 20);
+  for (let candidate = goal * 2; candidate <= maxSearchRange; candidate++) {
     if (sumDigits(candidate) === goal) {
       targets.push({
         number: candidate,
         stepsToGoal: 1,
-        path: [{ operation: 'sumDigits', from: candidate, to: goal }]
+        path: [{ operation: 'sum', from: candidate, to: goal }]
       });
-      break; // Found one, that's enough
+      
+      // Only need a few good candidates to keep performance reasonable
+      if (targets.length >= 8) break;
+    }
+  }
+  
+  // Numbers that when append1 applied give goal  
+  const goalStr = goal.toString();
+  if (goalStr.endsWith('1') && goalStr.length > 1) {
+    const baseNumber = parseInt(goalStr.slice(0, -1));
+    if (baseNumber > 0) {
+      targets.push({
+        number: baseNumber,
+        stepsToGoal: 1,
+        path: [{ operation: 'append1', from: baseNumber, to: goal }]
+      });
     }
   }
   
@@ -302,12 +390,6 @@ function sumDigits(n) {
   return n.toString().split('').reduce((sum, digit) => sum + parseInt(digit, 10), 0);
 }
 
-function findPathFromVariantToGoal(variant, goal, operations) {
-  // This would implement the specific operations to get from variant to goal
-  // For now, return the operations provided
-  return operations.filter(op => op.to === goal);
-}
-
 /**
  * Find shortest path from any start number to target using BFS
  */
@@ -329,7 +411,7 @@ export function findShortestPath(start, target, maxMoves = 15) {
         return [...path, { operation: opName, from: current, to: next }];
       }
       
-      if (next > 0 && next <= 10000 && !visited.has(next)) {
+      if (next > 0 && next <= 100000 && !visited.has(next)) {
         visited.add(next);
         queue.push({
           current: next,

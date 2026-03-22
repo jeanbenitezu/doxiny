@@ -48,17 +48,51 @@ const fallbackGoals = {
 };
 ```
 
-### BFS Solvability Validation
+### Enhanced BFS Solvability Validation
 ```javascript
-function validateExercise(goal, maxMoves = 20) {
-  const queue = [{ current: 1, steps: 0, path: [] }];
-  const visited = new Set([1]);
+function validateExercise(goal, maxMoves = null) {
+  // Auto-calculate maxMoves based on goal size for better coverage
+  if (!maxMoves) {
+    maxMoves = Math.min(25, Math.max(15, Math.floor(Math.log10(goal)) * 8));
+  }
+
+  // Multi-stage validation approach:
+  // 1. Quick pattern-based checks (powers of 2, single digits)
+  // 2. Enhanced BFS with improved pruning
+  // 3. Strategic approaches for complex numbers
   
   // Constraints:
-  // - Numbers: 1 to 10,000 (prevents DOUBLE from exploding)
-  // - Visited limit: 1,000 unique numbers max
-  // - Move limit: 20 moves default
+  // - Numbers: 1 to 100,000 (expanded from 10,000)
+  // - Dynamic move limits based on goal complexity
+  // - Strategic reverse-search for odd/complex numbers
   // - Returns: { solvable, minMoves, solutionPath }
+}
+```
+
+## Strategic Algorithm Approaches
+
+### Pattern Recognition
+- **Powers of 2**: Direct doubling path (1→2→4→8→16...)
+- **Single digits**: Pre-calculated optimal paths (2-9)
+- **Quick bailouts**: Immediate solutions for known patterns
+
+### Reverse Target Analysis  
+- **Double reverse**: Find numbers that double to goal
+- **Reverse numbers**: Check if reversed digits are reachable
+- **Sum-digits reverse**: Find numbers that sum to goal (expanded search)
+- **Append1 reverse**: For goals ending in 1, check base number
+
+### Digit Manipulation Strategy
+```javascript
+// For large odd numbers like 3333:
+// 1. Find sum of digits (3+3+3+3 = 12)
+// 2. Look for even numbers that also sum to 12
+// 3. Try to reach those even numbers, then transform
+const targetSum = sumDigits(goal);
+for (let base = 1000; base <= 9999; base++) {
+  if (base % 2 === 0 && sumDigits(base) === targetSum) {
+    // Try path: 1 → base → sum → goal
+  }
 }
 ```
 
@@ -107,10 +141,10 @@ const playerStats = {
 ```
 
 ## Constraints & Validation Rules
-- **Number bounds**: 1 ≤ number ≤ 10,000
+- **Number bounds**: 1 ≤ number ≤ 100,000 (expanded for complex numbers)
 - **Operation validity**: All operations must produce valid numbers
 - **Move tracking**: Complete history with operation names and number transitions
 - **No infinite loops**: BFS prevents cycles, visited set tracks explored states
 - **Memory limits**: Max 1,000 explored states per validation
 
-Last Updated: March 21, 2026
+Last Updated: March 22, 2026
