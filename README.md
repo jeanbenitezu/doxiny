@@ -32,7 +32,7 @@ The game automatically detects your browser language and provides seamless trans
 - � **Doxiny Branding** - "Do X in Y moves" with elegant visual identity
 - 🌍 **Multi-language Support** - English and Spanish localization
 - 📱 **Mobile-first design** with touch-optimized controls
-- 🌐 **Progressive Web App (PWA)** - works offline
+- ⚡ **Always Latest** - No caching, ensures fresh content on every visit
 - 📊 **Move history tracking** for learning patterns
 - ⌨️ **Keyboard shortcuts** (1-4 for operations, R for reset)
 - 🎯 **Multiple goals** and difficulty levels
@@ -62,8 +62,7 @@ npm run preview
 - **Vanilla JavaScript** - Pure ES6+ modules
 - **Vite** - Fast build tool and dev server
 - **CSS3** - Mobile-first responsive design
-- **PWA** - Service Worker for offline support
-- **Web Manifest** - App-like experience
+- **No Caching** - Always serves latest version for instant updates
 
 ### Project Structure
 
@@ -74,9 +73,7 @@ npm run preview
 │   ├── operations.js # Mathematical operations
 │   └── style.css     # Mobile-first styles
 ├── public/
-│   ├── manifest.json # PWA manifest
-│   ├── sw.js         # Service worker
-│   └── icon-*.png    # App icons
+│   └── sw.js         # Cleanup service worker (removes caching)
 └── index.html        # App shell
 ```
 
@@ -98,14 +95,6 @@ Easy to modify:
 - **New operations**: Add to `operations.js`
 - **Styling**: Modify `style.css` for different themes
 - **Game rules**: Extend `game.js` for variants
-
-## 📱 Installation
-
-As a PWA, this game can be installed on your device:
-
-1. Open in a modern browser
-2. Look for "Add to Home Screen" or "Install App"
-3. Enjoy offline play!
 
 ## 🏗️ Contributing
 

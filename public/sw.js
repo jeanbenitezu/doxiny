@@ -1,69 +1,49 @@
 /**
- * Number Puzzle PWA - Service Worker
- * Provides offline functionality and caching with auto-updates
+ * Service Worker Cleanup Script
+ * This service worker removes all caches and unregisters itself
+ * to ensure users always get the latest version without caching
  */
 
-// Generate cache version based on current timestamp for automatic updates
-const CACHE_VERSION = '1.0.0';
-const BUILD_TIMESTAMP = 1774201924615;
-const CACHE_NAME = `number-puzzle-v${CACHE_VERSION}-${BUILD_TIMESTAMP}`;
+console.log('🧹 Cleanup Service Worker: Starting cleanup process...');
 
-const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json'
-];
-
-// Install event - cache resources and skip waiting
+// Install event - skip waiting immediately
 self.addEventListener('install', (event) => {
-  console.log('🔧 Service Worker: Installing...');
-  
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('📦 Service Worker: Caching app resources');
-        return cache.addAll(urlsToCache);
-      })
-      .then(() => {
-        console.log('✅ Service Worker: Installation complete');
-        // Force the waiting service worker to become the active service worker
-        return self.skipWaiting();
-      })
-      .catch((error) => {
-        console.error('❌ Service Worker: Installation failed', error);
-      })
-  );
+  console.log('🧹 Cleanup Service Worker: Installing and skipping waiting...');
+  self.skipWaiting();
 });
 
-// Listen for skip waiting message
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.action === 'skipWaiting') {
-    self.skipWaiting();
-  }
-});
-
-// Activate event - clean up old caches and take control
+// Activate event - clean up all caches and unregister
 self.addEventListener('activate', (event) => {
-  console.log('🚀 Service Worker: Activating...');
+  console.log('🧹 Cleanup Service Worker: Activating cleanup...');
   
   event.waitUntil(
     Promise.all([
-      // Clean up old caches
+      // Delete ALL caches
       caches.keys().then((cacheNames) => {
+        console.log('🗑️ Cleanup Service Worker: Found caches to delete:', cacheNames);
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME) {
-              console.log('🗑️ Service Worker: Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
+            console.log('🗑️ Cleanup Service Worker: Deleting cache:', cacheName);
+            return caches.delete(cacheName);
           })
         );
       }),
-      // Take control of all clients immediately
+      // Take control of all clients
       self.clients.claim()
     ])
     .then(() => {
-      console.log('✅ Service Worker: Activation complete - Now controlling all pages');
+      console.log('✅ Cleanup Service Worker: All caches cleared');
+      
+      // Notify all clients to unregister this service worker
+      return self.clients.matchAll();
+    })
+    .then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({ 
+          action: 'cleanup-complete',
+          message: 'All caches cleared. Service worker will be unregistered.' 
+        });
+      });
     })
   );
 });

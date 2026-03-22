@@ -496,17 +496,6 @@ export const translations = {
     },
   },
 
-  // Update Banner
-  newVersionAvailable: {
-    en: "🚀 New version available!",
-    es: "🚀 ¡Nueva versión disponible!",
-  },
-
-  updateNow: {
-    en: "Update Now",
-    es: "Actualizar Ahora",
-  },
-
   // Preview Toggle
   preview: {
     en: "Preview",
