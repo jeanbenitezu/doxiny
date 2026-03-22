@@ -1314,18 +1314,18 @@ function setupCustomExerciseModal() {
     if (validation.solvable) {
       validationContent.innerHTML = `
         <div class="text-emerald-300">
-          ✅ <strong>Solvable!</strong><br>
-          Optimal solution: ${validation.minMoves} moves<br>
-          <span class="text-xs text-white/70">This number can be reached from 1</span>
+          ✅ <strong>${t('customExerciseModal.validation.solvable')}</strong><br>
+          ${t('customExerciseModal.validation.optimalSolution', { moves: validation.minMoves })}<br>
+          <span class="text-xs text-white/70">${t('customExerciseModal.validation.reachableFrom')}</span>
         </div>
       `;
       validationContent.className = "p-3 rounded-lg text-sm bg-emerald-900/20 border border-emerald-500/30";
     } else {
       validationContent.innerHTML = `
         <div class="text-yellow-300">
-          ❓ <strong>Unknown solvability</strong><br>
-          Not reachable with our 4 operations<br>
-          <span class="text-xs text-white/70">You can still try to solve it!</span>
+          ❓ <strong>${t('customExerciseModal.validation.unknownSolvability')}</strong><br>
+          ${t('customExerciseModal.validation.notReachable')}<br>
+          <span class="text-xs text-white/70">${t('customExerciseModal.validation.canStillTry')}</span>
         </div>
       `;
       validationContent.className = "p-3 rounded-lg text-sm bg-yellow-900/20 border border-yellow-500/30";

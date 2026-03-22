@@ -513,6 +513,35 @@ export const translations = {
     en: "Please enter a number between 2 and 10,000",
     es: "Por favor ingresa un número entre 2 y 10,000",
   },
+
+  customExerciseModal: {
+    validation: {
+      solvable: {
+        en: "Solvable!",
+        es: "¡Resoluble!",
+      },
+      optimalSolution: {
+        en: "Optimal solution: {moves} moves",
+        es: "Solución óptima: {moves} movimientos",
+      },
+      reachableFrom: {
+        en: "This number can be reached from 1",
+        es: "Este número se puede alcanzar desde 1",
+      },
+      unknownSolvability: {
+        en: "Unknown solvability",
+        es: "Resolubilidad desconocida",
+      },
+      notReachable: {
+        en: "Not reachable with our 4 operations",
+        es: "No alcanzable con nuestras 4 operaciones",
+      },
+      canStillTry: {
+        en: "You can still try to solve it!",
+        es: "¡Aún puedes intentar resolverlo!",
+      },
+    },
+  },
 };
 
 // Utility functions for i18n
