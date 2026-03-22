@@ -731,7 +731,7 @@ function updateDisplay() {
 
     // Update preview text and visibility
     if (previewEl) {
-      previewEl.textContent = isBlocked ? "Blocked" : previews[operation];
+      previewEl.textContent = isBlocked ? translate("blocked") : previews[operation];
       if (showPreviews) {
         previewEl.classList.remove("invisible");
       } else {
