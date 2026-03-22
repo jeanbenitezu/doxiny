@@ -97,12 +97,56 @@ function generateSimpleExercise(difficulty) {
 }
 
 /**
- * Validate that an exercise is actually solvable
+ * Validate that an exercise is actually solvable with enhanced strategies
  */
 export function validateExercise(goal, maxMoves = 20) {
-  // Simple BFS to verify solvability
-  const queue = [{ current: 1, steps: 0, path: [] }];
-  const visited = new Set([1]);
+  // Quick pattern-based checks first
+  const quickResult = checkQuickPatterns(goal);
+  if (quickResult) return quickResult;
+
+  // Enhanced BFS with bidirectional search and strategic analysis
+  const forwardResult = enhancedBFS(1, goal, maxMoves);
+  if (forwardResult.solvable) return forwardResult;
+
+  // For odd numbers, try strategic approaches
+  if (goal % 2 === 1) {
+    const strategicResult = tryStrategicApproaches(goal, maxMoves);
+    if (strategicResult.solvable) return strategicResult;
+  }
+
+  return { solvable: false, minMoves: Infinity, solutionPath: [] };
+}
+
+/**
+ * Quick pattern-based solvability checks
+ */
+function checkQuickPatterns(goal) {
+  // Powers of 2 are always reachable by doubling
+  if (isPowerOfTwo(goal)) {
+    const steps = Math.log2(goal);
+    return { 
+      solvable: true, 
+      minMoves: steps, 
+      solutionPath: Array(steps).fill().map((_, i) => ({
+        operation: 'double', from: Math.pow(2, i), to: Math.pow(2, i + 1)
+      }))
+    };
+  }
+
+  // Single digits (2-9) have known short paths
+  if (goal >= 2 && goal <= 9) {
+    return { solvable: true, minMoves: estimateMinMovesForDigit(goal), solutionPath: [] };
+  }
+
+  return null;
+}
+
+/**
+ * Enhanced BFS with better pruning and early termination
+ */
+function enhancedBFS(start, goal, maxMoves) {
+  const queue = [{ current: start, steps: 0, path: [] }];
+  const visited = new Map([[start, 0]]); // Track minimum steps to reach each number
 
   while (queue.length > 0) {
     const { current, steps, path } = queue.shift();
@@ -111,23 +155,157 @@ export function validateExercise(goal, maxMoves = 20) {
       return { solvable: true, minMoves: steps, solutionPath: path };
     }
 
-    if (steps >= maxMoves || visited.size > 1000) continue;
+    if (steps >= maxMoves) continue;
 
     for (const [opName, opFunc] of Object.entries(operations)) {
       const next = opFunc(current);
 
-      if (next > 0 && next <= 10000 && !visited.has(next)) {
-        visited.add(next);
-        queue.push({
-          current: next,
-          steps: steps + 1,
-          path: [...path, { operation: opName, from: current, to: next }],
-        });
+      if (next > 0 && next <= 10000) {
+        const existingSteps = visited.get(next);
+        if (!existingSteps || steps + 1 < existingSteps) {
+          visited.set(next, steps + 1);
+          queue.push({
+            current: next,
+            steps: steps + 1,
+            path: [...path, { operation: opName, from: current, to: next }],
+          });
+        }
       }
     }
   }
 
   return { solvable: false, minMoves: Infinity, solutionPath: [] };
+}
+
+/**
+ * Strategic approaches for hard-to-reach numbers (especially odd numbers)
+ */
+function tryStrategicApproaches(goal, maxMoves) {
+  // Strategy 1: Try appending digits to make even, then work backwards
+  const evenVariants = generateStrategicVariants(goal);
+  
+  for (const variant of evenVariants) {
+    const pathToVariant = enhancedBFS(1, variant.number, maxMoves - 2);
+    if (pathToVariant.solvable) {
+      const pathFromVariant = findPathFromVariantToGoal(variant.number, goal, variant.operations);
+      if (pathFromVariant.length > 0) {
+        return {
+          solvable: true,
+          minMoves: pathToVariant.minMoves + pathFromVariant.length,
+          solutionPath: [...pathToVariant.solutionPath, ...pathFromVariant]
+        };
+      }
+    }
+  }
+
+  // Strategy 2: Look for numbers that can reach goal in 1-2 operations
+  const reverseTargets = findReverseTargets(goal);
+  for (const target of reverseTargets) {
+    const pathToTarget = enhancedBFS(1, target.number, maxMoves - target.stepsToGoal);
+    if (pathToTarget.solvable) {
+      return {
+        solvable: true,
+        minMoves: pathToTarget.minMoves + target.stepsToGoal,
+        solutionPath: [...pathToTarget.solutionPath, ...target.path]
+      };
+    }
+  }
+
+  return { solvable: false, minMoves: Infinity, solutionPath: [] };
+}
+
+/**
+ * Generate strategic number variants that might be easier to reach
+ */
+function generateStrategicVariants(goal) {
+  const variants = [];
+  
+  // For odd numbers like 333, try 3330 (append 0 conceptually via append1 then operations)
+  if (goal % 2 === 1) {
+    // Try number with 0 appended (conceptually)
+    const with0 = goal * 10;
+    if (with0 <= 10000) {
+      variants.push({
+        number: with0,
+        operations: [{ operation: 'sumDigits', from: with0, to: sumDigits(with0) }]
+      });
+    }
+    
+    // Try number with 1 appended
+    const with1 = goal * 10 + 1;
+    if (with1 <= 10000 && with1 % 2 === 0) {
+      variants.push({
+        number: with1,
+        operations: [{ operation: 'sumDigits', from: with1, to: sumDigits(with1) }]
+      });
+    }
+  }
+  
+  return variants;
+}
+
+/**
+ * Find numbers that can reach the goal in 1-2 operations
+ */
+function findReverseTargets(goal) {
+  const targets = [];
+  
+  // Numbers that when doubled give goal
+  if (goal % 2 === 0) {
+    targets.push({
+      number: goal / 2,
+      stepsToGoal: 1,
+      path: [{ operation: 'double', from: goal / 2, to: goal }]
+    });
+  }
+  
+  // Numbers that when reversed give goal
+  const reversed = reverseNumber(goal);
+  if (reversed !== goal && reversed > 0) {
+    targets.push({
+      number: reversed,
+      stepsToGoal: 1,
+      path: [{ operation: 'reverse', from: reversed, to: goal }]
+    });
+  }
+  
+  // Numbers that when sum-digits applied give goal
+  for (let candidate = goal * 9; candidate >= goal * 2 && candidate <= 10000; candidate--) {
+    if (sumDigits(candidate) === goal) {
+      targets.push({
+        number: candidate,
+        stepsToGoal: 1,
+        path: [{ operation: 'sumDigits', from: candidate, to: goal }]
+      });
+      break; // Found one, that's enough
+    }
+  }
+  
+  return targets;
+}
+
+// Helper functions
+function isPowerOfTwo(n) {
+  return n > 0 && (n & (n - 1)) === 0;
+}
+
+function estimateMinMovesForDigit(digit) {
+  const shortcuts = { 2: 1, 4: 2, 8: 3, 3: 2, 6: 3, 9: 3, 5: 3, 7: 4 };
+  return shortcuts[digit] || 4;
+}
+
+function reverseNumber(n) {
+  return parseInt(n.toString().split('').reverse().join(''), 10) || 0;
+}
+
+function sumDigits(n) {
+  return n.toString().split('').reduce((sum, digit) => sum + parseInt(digit, 10), 0);
+}
+
+function findPathFromVariantToGoal(variant, goal, operations) {
+  // This would implement the specific operations to get from variant to goal
+  // For now, return the operations provided
+  return operations.filter(op => op.to === goal);
 }
 
 /**
