@@ -1310,6 +1310,8 @@ function showCustomExerciseModal() {
               placeholder="e.g., 128"
               min="2"
               max="10000"
+              inputmode="numeric"
+              pattern="[0-9]*"
             />
           </div>
           
