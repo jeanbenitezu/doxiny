@@ -49,6 +49,11 @@ export function applyMove(state, operation) {
         value: newValue,
       },
     ],
+    // Only clear cached hints but keep progression counter
+    hints: {
+      ...state.hints,
+      hintsData: [] // Clear old hints since optimal path changed
+    },
   };
 
   // Check if goal is reached

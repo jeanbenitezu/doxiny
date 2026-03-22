@@ -147,4 +147,66 @@ const playerStats = {
 - **No infinite loops**: BFS prevents cycles, visited set tracks explored states
 - **Memory limits**: Max 1,000 explored states per validation
 
-Last Updated: March 22, 2026
+## Hint System
+
+**Added March 22, 2026**: Intelligent hint system provides 3 levels of guidance per exercise.
+
+### Hint Types & UI Behavior
+
+#### 1. Strategic Hints (Level 1) - Non-Modal Display
+- **Purpose**: General direction and approach guidance
+- **Examples**: "Target is larger, consider growth operations", "Try digit manipulation"
+- **UI**: Non-modal display at top of screen, auto-hides after 8 seconds
+- **Icon**: 💡 (lightbulb)
+- **Cancellation**: Display hides immediately when user takes any action
+
+#### 2. Tactical Hints (Level 2) - Non-Modal Display  
+- **Purpose**: Specific number transformations and intermediate targets
+- **Examples**: "Doubling 64 gives 128", "Reversing 123 gives 321"
+- **UI**: Non-modal display at top of screen, auto-hides after 8 seconds
+- **Icon**: 🎯 (target)
+- **Cancellation**: Display hides immediately when user takes any action
+
+#### 3. Direct Hints (Level 3) - Button Blinking
+- **Purpose**: Exact next move with optimal operation
+- **Examples**: "Use DOUBLE to transform 64 → 128"  
+- **UI**: Target operation button blinks for 3 seconds with golden glow
+- **Icon**: ⚡ (lightning)
+- **Cancellation**: Blinking stops immediately when user takes any action
+
+### Hint Generation Algorithm
+```javascript
+function generateHints(currentNumber, targetNumber, movesMade, hintsUsed = 0) {
+  const optimalPath = findShortestPath(currentNumber, targetNumber);
+  
+  // Level 1: Strategic analysis
+  if (hintsUsed < 1) {
+    return analyzeOverallStrategy(currentNumber, targetNumber, optimalPath);
+  }
+  
+  // Level 2: Tactical guidance  
+  if (hintsUsed < 2) {
+    return suggestNextTransformation(currentNumber, targetNumber, optimalPath);
+  }
+  
+  // Level 3: Direct optimal move with operation reference
+  if (hintsUsed < 3) {
+    return {
+      level: 3,
+      type: 'direct',
+      message: t('hints.direct.nextMove', { operation, current, result }),
+      recommendedOperation: optimalPath[0].operation, // For button blinking
+      confidence: 'maximum'
+    };
+  }
+}
+```
+
+### Hint Limitation System
+- **Max hints per exercise**: 3 hints total
+- **Progressive revelation**: Must use hints in order (can't skip to direct hint)
+- **UI feedback**: Hint button greys out when exhausted
+- **Reset behavior**: Hint counter resets with new exercise AND when user makes any move
+- **Fresh hint generation**: Each move resets hints since optimal path changes with new number
+
+Last Updated: March 22, 2026 (Added comprehensive hint system with non-modal UI)

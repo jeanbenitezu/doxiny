@@ -608,20 +608,15 @@ export function generateHints(currentNumber, targetNumber, movesMade, hintsUsed 
 
   const hints = [];
   
+  // Always generate all 3 hint levels for current number
   // Hint 1: Strategic guidance (general direction)
-  if (hintsUsed < 1) {
-    hints.push(generateStrategicHint(currentNumber, targetNumber, optimalPath));
-  }
+  hints.push(generateStrategicHint(currentNumber, targetNumber, optimalPath));
   
   // Hint 2: Tactical guidance (specific numbers or operations)
-  if (hintsUsed < 2) {
-    hints.push(generateTacticalHint(currentNumber, targetNumber, optimalPath));
-  }
+  hints.push(generateTacticalHint(currentNumber, targetNumber, optimalPath));
   
-  // Hint 3: Direct guidance (exact next move)
-  if (hintsUsed < 3) {
-    hints.push(generateDirectHint(currentNumber, targetNumber, optimalPath));
-  }
+  // Hint 3: Direct guidance (exact next move) 
+  hints.push(generateDirectHint(currentNumber, targetNumber, optimalPath));
   
   return hints;
 }
@@ -758,59 +753,58 @@ function generateDirectHint(current, target, path) {
 function generateFallbackHints(current, target, hintsUsed) {
   const hints = [];
   
-  if (hintsUsed < 1) {
-    if (target > current * 2) {
-      hints.push({
-        level: 1,
-        type: 'strategic',
-        message: t('hints.strategic.targetMuchLarger', { target, current }),
-        confidence: 'medium'
-      });
-    } else if (target < current) {
-      hints.push({
-        level: 1,
-        type: 'strategic',
-        message: t('hints.strategic.targetSmaller', { target, current }),
-        confidence: 'medium'
-      });
-    } else {
-      hints.push({
-        level: 1,
-        type: 'strategic',
-        message: t('hints.strategic.targetClose', { target, current }),
-        confidence: 'medium'
-      });
-    }
-  }
+  // Always generate all 3 levels for current number
   
-  if (hintsUsed < 2) {
-    const currentStr = current.toString();
-    
-    if (currentStr.length > 1) {
-      hints.push({
-        level: 2,
-        type: 'tactical',
-        message: t('hints.tactical.multiDigitOps', { count: currentStr.length }),
-        confidence: 'medium'
-      });
-    } else {
-      hints.push({
-        level: 2,
-        type: 'tactical',
-        message: t('hints.tactical.singleDigitOps', { current }),
-        confidence: 'medium'
-      });
-    }
-  }
-  
-  if (hintsUsed < 3) {
+  // Level 1: Strategic hint
+  if (target > current * 2) {
     hints.push({
-      level: 3,
-      type: 'direct',
-      message: t('hints.direct.challenging', { target }),
-      confidence: 'low'
+      level: 1,
+      type: 'strategic',
+      message: t('hints.strategic.targetMuchLarger', { target, current }),
+      confidence: 'medium'
+    });
+  } else if (target < current) {
+    hints.push({
+      level: 1,
+      type: 'strategic',
+      message: t('hints.strategic.targetSmaller', { target, current }),
+      confidence: 'medium'
+    });
+  } else {
+    hints.push({
+      level: 1,
+      type: 'strategic',
+      message: t('hints.strategic.targetClose', { target, current }),
+      confidence: 'medium'
     });
   }
+  
+  // Level 2: Tactical hint
+  const currentStr = current.toString();
+  
+  if (currentStr.length > 1) {
+    hints.push({
+      level: 2,
+      type: 'tactical',
+      message: t('hints.tactical.multiDigitOps', { count: currentStr.length }),
+      confidence: 'medium'
+    });
+  } else {
+    hints.push({
+      level: 2,
+      type: 'tactical',
+      message: t('hints.tactical.singleDigitOps', { current }),
+      confidence: 'medium'
+    });
+  }
+  
+  // Level 3: Direct hint
+  hints.push({
+    level: 3,
+    type: 'direct',
+    message: t('hints.direct.challenging', { target }),
+    confidence: 'low'
+  });
   
   return hints;
 }

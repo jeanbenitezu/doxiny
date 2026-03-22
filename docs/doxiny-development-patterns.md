@@ -15,14 +15,19 @@ const double = (num) => num * 2;
 ### Immutable State Management
 Game state updates create new objects rather than mutating existing ones:
 ```javascript
-// game.js - State transitions
+// game.js - State transitions with smart hint handling
 function applyMove(gameState, operation, operationName) {
   const newCurrentNumber = operation(gameState.currentNumber);
   return {
     ...gameState,
     currentNumber: newCurrentNumber,
     moves: [...gameState.moves, { operation: operationName, from: gameState.currentNumber, to: newCurrentNumber }],
-    isComplete: newCurrentNumber === gameState.targetNumber
+    isComplete: newCurrentNumber === gameState.targetNumber,
+    // Keep hint progression but clear cached hints for current number
+    hints: {
+      ...gameState.hints,
+      hintsData: [] // Clear old hints since optimal path changed, but keep 'used' counter
+    }
   };
 }
 ```
@@ -196,8 +201,77 @@ t('game.success.perfect', { moves: 6, optimal: 6 });
 - [ ] Responsive design on mobile/desktop
 - [ ] PWA install and offline functionality
 - [ ] Multi-language switching
-- [ ] Animation performance with reduced motion
+- [ ] Animation performance with reduced motion- [ ] **Hint system**: 3 hint types display correctly
+- [ ] **Button blinking**: Direct hints trigger correct operation button
+- [ ] **Hint effects cancellation**: Any user action clears both blinking and hint display
+- [ ] **Non-modal hints**: Strategic/tactical hints auto-hide after 8 seconds
+- [ ] **Hint limitations**: Max 3 hints per exercise, button greys out when exhausted
+- [ ] **Smart hint progression**: Hint progression maintained across moves (strategic→tactical→direct) with fresh hints for new number
 
+## Hint System UI Patterns
+
+**Added March 22, 2026**: Non-modal hint system with blinking button interactions.
+
+### Button Blinking Animation for Direct Hints
+```css
+.hint-blink {
+  animation: hintBlink 0.8s ease-in-out 4;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.8) !important;
+  border-color: rgba(251, 191, 36, 0.8) !important;
+}
+
+@keyframes hintBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+```
+
+### Hint Display (Non-Modal) Pattern
+```javascript
+function showHintDisplay(hint, hintsUsed, maxHints) {
+  const display = document.getElementById("hint-display");
+  
+  // Populate hint content
+  updateHintContent(hint, hintsUsed, maxHints);
+  
+  // Show display at top of screen
+  display.classList.remove("hidden");
+  
+  // Auto-hide after 8 seconds for non-direct hints
+  setTimeout(() => {
+    display.classList.add("hidden");
+  }, 8000);
+}
+```
+
+### Clear All Hint Effects
+```javascript
+// Clean data-driven approach using recommendedOperation field
+function blinkOperationButton(hint) {
+  const targetOperation = hint.recommendedOperation;
+  
+  if (targetOperation) {
+    const button = document.querySelector(`[data-operation="${targetOperation}"]`);
+    if (button) {
+      button.classList.add('hint-blink');
+      setTimeout(() => button.classList.remove('hint-blink'), 3000);
+    }
+  }
+}
+
+// Clear all hint effects when user takes any action
+function clearHintEffects() {
+  // Remove blinking effect from operation buttons
+  const blinkingButtons = document.querySelectorAll('.hint-blink');
+  blinkingButtons.forEach(button => button.classList.remove('hint-blink'));
+  
+  // Hide hint display if visible
+  const hintDisplay = document.getElementById('hint-display');
+  if (hintDisplay && !hintDisplay.classList.contains('hidden')) {
+    hintDisplay.classList.add('hidden');
+  }
+}
+```
 ### Common Edge Cases
 ```javascript
 // Test cases to always verify
@@ -224,4 +298,4 @@ const testCases = [
 - Verify PWA functionality in network conditions
 - Check accessibility with screen readers
 
-Last Updated: March 22, 2026
+Last Updated: March 22, 2026 (Fixed hint progression to work properly across moves)
