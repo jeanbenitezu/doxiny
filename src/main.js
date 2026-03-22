@@ -305,6 +305,35 @@ function getOperationIcon(operation, color = "currentColor") {
 const app = document.querySelector("#app");
 
 /**
+ * Smoothly scroll to top of page and reset zoom level
+ */
+function scrollToTop() {
+  // Reset zoom level by manipulating viewport
+  const viewport = document.querySelector('meta[name="viewport"]');
+  if (viewport) {
+    // Force reset zoom by briefly changing and restoring viewport
+    const originalContent = viewport.content;
+    viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    
+    // Small delay to ensure zoom reset takes effect
+    setTimeout(() => {
+      viewport.content = originalContent;
+    }, 50);
+  }
+  
+  // Scroll to top smoothly
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'smooth'
+  });
+  
+  // Additional zoom prevention using CSS transform on body
+  document.body.style.transform = 'scale(1)';
+  document.body.style.transformOrigin = '0 0';
+}
+
+/**
  * Register service worker for PWA functionality with update handling
  */
 function registerServiceWorker() {
@@ -1046,6 +1075,7 @@ function handleReset() {
     gameManager.currentDifficulty,
   );
   updateDisplay();
+  scrollToTop();
 }
 
 /**
@@ -1061,6 +1091,7 @@ function handleNewExercise() {
   );
   // Re-render UI to reset all button states
   app.innerHTML = createGameUI();
+  scrollToTop();
 }
 
 /**
@@ -1176,6 +1207,7 @@ function handleDifficultySelect(difficulty) {
     );
     // Re-render UI (event listeners are already set up globally)
     app.innerHTML = createGameUI();
+    scrollToTop();
   }
 }
 
@@ -1285,6 +1317,7 @@ function setupCustomExerciseModal() {
   // Close modal handlers
   const closeModal = () => {
     modal.remove();
+    scrollToTop();
   };
   
   document.getElementById("close-custom-modal").addEventListener("click", closeModal);
@@ -1395,15 +1428,18 @@ function setupGlobalEventListeners() {
       handleNewExercise();
     } else if (e.target.closest("#close-info-btn")) {
       document.getElementById("info-modal").classList.add("hidden");
+      scrollToTop();
     } else if (e.target.closest("#info-btn")) {
       showInfoModal();
     } else if (e.target.closest("#next-exercise-btn")) {
       cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
+      scrollToTop();
       handleNextExercise();
     } else if (e.target.closest("#retry-exercise-btn")) {
       cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
+      scrollToTop();
       handleRetryExercise();
     } else if (e.target.closest(".level-btn")) {
       const levelBtn = e.target.closest(".level-btn");
@@ -1424,6 +1460,7 @@ function setupGlobalEventListeners() {
       handleHintRequest();
     } else if (e.target.closest("#close-hint-btn")) {
       document.getElementById("hint-modal").classList.add("hidden");
+      scrollToTop();
     }
   });
 
@@ -1445,6 +1482,9 @@ function init() {
 
   // Render initial UI
   app.innerHTML = createGameUI();
+  
+  // Ensure we start at the top of the page
+  scrollToTop();
 
   // Expose functions for dev tools testing
   if (typeof window !== 'undefined') {
