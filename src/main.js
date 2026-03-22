@@ -800,6 +800,24 @@ function updateDisplay() {
     }
   }
 
+  // Update hint button text and state
+  const hintBtn = document.getElementById("hint-btn");
+  if (hintBtn) {
+    const hintText = hintBtn.querySelector("span:last-child");
+    if (hintText) {
+      hintText.textContent = `${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})`;
+    }
+    
+    // Update button styling based on hints remaining
+    if (gameState.hints.used >= gameState.hints.maxHints) {
+      hintBtn.className = "bg-gray-600 text-gray-400 cursor-not-allowed border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
+      hintBtn.disabled = true;
+    } else {
+      hintBtn.className = "bg-amber-600 hover:bg-amber-500 border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
+      hintBtn.disabled = false;
+    }
+  }
+
   // Update inline history
   const inlineHistoryContent = document.getElementById(
     "inline-history-content",
