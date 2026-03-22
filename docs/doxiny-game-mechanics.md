@@ -206,7 +206,7 @@ function generateHints(currentNumber, targetNumber, movesMade, hintsUsed = 0) {
 - **Max hints per exercise**: 3 hints total
 - **Progressive revelation**: Must use hints in order (can't skip to direct hint)
 - **UI feedback**: Hint button greys out when exhausted
-- **Reset behavior**: Hint counter resets with new exercise AND when user makes any move
-- **Fresh hint generation**: Each move resets hints since optimal path changes with new number
+- **Smart progression**: When user makes move, hint progression continues (strategic→tactical→direct) but hints are regenerated for new current number
+- **Fresh context**: Each hint is always relevant to current game state
 
-Last Updated: March 22, 2026 (Added comprehensive hint system with non-modal UI)
+Last Updated: March 22, 2026 (Fixed hint progression to work properly across moves)
