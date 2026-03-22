@@ -1310,32 +1310,6 @@ function setupGlobalEventListeners() {
     }
   });
 
-  // Global keyboard support
-  document.addEventListener("keydown", (e) => {
-    switch (e.key) {
-      case "1":
-        handleOperationClick("reverse");
-        break;
-      case "2":
-        handleOperationClick("sum");
-        break;
-      case "3":
-        handleOperationClick("append1");
-        break;
-      case "4":
-        handleOperationClick("double");
-        break;
-      case "r":
-      case "R":
-        handleReset();
-        break;
-      case "n":
-      case "N":
-        handleNewExercise();
-        break;
-    }
-  });
-
   globalEventListenerSetup = true;
 }
 
