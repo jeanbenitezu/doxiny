@@ -516,10 +516,10 @@ function createGameUI() {
           ${translate("gameStates.reset")}
         </button>
         <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 info-btn h-full" id="info-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          <span>ℹ️</span> <span class="w-min">${translate("help")}</span>
+          <span>ℹ️</span> <span>${translate("help")}</span>
         </button>
         <button class="bg-[#6b46c1] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          <span>${showPreviews ? "👁️" : "🙈"}</span> <span class="w-min">${translate("preview")}</span>
+          <span>${showPreviews ? "👁️" : "🙈"}</span> <span>${translate("preview")}</span>
         </button>
       </section>
     </main>
