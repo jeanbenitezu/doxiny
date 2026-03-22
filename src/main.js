@@ -640,23 +640,18 @@ function createGameUI() {
       </div>
     </div>
     
-    <!-- Hint Modal -->
-    <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm hint-modal hidden p-4" id="hint-modal">
-      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-2xl p-4 sm:p-6 max-w-md w-full text-center shadow-2xl max-h-[90vh] max-h-[90svh] overflow-y-auto">
-        <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">💡 ${translate("hint")}</h3>
-        <div class="text-white/95 text-sm text-left leading-relaxed mb-4 sm:mb-6" id="hint-content">
-          <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-3">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-lg" id="hint-icon">💡</span>
-              <span class="font-bold text-amber-300" id="hint-level">${translate("hint")} #1</span>
-            </div>
-            <p class="text-white/90" id="hint-message">...</p>
-          </div>
-          <div class="text-center text-amber-300/70 text-xs" id="hint-remaining">
-            ...
-          </div>
+    <!-- Hint Display Area (Non-modal) -->
+    <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 max-w-md w-full px-4 hint-display hidden" id="hint-display">
+      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-2 border-amber-400/50 rounded-xl p-4 shadow-xl backdrop-blur-sm">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-lg" id="hint-icon-display">💡</span>
+          <span class="font-bold text-amber-300 text-sm" id="hint-level-display">Hint #1</span>
+          <button class="ml-auto text-white/60 hover:text-white text-lg" id="close-hint-display">×</button>
         </div>
-        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm" id="close-hint-btn">${translate("close")}</button>
+        <p class="text-white/90 text-sm leading-relaxed" id="hint-message-display">...</p>
+        <div class="text-center text-amber-300/70 text-xs mt-2" id="hint-remaining-display">
+          ...
+        </div>
       </div>
     </div>
   `;
@@ -1065,6 +1060,9 @@ function cleanupSuccessAnimations() {
  * Handle operation button clicks
  */
 function handleOperationClick(operation) {
+  // Clear any hint effects when user takes action
+  clearHintEffects();
+  
   if (!gameState.isComplete && gameState.moves < moveLimit) {
     try {
       // Calculate what the result would be
@@ -1086,6 +1084,7 @@ function handleOperationClick(operation) {
  * Handle reset button click
  */
 function handleReset() {
+  clearHintEffects();
   cleanupSuccessAnimations();
   gameState = resetGame(
     gameManager.currentExercise.goal,
@@ -1099,6 +1098,7 @@ function handleReset() {
  * Generate new exercise
  */
 function handleNewExercise() {
+  clearHintEffects();
   cleanupSuccessAnimations();
   gameManager.generateNewExercise();
   updateMoveLimit();
@@ -1115,6 +1115,7 @@ function handleNewExercise() {
  * Toggle preview visibility
  */
 function togglePreviews() {
+  clearHintEffects();
   showPreviews = !showPreviews;
   
   // Re-render UI to update all button states and toggle button appearance
@@ -1154,8 +1155,8 @@ function handleHintRequest() {
   gameState.hints.used += 1;
   gameState.hints.hintsData.push(nextHint);
   
-  // Show hint modal
-  showHintModal(nextHint, gameState.hints.used, gameState.hints.maxHints);
+  // Show hint (modal or button blink depending on type)
+  showHint(nextHint, gameState.hints.used, gameState.hints.maxHints);
   
   // Update UI to reflect hint usage
   updateDisplay();
@@ -1166,12 +1167,22 @@ function handleHintRequest() {
 /**
  * Show hint modal with hint information
  */
-function showHintModal(hint, hintsUsed, maxHints) {
-  const modal = document.getElementById("hint-modal");
-  const hintIcon = document.getElementById("hint-icon");
-  const hintLevel = document.getElementById("hint-level");
-  const hintMessage = document.getElementById("hint-message");
-  const hintRemaining = document.getElementById("hint-remaining");
+function showHint(hint, hintsUsed, maxHints) {
+  if (hint.type === 'direct') {
+    // For direct hints, blink the relevant operation button
+    blinkOperationButton(hint);
+  } else {
+    // For strategic/tactical hints, show non-modal display
+    showHintDisplay(hint, hintsUsed, maxHints);
+  }
+}
+
+function showHintDisplay(hint, hintsUsed, maxHints) {
+  const display = document.getElementById("hint-display");
+  const hintIcon = document.getElementById("hint-icon-display");
+  const hintLevel = document.getElementById("hint-level-display");
+  const hintMessage = document.getElementById("hint-message-display");
+  const hintRemaining = document.getElementById("hint-remaining-display");
   
   // Set hint icon based on type
   const icons = {
@@ -1193,7 +1204,46 @@ function showHintModal(hint, hintsUsed, maxHints) {
     hintRemaining.textContent = t('hints.ui.finalHint');
   }
   
-  modal.classList.remove("hidden");
+  display.classList.remove("hidden");
+  
+  // Auto-hide after 8 seconds for non-direct hints
+  setTimeout(() => {
+    display.classList.add("hidden");
+  }, 8000);
+}
+
+function blinkOperationButton(hint) {
+  // Use the recommendedOperation field if available
+  const targetOperation = hint.recommendedOperation;
+  
+  if (targetOperation) {
+    const targetButton = document.querySelector(`[data-operation="${targetOperation}"]`);
+    if (targetButton) {
+      targetButton.classList.add('hint-blink');
+      
+      // Remove blink class after 3 seconds
+      setTimeout(() => {
+        targetButton.classList.remove('hint-blink');
+      }, 3000);
+    }
+  }
+}
+
+/**
+ * Clear all active hint effects (blinking and display)
+ */
+function clearHintEffects() {
+  // Remove blinking effect from operation buttons
+  const blinkingButtons = document.querySelectorAll('.hint-blink');
+  blinkingButtons.forEach(button => {
+    button.classList.remove('hint-blink');
+  });
+  
+  // Hide hint display if visible
+  const hintDisplay = document.getElementById('hint-display');
+  if (hintDisplay && !hintDisplay.classList.contains('hidden')) {
+    hintDisplay.classList.add('hidden');
+  }
 }
 
 /**
@@ -1216,6 +1266,7 @@ function handleRetryExercise() {
  */
 function handleDifficultySelect(difficulty) {
   if (gameManager.setDifficulty(difficulty)) {
+    clearHintEffects();
     cleanupSuccessAnimations();
     updateMoveLimit();
     gameState = createGameState(
@@ -1481,8 +1532,8 @@ function setupGlobalEventListeners() {
       togglePreviews();
     } else if (e.target.closest("#hint-btn")) {
       handleHintRequest();
-    } else if (e.target.closest("#close-hint-btn")) {
-      document.getElementById("hint-modal").classList.add("hidden");
+    } else if (e.target.closest("#close-hint-display")) {
+      document.getElementById("hint-display").classList.add("hidden");
       scrollToTop();
     }
   });

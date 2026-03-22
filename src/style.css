@@ -226,25 +226,52 @@ h3 {
 }
 
 /* Smooth transitions for modal states */
-.hint-modal,
+.hint-display,
 .success-modal {
   transition:
     opacity 0.3s ease,
-    visibility 0.3s ease;
+    visibility 0.3s ease,
+    transform 0.3s ease;
 }
 
-.hint-modal.hidden,
+.hint-display.hidden,
 .success-modal.hidden {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
 
-.hint-modal:not(.hidden),
+.hint-display.hidden {
+  transform: translate(-50%, -20px);
+}
+
+.hint-display:not(.hidden),
 .success-modal:not(.hidden) {
   opacity: 1;
   visibility: visible;
   pointer-events: all;
+}
+
+.hint-display:not(.hidden) {
+  transform: translate(-50%, 0);
+}
+
+/* Button blinking animation for direct hints */
+.hint-blink {
+  animation: hintBlink 0.8s ease-in-out 4;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.8) !important;
+  border-color: rgba(251, 191, 36, 0.8) !important;
+}
+
+@keyframes hintBlink {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
 }
 
 /* Improved button active states */

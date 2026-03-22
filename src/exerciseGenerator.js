@@ -747,6 +747,7 @@ function generateDirectHint(current, target, path) {
       current, 
       result: nextMove.to 
     }),
+    recommendedOperation: operationKey, // Add the operation key for button blinking
     confidence: 'maximum'
   };
 }
