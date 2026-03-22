@@ -164,7 +164,7 @@ t('game.success.perfect', { moves: 6, optimal: 6 });
   "name": "Doxiny - Do X in Y moves",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#0099CC",
+  "theme_color": "#2563EB",
   "background_color": "#1a1f26"
 }
 ```

@@ -99,7 +99,7 @@ function generateSimpleExercise(difficulty) {
 /**
  * Validate that an exercise is actually solvable
  */
-function validateExercise(goal, maxMoves = 20) {
+export function validateExercise(goal, maxMoves = 20) {
   // Simple BFS to verify solvability
   const queue = [{ current: 1, steps: 0, path: [] }];
   const visited = new Set([1]);

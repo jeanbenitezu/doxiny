@@ -23,19 +23,41 @@ Mathematical beauty through minimal moves.
 ### Color Palette
 
 #### Primary Colors
-- **Doxiny Blue**: `#0099CC` - Trust, logic, depth
+- **Doxiny Blue**: `#2563EB` - Professional, sophisticated depth
 - **Transform Orange**: `#F97316` - Action, energy, progress  
 - **Success Green**: `#10B981` - Achievement, completion
 
-#### Secondary Colors
-- **Dark Base**: `#1A1A1A` - Background, elegance
-- **Glass Accent**: `rgba(255,255,255,0.1)` - UI elements
-- **Number Silver**: `#E5E7EB` - Text, numbers
+#### Modal & UI Styling
+- **Modal Background**: `bg-gradient-to-br from-[#4a5568] to-[#2d3748]` - Sophisticated depth
+- **Modal Border**: `border-3 border-[#4a5568]` - Elegant framing
+- **Backdrop**: `bg-black/70 backdrop-blur-sm` - Professional overlay
+- **Glass Buttons**: `bg-white/20 hover:bg-white/30 border-white/30` - Modern transparency
+- **Accent Colors**: 
+  - Blue highlights: `text-blue-300`
+  - Yellow operations: `text-yellow-300`
+  - Success elements: `text-emerald-300`
+  - Primary text: `text-white/95`
 
-### Typography
-- **Headers**: Bold sans-serif
-- **Numbers**: Monospace for alignment
-- **Body**: Clean, readable sans-serif
+#### Typography Colors
+- **Headers**: `text-white font-bold` - Clear hierarchy
+- **Body Text**: `text-white/95` - Optimal readability
+- **Secondary Text**: `text-white/80` - Subtle information
+- **Interactive Elements**: Color-coded for clarity
+
+### Typography & Layout
+
+#### Font Styles
+- **Headers**: `text-xl sm:text-2xl font-bold` - Clear hierarchy
+- **Numbers**: Monospace for alignment, `text-lg sm:text-xl font-bold`
+- **Body**: `text-sm text-left leading-relaxed` - Enhanced readability
+- **Buttons**: `font-bold uppercase tracking-wide` - Professional action elements
+
+#### Modal Design System
+- **Container**: `rounded-2xl shadow-2xl` - Premium feel
+- **Spacing**: `p-4 sm:p-6` - Responsive padding
+- **Transitions**: `transition-all transform hover:-translate-y-1` - Smooth interactions
+- **Responsive**: `max-w-sm w-full max-h-[90vh]` - Optimal sizing
+- **Backdrop**: Blur effects for depth and focus
 
 ## Voice & Tone
 

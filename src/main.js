@@ -5,7 +5,7 @@
 
 import { createGameState, applyMove, resetGame } from "./game.js";
 import { operations, operationLabels } from "./operations.js";
-import { generateExercise, getDifficultyLevels, calculateProgressToTarget } from "./exerciseGenerator.js";
+import { generateExercise, getDifficultyLevels, calculateProgressToTarget, validateExercise } from "./exerciseGenerator.js";
 import {
   translate,
   t,
@@ -177,7 +177,9 @@ function updateMoveLimit() {
 }
 
 // Get available difficulty levels for UI
-const availableLevels = getDifficultyLevels().slice(0, 6); // Show 6 levels
+const baseLevels = getDifficultyLevels().slice(0, 6); // Show 6 regular levels
+const customLevel = { level: "custom", nameKey: "custom" };
+const availableLevels = [...baseLevels, customLevel];
 
 /**
  * Calculate progress toward goal as percentage (0-100) using dynamic path calculation
@@ -409,15 +411,26 @@ function createGameUI() {
     
     <!-- Level Selector -->
     <nav class="w-full mb-3" style="height: 6vh; height: 6svh; min-height: 2.5rem; max-height: 4rem;" data-purpose="level-selector">
-      <div class="grid grid-cols-6 gap-1 h-full">
+      <div class="grid grid-cols-7 gap-1 h-full">
         ${availableLevels
           .map(
-            (lvl) =>
-              `<button class="${lvl.level === gameManager.currentDifficulty ? "bg-orange-600 border border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60"} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
+            (lvl) => {
+              const isCustom = lvl.level === "custom";
+              const isActive = isCustom ? false : (lvl.level === gameManager.currentDifficulty);
+              const buttonClass = isCustom 
+                ? "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500" 
+                : (isActive ? "bg-orange-600 border border-orange-400" : "bg-[#2a2f3a] border border-white/10 opacity-60");
+              
+              return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
                    data-level="${lvl.level}">
-            <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem); font-size: clamp(0.7rem, 2svh, 1rem);">${lvl.level}</span>
-            <span class="uppercase font-bold leading-tight" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem); font-size: clamp(0.5rem, 1.2svh, 0.7rem);">${translate(`difficultyLevels.${lvl.nameKey}`)}</span>
-          </button>`,
+                <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem); font-size: clamp(0.7rem, 2svh, 1rem);">
+                  ${isCustom ? "🎯" : lvl.level}
+                </span>
+                <span class="uppercase font-bold leading-tight" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem); font-size: clamp(0.5rem, 1.2svh, 0.7rem);">
+                  ${isCustom ? (translate("custom") || "Custom") : translate(`difficultyLevels.${lvl.nameKey}`)}
+                </span>
+              </button>`;
+            }
           )
           .join("")}
       </div>
@@ -600,7 +613,7 @@ function renderInlineHistory() {
       };
       const op =
         operationMap[operationKey] || operationMap[entry.action.toLowerCase()];
-      const color = index === 0 ? "#0099CC" : "#10b981"; // emerald-500
+      const color = index === 0 ? "#2563EB" : "#10b981"; // emerald-500
 
       return `<div class="flex items-center gap-1 bg-[${color}10] border border-[${color}20] rounded-lg px-2 py-1" title="${entry.action}: ${gameState.history[index].value} → ${entry.value}">
         ${getOperationIcon(op, color)}

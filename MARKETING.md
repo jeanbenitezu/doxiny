@@ -31,6 +31,8 @@ Unlike other number games that rely on speed or luck, Doxiny rewards **strategic
 - **Strategy over Speed**: Not about quick calculations
 - **Infinite Replayability**: Same puzzle, multiple solutions
 - **Learning Curve**: Easy to start, impossible to master
+- **Premium UI/UX**: Sophisticated modal design with blur effects and gradients
+- **Professional Aesthetics**: Glass morphism and elegant transitions
 
 ### vs Puzzle Apps
 - **Universal Language**: Numbers work across all cultures

@@ -328,6 +328,27 @@ export const translations = {
       es: "💡 Extremo: ¡El desafío definitivo!",
     },
   },
+
+  // Custom Exercise Modal
+  custom: {
+    en: "Custom",
+    es: "Personalizado",
+  },
+
+  customExercise: {
+    en: "Custom Exercise",
+    es: "Ejercicio Personalizado",
+  },
+
+  customExerciseDescription: {
+    en: "Enter any target number between 2-10,000. We'll show if it's solvable, but you can load any number to try!",
+    es: "Ingresa cualquier número objetivo entre 2-10,000. Te mostraremos si es resoluble, ¡pero puedes cargar cualquier número para intentar!",
+  },
+
+  loadExercise: {
+    en: "Load Exercise",
+    es: "Cargar Ejercicio",
+  },
 };
 
 // Utility functions for i18n
