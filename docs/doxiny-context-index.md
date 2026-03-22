@@ -145,7 +145,7 @@ Update: Development Patterns
 ## 🎮 Project Quick Facts
 
 - **Name**: Doxiny (Do X in Y moves)
-- **Type**: Mathematical number puzzle PWA
+- **Type**: Mathematical number puzzle
 - **Tech**: Vanilla JS + Vite + Tailwind CSS
 - **Goal**: Transform 1 → target using 4 operations optimally
 - **Operations**: REVERSE, SUM DIGITS, APPEND 1, DOUBLE

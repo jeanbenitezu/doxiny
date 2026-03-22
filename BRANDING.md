@@ -110,7 +110,6 @@ const operations = {
 - mathematical thinking
 - strategy game
 - minimalist game
-- PWA game
 
 ### Keywords (Spanish)  
 - rompecabezas numérico
@@ -152,11 +151,6 @@ const operations = {
 - Real strategy development
 
 ## Implementation Notes
-
-### PWA Considerations
-- Offline-first approach aligns with "focus" brand
-- Fast loading maintains "efficiency" promise
-- Mobile-optimized for universal accessibility
 
 ### Internationalization Strategy
 - Icons reduce translation needs

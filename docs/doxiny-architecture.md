@@ -3,7 +3,6 @@
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
 - **Styling**: Tailwind CSS v3 (CDN), custom CSS variables
-- **PWA**: Manifest + Service Worker for offline capability
 - **Deployment**: Surge.sh for previews, GitHub Pages for production
 
 ## File Structure & Responsibilities
@@ -17,10 +16,8 @@
 - **`src/style.css`** - Custom styles, animations, responsive design
 
 ### Configuration Files
-- **`vite.config.js`** - Build configuration, PWA settings
-- **`package.json`** - Dependencies, scripts, PWA metadata
-- **`public/manifest.json`** - PWA manifest with branding
-- **`public/sw.js`** - Service worker for offline functionality
+- **`vite.config.js`** - Build configuration
+- **`package.json`** - Dependencies, scripts
 
 ## Architecture Patterns
 
@@ -68,8 +65,7 @@ function validateExercise(goal, maxMoves = null) {
 
 ## Build & Deployment
 - **Development**: `npm run dev` - Vite dev server
-- **Build**: `npm run build` - Production build with PWA features
-- **Preview**: `npm run deploy:preview` - Deploy to surge.sh
+- **Build**: `npm run build` - Production build
 - **Production**: Manual GitHub Pages deployment
 
 ## Dependencies

@@ -37,7 +37,6 @@ Unlike other number games that rely on speed or luck, Doxiny rewards **strategic
 ### vs Puzzle Apps
 - **Universal Language**: Numbers work across all cultures
 - **No Artificial Complexity**: Pure mathematical elegance
-- **Offline-First**: True PWA, works everywhere
 
 ### vs Brain Training Apps
 - **Genuine Mathematics**: Real strategic thinking
@@ -192,7 +191,6 @@ Can you do better? doxiny.app
 - **Community Contributions**: User-generated challenges
 
 ### Technical Performance
-- **PWA Metrics**: Offline usage, installation rates
 - **Multi-language Success**: Usage distribution by language
 - **Platform Performance**: Load times, engagement by device
 

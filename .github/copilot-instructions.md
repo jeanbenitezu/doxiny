@@ -1,10 +1,10 @@
-# Number Puzzle PWA - Project Instructions
+# Doxiny Number Puzzle - Project Instructions
 
-This is a mathematical puzzle PWA game built with Vanilla JS + Vite.
+This is a mathematical puzzle game built with Vanilla JS + Vite.
 
 ## Project Overview
 - **Game Type**: Number manipulation puzzle
-- **Tech Stack**: Vanilla JS, Vite, CSS, PWA
+- **Tech Stack**: Vanilla JS, Vite, CSS
 - **Target**: Mobile-first, dev-friendly design
 - **Core Concept**: Transform numbers using 4 operations to reach goal
 
@@ -12,7 +12,6 @@ This is a mathematical puzzle PWA game built with Vanilla JS + Vite.
 - Start with number 1, reach goal (e.g., 128)
 - Operations: REVERSE, SUM DIGITS, APPEND 1, DOUBLE
 - Track movement history and optimize for fewest steps
-- PWA with offline capability
 
 ## Development Focus
 - Clean, modular code structure

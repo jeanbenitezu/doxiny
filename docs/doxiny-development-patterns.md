@@ -175,31 +175,12 @@ const translations = {
 t('game.success.perfect', { moves: 6, optimal: 6 });
 ```
 
-## PWA Best Practices
-
-### Service Worker Strategy
-- **Cache-first** for static assets (JS, CSS, images)
-- **Network-first** for mutable content (translations, config)
-- **Offline fallback** for HTML pages
-
-### Manifest Configuration
-```json
-{
-  "name": "Doxiny - Do X in Y moves",
-  "display": "standalone",
-  "orientation": "portrait",
-  "theme_color": "#2563EB",
-  "background_color": "#1a1f26"
-}
-```
-
 ## Testing Patterns
 
 ### Manual Testing Checklist
 - [ ] All 4 operations work correctly with edge cases
 - [ ] Enhanced BFS validation handles numbers 1-100,000 with strategic approaches
 - [ ] Responsive design on mobile/desktop
-- [ ] PWA install and offline functionality
 - [ ] Multi-language switching
 - [ ] Animation performance with reduced motion- [ ] **Hint system**: 3 hint types display correctly
 - [ ] **Button blinking**: Direct hints trigger correct operation button
@@ -295,7 +276,6 @@ const testCases = [
 ### Debugging Guidelines
 - Use `console.log` for state transitions in development
 - Test BFS validation with complex numbers
-- Verify PWA functionality in network conditions
 - Check accessibility with screen readers
 
 Last Updated: March 22, 2026 (Fixed hint progression to work properly across moves)

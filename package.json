@@ -1,15 +1,12 @@
 {
-  "name": "number-puzzle-pwa",
+  "name": "doxiny-number-puzzle",
   "private": true,
   "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "deploy:prepare": "node scripts/update-sw-version.js",
-    "deploy:build": "npm run deploy:prepare && npm run build",
-    "deploy:preview": "npm run deploy:build && npm run preview"
+    "preview": "vite preview"
   },
   "devDependencies": {
     "vite": "^6.0.8"
