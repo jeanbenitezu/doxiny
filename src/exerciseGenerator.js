@@ -391,18 +391,72 @@ function sumDigits(n) {
 }
 
 /**
- * Find shortest path from any start number to target using BFS
+ * Find shortest path from any start number to target using enhanced BFS with strategic approaches
  */
-export function findShortestPath(start, target, maxMoves = 15) {
+export function findShortestPath(start, target, maxMoves = null) {
   if (start === target) return [];
   
+  // Auto-calculate maxMoves based on numbers involved
+  if (!maxMoves) {
+    const complexity = Math.max(Math.floor(Math.log10(start)), Math.floor(Math.log10(target)));
+    maxMoves = Math.min(20, Math.max(10, complexity * 6));
+  }
+
+  // Quick pattern-based checks for direct paths
+  const quickPath = findQuickPath(start, target);
+  if (quickPath.length > 0) return quickPath;
+
+  // Enhanced BFS with strategic approaches
+  const directPath = enhancedPathBFS(start, target, maxMoves);
+  if (directPath.length > 0) return directPath;
+
+  // If direct path fails, try strategic reverse approaches
+  const strategicPath = findStrategicPath(start, target, maxMoves);
+  if (strategicPath.length > 0) return strategicPath;
+
+  return []; // No path found
+}
+
+/**
+ * Quick pattern-based path finding
+ */
+function findQuickPath(start, target) {
+  // Direct single operation check
+  const directPaths = findDirectPath(start, target);
+  if (directPaths.length > 0) return directPaths;
+
+  // Powers of 2 pattern from start
+  if (isPowerOfTwo(target) && isPowerOfTwo(start) && target >= start) {
+    const startExp = Math.log2(start);
+    const targetExp = Math.log2(target);
+    const doublingSteps = targetExp - startExp;
+    
+    if (doublingSteps > 0 && doublingSteps <= 8) {
+      const path = [];
+      let current = start;
+      for (let i = 0; i < doublingSteps; i++) {
+        const next = current * 2;
+        path.push({ operation: 'double', from: current, to: next });
+        current = next;
+      }
+      return path;
+    }
+  }
+
+  return [];
+}
+
+/**
+ * Enhanced BFS with better pruning and tracking
+ */
+function enhancedPathBFS(start, target, maxMoves) {
   const queue = [{ current: start, moves: 0, path: [] }];
-  const visited = new Set([start]);
+  const visited = new Map([[start, 0]]); // Track minimum moves to reach each number
   
   while (queue.length > 0) {
     const { current, moves, path } = queue.shift();
     
-    if (moves >= maxMoves || visited.size > 5000) continue;
+    if (moves >= maxMoves) continue;
     
     for (const [opName, opFunc] of Object.entries(operations)) {
       const next = opFunc(current);
@@ -411,18 +465,83 @@ export function findShortestPath(start, target, maxMoves = 15) {
         return [...path, { operation: opName, from: current, to: next }];
       }
       
-      if (next > 0 && next <= 100000 && !visited.has(next)) {
-        visited.add(next);
-        queue.push({
-          current: next,
-          moves: moves + 1,
-          path: [...path, { operation: opName, from: current, to: next }],
-        });
+      if (next > 0 && next <= 100000) {
+        const existingMoves = visited.get(next);
+        if (!existingMoves || moves + 1 < existingMoves) {
+          visited.set(next, moves + 1);
+          queue.push({
+            current: next,
+            moves: moves + 1,
+            path: [...path, { operation: opName, from: current, to: next }],
+          });
+        }
       }
     }
   }
   
-  return []; // No path found
+  return [];
+}
+
+/**
+ * Strategic path finding using reverse targeting
+ */
+function findStrategicPath(start, target, maxMoves) {
+  // Strategy 1: Find intermediate numbers that can reach target in 1 operation
+  const reverseTargets = findReverseTargets(target);
+  
+  for (const reverseTarget of reverseTargets.slice(0, 5)) { // Limit to top 5 for performance
+    if (reverseTarget.number === start) {
+      // Direct path found
+      return reverseTarget.path;
+    }
+    
+    // Try to find path from start to this intermediate number
+    const pathToIntermediate = enhancedPathBFS(start, reverseTarget.number, maxMoves - reverseTarget.stepsToGoal);
+    if (pathToIntermediate.length > 0) {
+      return [...pathToIntermediate, ...reverseTarget.path];
+    }
+  }
+
+  // Strategy 2: For single digit targets, try known efficient patterns
+  if (target >= 2 && target <= 9 && start <= 50) {
+    return findSingleDigitPath(start, target);
+  }
+
+  return [];
+}
+
+/**
+ * Find paths to single digit numbers using efficient patterns
+ */
+function findSingleDigitPath(start, target) {
+  // Common efficient paths for single digits
+  const patterns = {
+    3: [
+      { condition: (s) => s === 1, path: [{ operation: 'append1', from: 1, to: 11 }, { operation: 'sum', from: 11, to: 2 }, { operation: 'append1', from: 2, to: 21 }, { operation: 'sum', from: 21, to: 3 }] },
+      { condition: (s) => s === 2, path: [{ operation: 'append1', from: 2, to: 21 }, { operation: 'sum', from: 21, to: 3 }] },
+    ],
+    5: [
+      { condition: (s) => s === 1, path: [{ operation: 'double', from: 1, to: 2 }, { operation: 'append1', from: 2, to: 21 }, { operation: 'sum', from: 21, to: 3 }, { operation: 'append1', from: 3, to: 31 }, { operation: 'sum', from: 31, to: 4 }, { operation: 'append1', from: 4, to: 41 }, { operation: 'sum', from: 41, to: 5 }] },
+    ],
+    6: [
+      { condition: (s) => s === 3, path: [{ operation: 'double', from: 3, to: 6 }] },
+      { condition: (s) => s === 2, path: [{ operation: 'append1', from: 2, to: 21 }, { operation: 'sum', from: 21, to: 3 }, { operation: 'double', from: 3, to: 6 }] },
+    ],
+    9: [
+      { condition: (s) => s === 3, path: [{ operation: 'append1', from: 3, to: 33 }, { operation: 'sum', from: 33, to: 6 }, { operation: 'append1', from: 6, to: 63 }, { operation: 'sum', from: 63, to: 9 }] },
+    ]
+  };
+
+  const targetPatterns = patterns[target];
+  if (targetPatterns) {
+    for (const pattern of targetPatterns) {
+      if (pattern.condition(start)) {
+        return pattern.path;
+      }
+    }
+  }
+
+  return [];
 }
 
 /**
