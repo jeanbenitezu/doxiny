@@ -13,6 +13,15 @@ import {
   setLanguage,
   languages,
 } from "./i18n.js";
+import { 
+  generateShareURL, 
+  generateShareMessage, 
+  shareContent, 
+  showShareFeedback, 
+  handleShareVictory, 
+  handleShareChallenge, 
+  handleSharedPuzzleURL 
+} from "./sharing.js";
 import "./style.css";
 
 // Dynamic game manager with exercise generation
@@ -485,6 +494,13 @@ function createGameUI() {
           .join("")}
       </section>
       
+      <!-- Share Row -->
+      <section class="flex justify-center flex-shrink-0" style="max-height: 6vh; max-height: 6svh;" data-purpose="share-controls">
+        <button class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 border border-white/20 rounded-xl flex items-center justify-center gap-2 font-bold transition-all active:scale-95 h-full px-4" id="share-puzzle-btn" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem);">
+          <span>🧠</span> <span>${translate("sharing.shareCurrentPuzzle")}</span>
+        </button>
+      </section>
+      
       <!-- Utility Row -->
       <section class="grid grid-cols-4 gap-2 flex-1 flex-shrink-0" style="max-height: 8vh; max-height: 8svh;" data-purpose="utility-controls">
         <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
@@ -562,9 +578,18 @@ function createGameUI() {
         <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-2 hidden">
           📈 <span id="difficulty-change-text"></span>
         </div>
-        <div class="flex gap-4 justify-center">
-          <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")} 🎯</button>
-          <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
+        <!-- Action buttons row -->
+        <div class="flex flex-col gap-3 justify-center">
+          <!-- Main action buttons -->
+          <div class="flex gap-4 justify-center">
+            <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")} 🎯</button>
+            <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
+          </div>
+          <!-- Share buttons row -->
+          <div class="flex gap-2 justify-center">
+            <button class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-orange-500/30" id="share-victory-btn">${translate("sharing.shareVictory")}</button>
+            <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/30" id="share-challenge-btn">${translate("sharing.shareChallenge")}</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1471,6 +1496,12 @@ function setupGlobalEventListeners() {
       document.getElementById("success-modal").classList.add("hidden");
       scrollToTop();
       handleRetryExercise();
+    } else if (e.target.closest("#share-victory-btn")) {
+      handleShareVictory(gameState, gameManager);
+    } else if (e.target.closest("#share-challenge-btn")) {
+      handleShareChallenge(gameState, gameManager); 
+    } else if (e.target.closest("#share-puzzle-btn")) {
+      handleShareChallenge(gameState, gameManager);
     } else if (e.target.closest(".level-btn")) {
       const levelBtn = e.target.closest(".level-btn");
       const level = levelBtn.dataset.level;
@@ -1544,6 +1575,17 @@ function init() {
   
   // Ensure we start at the top of the page
   scrollToTop();
+
+  // Handle shared puzzle URLs
+  const shareResult = handleSharedPuzzleURL(gameManager, resetGame, (newGameState) => {
+    gameState = newGameState;
+    render();
+  });
+  
+  if (!shareResult.processed) {
+    // No shared puzzle, continue with normal initialization
+    console.log('🎮 Normal game initialization');
+  }
 
   // Expose functions for dev tools testing
   if (typeof window !== 'undefined') {

@@ -1,4 +1,5 @@
 # Doxiny - Development Patterns & Best Practices
+*Last Updated: March 22, 2026*
 
 ## Code Organization Principles
 
@@ -32,6 +33,55 @@ function applyMove(gameState, operation, operationName) {
 }
 ```
 
+### Modular Sharing System Architecture
+Progressive enhancement sharing with dedicated module separation:
+```javascript
+// src/sharing.js - Dedicated sharing module with all functionality
+export async function shareContent(message, title) {
+  // Web Share API with progressive fallbacks
+}
+export function generateShareMessage(goal, moves, efficiency) {
+  // Gamified messages based on performance
+}
+export function handleSharedPuzzleURL(gameManager, resetGame, renderCallback) {
+  // URL parameter routing with state management
+}
+
+// src/main.js - Import and coordinate sharing actions
+import { handleShareVictory, handleShareChallenge } from "./sharing.js";
+
+// Event handlers pass required state as parameters
+handleShareVictory(gameState, gameManager);
+```
+
+### Progressive Enhancement Sharing System
+Mobile-first sharing with Web Share API fallbacks:
+```javascript
+// main.js - Progressive sharing functionality
+async function shareContent(message, title = "Doxiny Number Puzzle") {
+  try {
+    // Try Web Share API first (mobile-friendly)
+    if (navigator.share && navigator.canShare) {
+      await navigator.share({ title, text: message, url: "" });
+      return { success: true, method: 'native' };
+    } else {
+      // Fallback to clipboard
+      await navigator.clipboard.writeText(message);
+      return { success: true, method: 'clipboard' };
+    }
+  } catch (error) {
+    // Final fallback for older browsers
+    const textarea = document.createElement('textarea');
+    textarea.value = message;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    return { success: true, method: 'fallback' };
+  }
+}
+```
+
 ### Component-Based UI Updates
 Each UI section has dedicated update functions:
 ```javascript
@@ -43,6 +93,58 @@ function updateGameHistory(moves) { /* Updates move history display */ }
 ```
 
 ## UI/UX Patterns
+
+### Sharing Button Placement Strategy
+- **Success Modal**: Share victory with performance stats
+- **Main Game**: Share puzzle invitation from unsolved state
+- **Multi-tier Layout**: Primary actions + secondary sharing actions
+
+```javascript
+// Success modal sharing buttons layout
+<div class="flex flex-col gap-3 justify-center">
+  <!-- Main action buttons -->
+  <div class="flex gap-4 justify-center">
+    <button id="next-exercise-btn">Next Level 🎯</button>
+    <button id="retry-exercise-btn">Retry</button>
+  </div>
+  <!-- Share buttons row -->
+  <div class="flex gap-2 justify-center">
+    <button id="share-victory-btn">Share Victory 🏆</button>
+    <button id="share-challenge-btn">Challenge Friends 💪</button>
+  </div>
+</div>
+```
+
+### Gamified Messaging System
+Performance-based sharing messages with competitive elements:
+```javascript
+// Gamified sharing messages based on performance
+function generateShareMessage(goal, moves, efficiency, isPerfect, solved = true) {
+  if (isPerfect) {
+    return t("sharing.perfectVictoryMessage", { goal, moves });
+  } else if (efficiency >= 80) {
+    return t("sharing.victoryMessage", { goal, moves, efficiency });
+  } else {
+    return t("sharing.challengeMessage", { goal, moves });
+  }
+}
+```
+
+### URL Parameter Routing for Shared Content
+```javascript  
+// URL structure: ?puzzle=128&difficulty=3&challenge_moves=5&solved=1
+function generateShareURL(goal, difficulty = null, moves = null, solved = false) {
+  const baseURL = window.location.origin + window.location.pathname;
+  const params = new URLSearchParams();
+  
+  params.set('puzzle', goal.toString());
+  if (difficulty) params.set('difficulty', difficulty.toString());
+  if (moves && solved) params.set('challenge_moves', moves.toString());
+  if (solved) params.set('solved', '1');
+  
+  return `${baseURL}?${params.toString()}`;
+}
+```
 
 ### Internationalization (i18n)
 All UI text must use the translation system for Spanish/English support:

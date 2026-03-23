@@ -540,6 +540,67 @@ export const translations = {
       },
     },
   },
+
+  // Sharing Messages
+  sharing: {
+    // Share solved puzzle victory
+    victoryMessage: {
+      en: "🎯 I crushed {goal} in just {moves} moves with {efficiency}% efficiency! Think you can beat my score? Try Doxiny Number Puzzle:",
+      es: "🎯 ¡Aplasté {goal} en solo {moves} movimientos con {efficiency}% de eficiencia! ¿Crees que puedes superar mi puntuación? Prueba Doxiny Number Puzzle:",
+    },
+    perfectVictoryMessage: {
+      en: "🏆 PERFECT SOLUTION! I solved {goal} in the optimal {moves} moves! Can you match this masterpiece? Challenge yourself with Doxiny:",
+      es: "🏆 ¡SOLUCIÓN PERFECTA! ¡Resolví {goal} en los {moves} movimientos óptimos! ¿Puedes igualar esta obra maestra? Desafíate con Doxiny:",
+    },
+    challengeMessage: {
+      en: "💪 Can you reach {goal} faster than {moves} moves? I dare you to try! Play Doxiny Number Puzzle:",
+      es: "💪 ¿Puedes llegar a {goal} más rápido que en {moves} movimientos? ¡Te reto a intentarlo! Juega Doxiny Number Puzzle:",
+    },
+    
+    // Share exercise invitation  
+    inviteMessage: {
+      en: "🧠 I challenge you to solve this brain twister: Reach {goal} starting from 1! Can you do it? Try Doxiny Number Puzzle:",
+      es: "🧠 Te desafío a resolver este acertijo mental: ¡Llega a {goal} empezando desde 1! ¿Puedes hacerlo? Prueba Doxiny Number Puzzle:",
+    },
+    expertInviteMessage: {
+      en: "🔥 Think you're smart? Try reaching {goal} in this EXPERT level challenge! Only math geniuses can solve it. Doxiny Number Puzzle:",
+      es: "🔥 ¿Crees que eres inteligente? ¡Intenta llegar a {goal} en este desafío nivel EXPERTO! Solo los genios matemáticos pueden resolverlo. Doxiny Number Puzzle:",
+    },
+    
+    // Button labels
+    shareVictory: {
+      en: "Share Victory 🏆",
+      es: "Compartir Victoria 🏆",
+    },
+    shareChallenge: {
+      en: "Challenge Friends 💪",  
+      es: "Retar Amigos 💪",
+    },
+    shareCurrentPuzzle: {
+      en: "Share Puzzle 🧠",
+      es: "Compartir Puzzle 🧠",
+    },
+    
+    // Feedback messages
+    linkCopied: {
+      en: "🎉 Challenge link copied! Paste it anywhere to invite friends!",
+      es: "🎉 ¡Enlace de desafío copiado! ¡Pégalo en cualquier lugar para invitar amigos!",
+    },
+    shareFailed: {
+      en: "📋 Couldn't share automatically, but link is copied to clipboard!",
+      es: "📋 ¡No se pudo compartir automáticamente, pero el enlace está copiado al portapapeles!",
+    },
+    
+    // URL parameter handling
+    sharedPuzzle: {
+      en: "🎯 Shared Puzzle Challenge",
+      es: "🎯 Desafío de Puzzle Compartido",
+    },
+    friendChallengesYou: {
+      en: "A friend challenges you to reach {goal}!",
+      es: "¡Un amigo te desafía a llegar a {goal}!",
+    },
+  },
 };
 
 // Utility functions for i18n

@@ -1,8 +1,10 @@
 # Doxiny - Architecture & Code Structure
+*Last Updated: March 22, 2026*
 
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
 - **Styling**: Tailwind CSS v3 (CDN), custom CSS variables
+- **Sharing**: HTML5 Web Share API with progressive fallbacks
 - **Deployment**: Surge.sh for previews, GitHub Pages for production
 
 ## File Structure & Responsibilities
@@ -12,7 +14,8 @@
 - **`src/game.js`** - Game state management, move history, state transitions
 - **`src/operations.js`** - Pure functions for 4 number operations (REVERSE, SUM, APPEND, DOUBLE)
 - **`src/exerciseGenerator.js`** - BFS-based exercise generation and solvability validation
-- **`src/i18n.js`** - Multi-language support system (5 languages)
+- **`src/sharing.js`** - Progressive enhancement sharing system with Web Share API
+- **`src/i18n.js`** - Bilingual support system (EN/ES) with sharing messages
 - **`src/style.css`** - Custom styles, animations, responsive design
 
 ### Configuration Files
@@ -20,6 +23,28 @@
 - **`package.json`** - Dependencies, scripts
 
 ## Architecture Patterns
+
+### Progressive Enhancement Sharing System
+```javascript
+// Mobile-first sharing with fallbacks in main.js
+async function shareContent(message, title) {
+  // 1. Try Web Share API (native mobile sharing)
+  // 2. Fallback to Clipboard API
+  // 3. Final fallback to document.execCommand (legacy browsers)
+}
+```
+
+### URL Parameter Routing
+```javascript
+// URL structure for shared puzzles
+// ?puzzle=128&difficulty=3&challenge_moves=5&solved=1
+function handleSharedPuzzleURL() {
+  // Parse URL parameters
+  // Show notification UI
+  // Load shared puzzle state
+  // Clear URL to avoid re-triggering
+}
+```
 
 ### Game State Management
 ```javascript
@@ -41,7 +66,7 @@ const reverse = (num) => parseInt(num.toString().split('').reverse().join('')) |
 ### Enhanced BFS Exercise Validation
 ```javascript
 // Multi-stage validation with strategic approaches
-function validateExercise(goal, maxMoves = null) {
+function validateExercise(goal, maxMoves = DEFAULT_MAX_MOVES) {
   // Dynamic move calculation: Math.min(25, Math.max(15, Math.floor(Math.log10(goal)) * 8))
   // 1. Quick patterns (powers of 2, single digits)
   // 2. Enhanced BFS with better pruning (Map-based visited tracking)
