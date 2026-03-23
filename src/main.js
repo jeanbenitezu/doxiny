@@ -274,13 +274,13 @@ function getProgressHTML(currentNumber, targetNumber) {
   );
 
   return `
-    <div class="relative bg-gray-800/50 rounded-full h-6 border border-white/10 overflow-hidden">
+    <div class="relative bg-gray-800/50 rounded-full h-4 border border-white/10 overflow-hidden">
       <div id="progress-bar-fill" class="h-full rounded-full transition-all duration-700 ease-out" 
            style="
              width: ${progress}%;
              background: linear-gradient(to right, rgb(${color1}), rgb(${color2}));
            "></div>
-      <div id="progress-percentage" class="absolute inset-0 flex items-center justify-center text-white font-bold text-sm drop-shadow-lg">
+      <div id="progress-percentage" class="absolute inset-0 flex items-center justify-center text-white font-bold text-xs drop-shadow-lg">
         ${progress}%
       </div>
     </div>
@@ -463,10 +463,10 @@ function createGameUI() {
     
     <!-- Progress Indicator -->
     <div class="w-full p-1" id="progress-container">
-      <div class="relative bg-gray-800/50 rounded-full h-6 border border-white/10 overflow-hidden">
+      <div class="relative bg-gray-800/50 rounded-full h-4 border border-white/10 overflow-hidden">
         <div id="progress-bar-fill" class="h-full rounded-full transition-all duration-700 ease-out" 
              style="width: 0%; background: linear-gradient(to right, rgb(107, 114, 128), rgb(100, 116, 139));"></div>
-        <div id="progress-percentage" class="absolute inset-0 flex items-center justify-center text-white font-bold text-sm drop-shadow-lg">
+        <div id="progress-percentage" class="absolute inset-0 flex items-center justify-center text-white font-bold text-xs drop-shadow-lg">
           0%
         </div>
       </div>
