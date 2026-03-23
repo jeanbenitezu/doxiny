@@ -7,6 +7,13 @@ import { operations } from "./operations.js";
 import { t } from "./i18n.js";
 
 /**
+ * Default maximum moves limit for BFS pathfinding algorithms
+ * This prevents infinite loops and excessive computation time
+ * while allowing reasonable solution depths for most puzzles
+ */
+const DEFAULT_MAX_MOVES = 30;
+
+/**
  * Simple difficulty configuration with i18n keys
  */
 const difficultyLevels = {
@@ -100,12 +107,7 @@ function generateSimpleExercise(difficulty) {
 /**
  * Validate that an exercise is actually solvable with enhanced strategies
  */
-export function validateExercise(goal, maxMoves = null) {
-  // Auto-calculate maxMoves based on goal size for better coverage
-  if (!maxMoves) {
-    maxMoves = Math.min(25, Math.max(15, Math.floor(Math.log10(goal)) * 8));
-  }
-
+export function validateExercise(goal, maxMoves = DEFAULT_MAX_MOVES) {
   // Quick pattern-based checks first
   const quickResult = checkQuickPatterns(goal);
   if (quickResult) return quickResult;
@@ -394,14 +396,8 @@ function sumDigits(n) {
 /**
  * Find shortest path from any start number to target using enhanced BFS with strategic approaches
  */
-export function findShortestPath(start, target, maxMoves = null) {
+export function findShortestPath(start, target, maxMoves = DEFAULT_MAX_MOVES) {
   if (start === target) return [];
-  
-  // Auto-calculate maxMoves based on numbers involved
-  if (!maxMoves) {
-    const complexity = Math.max(Math.floor(Math.log10(start)), Math.floor(Math.log10(target)));
-    maxMoves = Math.min(20, Math.max(10, complexity * 6));
-  }
 
   // Quick pattern-based checks for direct paths
   const quickPath = findQuickPath(start, target);
