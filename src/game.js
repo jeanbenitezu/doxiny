@@ -20,7 +20,7 @@ export function createGameState(goalNumber = 10, level = 1) {
     hints: {
       used: 0,
       maxHints: 3,
-      hintsData: []
+      hintsData: [],
     },
   };
 }
@@ -52,7 +52,7 @@ export function applyMove(state, operation) {
     // Only clear cached hints but keep progression counter
     hints: {
       ...state.hints,
-      hintsData: [] // Clear old hints since optimal path changed
+      hintsData: [], // Clear old hints since optimal path changed
     },
   };
 

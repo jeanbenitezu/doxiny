@@ -13,10 +13,10 @@ export function generateShareURL(goal, moves = null, solved = false) {
   const params = new URLSearchParams();
 
   // Combine all parameters into single encoded string: puzzle_moves_solved
-  const movesStr = (moves && solved) ? moves.toString() : "";
+  const movesStr = moves && solved ? moves.toString() : "";
   const solvedStr = solved ? "1" : "";
   const combinedData = `${goal}_${movesStr}_${solvedStr}`;
-  
+
   // Encode the combined data to prevent manipulation
   params.set("d", btoa(combinedData));
 
@@ -42,9 +42,10 @@ export function generateShareMessage(
   let message = "";
 
   if (!solved) {
-    const messageKey = level >= 4 // Expert level gets a different message
-      ? "sharing.expertInviteMessage"
-      : "sharing.inviteMessage";
+    const messageKey =
+      level >= 4 // Expert level gets a different message
+        ? "sharing.expertInviteMessage"
+        : "sharing.inviteMessage";
     message = t(messageKey, { goal });
   } else if (isPerfect) {
     message = t("sharing.perfectVictoryMessage", { goal, moves });
@@ -67,7 +68,7 @@ export async function shareContent(message, title = "Doxiny Number Puzzle") {
       await navigator.share({
         title: title,
         text: message.message,
-        url: message.url
+        url: message.url,
       });
       return { success: true, method: "native" };
     } else {
@@ -148,10 +149,7 @@ export async function handleShareVictory(gameState, gameManager) {
  * Handle sharing current unsolved puzzle as challenge
  */
 export async function handleShareChallenge(gameState) {
-  const message = generateShareMessage(
-    gameState.goal,
-    gameState.level,
-  );
+  const message = generateShareMessage(gameState.goal, gameState.level);
 
   const result = await shareContent(message, t("sharing.sharedPuzzle"));
   showShareFeedback(result);
@@ -169,24 +167,24 @@ export function handleSharedPuzzleURL() {
       // Decode and split the combined data: puzzle_moves_solved
       const decodedData = atob(dataParam);
       const [goalStr, movesStr, solvedStr] = decodedData.split("_");
-      
+
       const goal = parseInt(goalStr);
       const challengeMoves = movesStr ? parseInt(movesStr) : null;
       const solved = solvedStr || null;
-      
+
       if (goal >= 2 && goal <= 10000) {
         // Update document title for social media previews
         document.title = t("sharing.sharedPuzzleTitle", { goal });
-        
+
         // Show shared puzzle notification
         const notification = document.createElement("div");
         notification.className =
           "fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-sm text-center";
 
         if (solved === "1" && challengeMoves) {
-          notification.innerHTML = t("sharing.friendChallengeWithMoves", { 
-            moves: challengeMoves, 
-            goal 
+          notification.innerHTML = t("sharing.friendChallengeWithMoves", {
+            moves: challengeMoves,
+            goal,
           });
         } else {
           notification.textContent = t("sharing.friendChallengesYou", { goal });
@@ -205,7 +203,11 @@ export function handleSharedPuzzleURL() {
         }, 5000);
 
         // Clear URL parameters to avoid re-triggering
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
         return { processed: true, goal };
       }
     } catch (error) {
