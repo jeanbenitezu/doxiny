@@ -105,12 +105,40 @@ class GameModeManager {
   }
 
   canCreateCustomExercases() {
-    return this.currentMode === this.modes.FREEPLAY;
+    // Custom exercises only available to masters
+    return this.isMaster();
   }
 
   resetProgression() {
     this.unlockedLevels = [1];
     this.saveUnlockedLevels();
+    // Also reset master status
+    localStorage.removeItem("doxiny-master-status");
+  }
+
+  // === MASTERY SYSTEM ===
+  
+  isMaster() {
+    const masterStatus = localStorage.getItem("doxiny-master-status");
+    return masterStatus === "true";
+  }
+  
+  setMasterStatus(isMaster) {
+    localStorage.setItem("doxiny-master-status", isMaster.toString());
+  }
+  
+  isAllLevelsCompleted() {
+    // Check if player has unlocked all 6 levels (meaning they completed level 5 successfully)
+    const maxLevel = 6;
+    return this.unlockedLevels.length >= maxLevel && this.unlockedLevels.includes(maxLevel);
+  }
+
+  checkAndAwardMasterStatus() {
+    if (!this.isMaster() && this.isAllLevelsCompleted()) {
+      this.setMasterStatus(true);
+      return true; // Newly achieved master status
+    }
+    return false; // Already was master or hasn't completed all levels
   }
 }
 
@@ -119,8 +147,8 @@ class GameManager {
   constructor() {
     this.gameModeManager = new GameModeManager();
     
-    // In Normal mode, start at highest unlocked level
-    if (this.gameModeManager.getGameMode() === this.gameModeManager.modes.NORMAL) {
+    // In non-master Normal mode, start at highest unlocked level
+    if (this.gameModeManager.getGameMode() === this.gameModeManager.modes.NORMAL && !this.gameModeManager.isMaster()) {
       const unlockedLevels = this.gameModeManager.getUnlockedLevels();
       this.currentDifficulty = Math.max(...unlockedLevels);
     } else {
@@ -174,12 +202,25 @@ class GameManager {
 
     // Handle Normal Game mode progression
     let levelUnlocked = null;
+    let masterAchieved = false;
     if (this.gameModeManager.getGameMode() === this.gameModeManager.modes.NORMAL) {
       const requiredEfficiency = this.gameModeManager.getEfficiencyRequirement(this.currentDifficulty);
-      if (efficiency >= requiredEfficiency && this.currentDifficulty < 6) {
-        const nextLevel = this.currentDifficulty + 1;
-        if (this.gameModeManager.unlockLevel(nextLevel)) {
-          levelUnlocked = nextLevel;
+      if (efficiency >= requiredEfficiency) {
+        // Check for unlocking next level (if not at max level)
+        if (this.currentDifficulty < 6) {
+          const nextLevel = this.currentDifficulty + 1;
+          if (this.gameModeManager.unlockLevel(nextLevel)) {
+            levelUnlocked = nextLevel;
+            
+            // Check if they just became a master by unlocking level 6
+            if (nextLevel === 6) {
+              masterAchieved = this.gameModeManager.checkAndAwardMasterStatus();
+            }
+          }
+        }
+        // Check for mastery when completing level 6 itself
+        else if (this.currentDifficulty === 6) {
+          masterAchieved = this.gameModeManager.checkAndAwardMasterStatus();
         }
       }
     }
@@ -193,6 +234,7 @@ class GameManager {
       grade: this.getPerformanceGrade(efficiency),
       levelChange,
       levelUnlocked,
+      masterAchieved,
     };
   }
 
@@ -343,6 +385,157 @@ function getAvailableLevels() {
 function isLevelLocked(level) {
   return !gameManager.gameModeManager.isLevelUnlocked(level);
 }
+
+// === NOTIFICATION SYSTEM ===
+
+/**
+ * Show UI notification with animation
+ */
+function showNotification(message, type = 'info', duration = 3000) {
+  const notification = document.createElement('div');
+  notification.className = `notification fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 max-w-xs text-sm font-semibold animate-slide-in ${
+    type === 'success' ? 'bg-green-600 text-white' :
+    type === 'warning' ? 'bg-orange-600 text-white' :
+    type === 'error' ? 'bg-red-600 text-white' :
+    'bg-blue-600 text-white'
+  }`;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.classList.add('animate-slide-out');
+    setTimeout(() => notification.remove(), 300);
+  }, duration);
+}
+
+/**
+ * Show celebration notification for achievements
+ */
+function showCelebrationNotification(message) {
+  showNotification(message, 'success', 4000);
+  
+  // Add some confetti-like celebration effect
+  const celebration = document.createElement('div');
+  celebration.className = 'fixed inset-0 pointer-events-none z-40';
+  celebration.innerHTML = `
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-bounce">
+      🎉
+    </div>
+  `;
+  document.body.appendChild(celebration);
+  
+  setTimeout(() => celebration.remove(), 3000);
+}
+
+// === MASTERY SYSTEM UI FUNCTIONS ===
+
+/**
+ * Show master achievement celebration modal
+ */
+function showMasterAchievementModal() {
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fade-in";
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) hideMasterAchievementModal();
+  });
+  
+  modal.innerHTML = `
+    <div class="bg-gradient-to-br from-yellow-400 via-gold-500 to-yellow-600 p-6 rounded-2xl max-w-sm mx-4 text-center shadow-2xl shadow-gold-500/50 animate-bounce-in">
+      <div class="text-6xl mb-4 animate-spin-once">👑</div>
+      <h2 class="text-2xl font-bold text-white mb-2">${translate('masterAchievement.title')}</h2>
+      <p class="text-white/90 mb-4">${translate('masterAchievement.message')}</p>
+      <div class="flex gap-2">
+        <button id="master-achievement-show-journey-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all">
+          ${translate('masterJourney.showJourney')}
+        </button>
+        <button id="master-achievement-continue-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all">
+          ${translate('common.continue')}
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+function hideMasterAchievementModal() {
+  const modal = document.querySelector('.fixed.inset-0.bg-black\\/80');
+  if (modal) modal.remove();
+}
+
+/**
+ * Show journey statistics modal for masters
+ */
+function showJourneyModal() {
+  // Hide achievement modal first if present
+  hideMasterAchievementModal();
+  
+  const stats = gameManager.playerStats;
+  const unlockedLevels = gameManager.gameModeManager.getUnlockedLevels();
+  
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fade-in";
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) hideJourneyModal();
+  });
+  
+  modal.innerHTML = `
+    <div class="bg-gray-800 p-6 rounded-2xl max-w-md mx-4 shadow-2xl border border-gold-500/30">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-2">👑</div>
+        <h2 class="text-2xl font-bold text-gold-400 mb-1">${translate('masterJourney.title')}</h2>
+        <p class="text-gray-300 text-sm">${translate('masterJourney.subtitle')}</p>
+      </div>
+      
+      <div class="space-y-3 text-gray-200">
+        <div class="bg-gray-700/50 p-3 rounded-lg">
+          <div class="text-sm text-gray-400 uppercase tracking-wide">${translate('masterJourney.stats.levelsCompleted')}</div>
+          <div class="text-lg font-bold text-white">${unlockedLevels.length}/6 ${translate('masterJourney.stats.levels')}</div>
+        </div>
+        
+        <div class="bg-gray-700/50 p-3 rounded-lg">
+          <div class="text-sm text-gray-400 uppercase tracking-wide">${translate('masterJourney.stats.exercisesCompleted')}</div>
+          <div class="text-lg font-bold text-white">${stats.exercisesCompleted}</div>
+        </div>
+        
+        <div class="bg-gray-700/50 p-3 rounded-lg">
+          <div class="text-sm text-gray-400 uppercase tracking-wide">${translate('masterJourney.stats.totalMoves')}</div>
+          <div class="text-lg font-bold text-white">${stats.totalMoves}</div>
+        </div>
+        
+        <div class="bg-gray-700/50 p-3 rounded-lg">
+          <div class="text-sm text-gray-400 uppercase tracking-wide">${translate('masterJourney.stats.perfectSolutions')}</div>
+          <div class="text-lg font-bold text-white">${stats.perfectSolutions}</div>
+        </div>
+        
+        <div class="bg-gold-500/20 border border-gold-500/30 p-3 rounded-lg">
+          <div class="text-sm text-gold-400 uppercase tracking-wide">${translate('masterJourney.stats.status')}</div>
+          <div class="text-lg font-bold text-gold-300">${translate('masterJourney.stats.masterUnlocked')}</div>
+          <div class="text-xs text-gold-400 mt-1">${translate('masterJourney.stats.customExerciseAccess')}</div>
+        </div>
+      </div>
+      
+      <div class="mt-6 flex gap-2">
+        <button id="journey-go-to-freeplay-btn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-all">
+          ${translate('masterJourney.goToFreePlay')}
+        </button>
+        <button id="journey-close-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition-all">
+          ${translate('common.close')}
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+function hideJourneyModal() {
+  const modal = document.querySelector('.fixed.inset-0.bg-black\\/80');
+  if (modal) modal.remove();
+}
+
+// === END MASTERY SYSTEM UI FUNCTIONS ===
 
 /**
  * Calculate progress toward goal as percentage (0-100) using dynamic path calculation
@@ -505,6 +698,7 @@ function createGameUI() {
       
       <!-- Game Mode & Language Controls -->
       <div class="flex gap-2 justify-center sm:justify-end items-center">
+        ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold" title="${translate('masterStatus.title')}">👑</span>` : ''}
         <!-- Game Mode Dropdown -->
         <div class="relative">
           <button id="game-mode-dropdown-btn" class="bg-gray-700/80 hover:bg-gray-600/80 border border-white/20 rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
@@ -621,11 +815,9 @@ function createGameUI() {
           <div class="text-emerald-200 uppercase tracking-wide font-semibold" style="font-size: clamp(0.6rem, 1.3vh, 0.8rem); font-size: clamp(0.6rem, 1.3svh, 0.8rem);">${translate("moves")}</div>
           <div id="moves-count" class="text-white font-bold" style="font-size: clamp(0.9rem, 2.2vh, 1.3rem); font-size: clamp(0.9rem, 2.2svh, 1.3rem);">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
         </div>
-        ${gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.FREEPLAY ? `
         <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="new-exercise-btn">
           🎲 <span>${translate("gameStates.newGame")}</span>
         </button>
-        ` : ''}
       </div>
     </div>
     
@@ -769,7 +961,11 @@ function createGameUI() {
           <!-- Main action buttons -->
           <div class="flex gap-2 justify-between">
             <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
-            <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")}</button>
+            ${gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.NORMAL && 
+              gameManager.gameModeManager.isMaster() && gameManager.currentDifficulty === 6 ? 
+              `<button class="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-gold-500/30 text-nowrap" id="show-journey-btn">${translate("masterJourney.showJourney")}</button>` :
+              `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")}</button>`
+            }
           </div>
           <!-- Share buttons row -->
           <div class="flex gap-2 justify-around">
@@ -1066,11 +1262,11 @@ function showSuccessModal() {
       }, 1000); // Show after success modal appears
     }
 
-    // Handle level unlock notification
-    if (completionResult.levelUnlocked) {
+    // Handle master achievement celebration
+    if (completionResult.masterAchieved) {
       setTimeout(() => {
-        showLevelUnlockNotification(completionResult.levelUnlocked);
-      }, 1000); // Show after success modal appears
+        showMasterAchievementModal();
+      }, 2000); // Show after level unlock notification
     }
 
     // Check for level progression
@@ -1738,6 +1934,8 @@ function setupGlobalEventListeners() {
       document.getElementById("success-modal").classList.add("hidden");
       scrollToTop();
       handleNextExercise();
+    } else if (e.target.closest("#show-journey-btn")) {
+      showJourneyModal();
     } else if (e.target.closest("#retry-exercise-btn")) {
       cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
@@ -1784,6 +1982,17 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#close-hint-display")) {
       document.getElementById("hint-display").classList.add("hidden");
       scrollToTop();
+    } else if (e.target.closest("#master-achievement-show-journey-btn")) {
+      showJourneyModal();
+    } else if (e.target.closest("#master-achievement-continue-btn")) {
+      hideMasterAchievementModal();
+    } else if (e.target.closest("#journey-go-to-freeplay-btn")) {
+      hideJourneyModal();
+      gameManager.gameModeManager.setGameMode('freeplay');
+      app.innerHTML = createGameUI();
+      // Event listeners are already set up globally
+    } else if (e.target.closest("#journey-close-btn")) {
+      hideJourneyModal();
     }
 
     // Close game mode dropdown if clicking outside
@@ -1870,6 +2079,7 @@ function init() {
       operations: operations,
       generateExercise: generateExercise,
     };
+    
     console.log("🔧 Dev tools available: window.doxinyDev");
   }
 
@@ -1916,43 +2126,6 @@ function handleGameModeChange(mode) {
   // Re-render UI to update mode selector and level states
   app.innerHTML = createGameUI();
   updateDisplay();
-}
-
-/**
- * Show temporary notification to user
- */
-function showNotification(message, type = 'info') {
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `notification fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full`;
-  
-  // Style based on type
-  if (type === 'success') {
-    notification.classList.add('bg-green-600', 'text-white');
-  } else if (type === 'warning') {
-    notification.classList.add('bg-orange-600', 'text-white');
-  } else {
-    notification.classList.add('bg-blue-600', 'text-white');
-  }
-  
-  notification.innerHTML = `<div class="font-semibold">${message}</div>`;
-  
-  document.body.appendChild(notification);
-  
-  // Animate in
-  setTimeout(() => {
-    notification.classList.remove('translate-x-full');
-  }, 10);
-  
-  // Remove after 3 seconds
-  setTimeout(() => {
-    notification.classList.add('translate-x-full');
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 300);
-  }, 3000);
 }
 
 /**

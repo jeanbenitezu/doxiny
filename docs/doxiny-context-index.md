@@ -13,8 +13,9 @@ This repository maintains a living documentation system that provides complete p
 - Tech stack and dependencies  
 - Architecture patterns and code organization
 - Build and deployment processes
+- **NEW**: Mastery system components and localStorage schema
 
-**Update triggers**: File structure changes, new dependencies, build modifications
+**Update triggers**: File structure changes, new dependencies, build modifications, mastery system architecture
 
 ---
 
@@ -25,8 +26,9 @@ This repository maintains a living documentation system that provides complete p
 - BFS exercise generation and validation
 - Difficulty progression and scoring system
 - Player statistics and progress tracking
+- **NEW**: Mastery achievement system with dual game modes
 
-**Update triggers**: Game rule changes, new operations, algorithm modifications
+**Update triggers**: Game rule changes, new operations, algorithm modifications, achievement system updates
 
 ---
 
@@ -37,8 +39,9 @@ This repository maintains a living documentation system that provides complete p
 - UI/UX implementation guidelines
 - Error handling and performance optimization
 - Testing patterns and debugging approaches
+- **NEW**: Mastery system architecture and UI adaptation patterns
 
-**Update triggers**: New code patterns, UI changes, optimization techniques
+**Update triggers**: New code patterns, UI changes, optimization techniques, mastery features
 
 ---
 

@@ -363,3 +363,113 @@ button:active:not(:disabled) {
     opacity: 1;
   }
 }
+
+/* === MASTERY SYSTEM STYLES === */
+
+/* Gold color system for masters */
+.text-gold-300 {
+  color: #fbbf24;
+}
+
+.text-gold-400 {
+  color: #f59e0b;
+}
+
+.text-gold-500 {
+  color: #d97706;
+}
+
+.bg-gold-500 {
+  background-color: #d97706;
+}
+
+.bg-gold-600 {
+  background-color: #b45309;
+}
+
+.border-gold-500 {
+  border-color: #d97706;
+}
+
+.shadow-gold-500\/50 {
+  box-shadow: 0 20px 25px -5px rgba(217, 119, 6, 0.5), 0 10px 10px -5px rgba(217, 119, 6, 0.04);
+}
+
+/* Master indicator */
+.master-indicator {
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  animation: masterGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes masterGlow {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  }
+  100% {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
+  }
+}
+
+/* Modal animations */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-spin-once {
+  animation: spinOnce 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spinOnce {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Gradient button effects */
+.bg-gradient-to-r.from-gold-500.to-gold-600 {
+  background: linear-gradient(to right, #d97706, #b45309);
+}
+
+.hover\\:from-gold-600:hover {
+  background: linear-gradient(to right, #b45309, #92400e);
+}
+
+.hover\\:shadow-gold-500\\30:hover {
+  box-shadow: 0 20px 25px -5px rgba(217, 119, 6, 0.3), 0 10px 10px -5px rgba(217, 119, 6, 0.04);
+}

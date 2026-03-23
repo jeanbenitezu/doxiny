@@ -140,6 +140,48 @@ const playerStats = {
 };
 ```
 
+## Mastery Achievement System
+
+### Dual Game Mode System
+- **Normal Game**: Progressive unlocking with efficiency requirements
+- **Free Play**: Unrestricted level access (masters only for custom exercises)
+
+### Master Achievement Criteria
+```javascript
+// Achievement Requirements:
+// 1. Complete all 6 levels (unlock level 6 by completing level 5)
+// 2. Meet efficiency requirements:
+//    - Levels 1-3: 80% efficiency (moves <= optimal * 1.25)
+//    - Levels 4-6: 90% efficiency (moves <= optimal * 1.11)
+
+function checkMasteryAchievement() {
+  const allLevelsCompleted = unlockedLevels.includes(6); // [1,2,3,4,5,6]
+  const masterStatus = localStorage.getItem("doxiny-master-status") === "true";
+  return allLevelsCompleted && !masterStatus; // New achievement
+}
+```
+
+### Master Benefits & Features
+- **Visual Recognition**: Crown indicator (👑) with gold glow animation
+- **Exclusive Access**: Custom exercise creation restricted to masters in Free Play
+- **Achievement Celebration**: Multi-modal celebration with journey statistics
+- **Journey Modal**: Comprehensive progress view with master status display
+
+### Master UI Adaptations
+```javascript
+// Conditional UI rendering based on master status
+if (isMaster && currentDifficulty === 6) {
+  showButton("Show Journey"); // Replace "Next Level"
+} else {
+  showButton("Next Level");
+}
+
+// Custom exercise gating
+canCreateCustomExercases() {
+  return currentMode === 'freeplay' && isMaster();
+}
+```
+
 ## Constraints & Validation Rules
 - **Number bounds**: 1 ≤ number ≤ 100,000 (expanded for complex numbers)
 - **Operation validity**: All operations must produce valid numbers
@@ -209,4 +251,4 @@ function generateHints(currentNumber, targetNumber, movesMade, hintsUsed = 0) {
 - **Smart progression**: When user makes move, hint progression continues (strategic→tactical→direct) but hints are regenerated for new current number
 - **Fresh context**: Each hint is always relevant to current game state
 
-Last Updated: March 22, 2026 (Fixed hint progression to work properly across moves)
+Last Updated: March 23, 2026 (Added mastery achievement system with dual game modes)

@@ -1,22 +1,23 @@
 # Doxiny - Architecture & Code Structure
-*Last Updated: March 22, 2026*
+*Last Updated: March 23, 2026*
 
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
-- **Styling**: Tailwind CSS v3 (CDN), custom CSS variables
+- **Styling**: Tailwind CSS v3 (CDN), custom CSS variables, gold accent system
 - **Sharing**: HTML5 Web Share API with progressive fallbacks
+- **Persistence**: localStorage for game mode, progression, and master status
 - **Deployment**: Surge.sh for previews, GitHub Pages for production
 
 ## File Structure & Responsibilities
 
 ### Core Game Files
-- **`src/main.js`** - Game manager, UI orchestration, main game loop
+- **`src/main.js`** - Game manager, GameModeManager class, UI orchestration, mastery system, main game loop
 - **`src/game.js`** - Game state management, move history, state transitions
 - **`src/operations.js`** - Pure functions for 4 number operations (REVERSE, SUM, APPEND, DOUBLE)
 - **`src/exerciseGenerator.js`** - BFS-based exercise generation and solvability validation
 - **`src/sharing.js`** - Progressive enhancement sharing system with Web Share API
-- **`src/i18n.js`** - Bilingual support system (EN/ES) with sharing messages
-- **`src/style.css`** - Custom styles, animations, responsive design
+- **`src/i18n.js`** - Bilingual support system (EN/ES) with sharing messages and master status translations
+- **`src/style.css`** - Custom styles, animations, responsive design, gold accent system for masters
 
 ### Configuration Files
 - **`vite.config.js`** - Build configuration
@@ -74,6 +75,40 @@ function validateExercise(goal, maxMoves = DEFAULT_MAX_MOVES) {
   // 4. Expanded search space (1 to 100,000)
   // Returns: { solvable, minMoves, solutionPath }
 }
+```
+
+### Mastery Achievement System Architecture
+```javascript
+// GameModeManager class - Dual mode system with mastery tracking
+class GameModeManager {
+  modes: { NORMAL: 'normal', FREEPLAY: 'freeplay' }
+  currentMode: localStorage persistence
+  unlockedLevels: array of completed levels
+  
+  // Master status tracking
+  isMaster(): boolean // localStorage-backed
+  setMasterStatus(boolean): void
+  checkAndAwardMasterStatus(): boolean // Achievement detection
+  
+  // Progression requirements
+  getEfficiencyRequirement(level): 0.80 (levels 1-3) | 0.90 (levels 4-6)
+  canCreateCustomExercases(): requires FREEPLAY + master status
+}
+
+// UI Integration
+- Master crown indicator (👑) with glow animation
+- Conditional button rendering (Next Level → Show Journey)
+- Achievement celebration modals with gold styling
+- Journey statistics display with progress tracking
+```
+
+### localStorage Persistence Schema
+```javascript
+// Game mode and progression state
+"doxiny-gamemode": "normal" | "freeplay"
+"doxiny-unlocked-levels": [1, 2, 3, 4, 5, 6] // Array of completed levels
+"doxiny-master-status": "true" | null // Master achievement status
+"doxiny-language": "en" | "es"
 ```
 
 ### Component-based UI Updates
