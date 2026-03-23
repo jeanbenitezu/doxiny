@@ -186,7 +186,10 @@ export function handleSharedPuzzleURL() {
           "fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-sm text-center";
 
         if (solved === "1" && challengeMoves) {
-          notification.innerHTML = `🎯 <strong>Friend's Challenge!</strong><br>Beat their ${challengeMoves} moves to reach ${goal}!`;
+          notification.innerHTML = t("sharing.friendChallengeWithMoves", { 
+            moves: challengeMoves, 
+            goal 
+          });
         } else {
           notification.textContent = t("sharing.friendChallengesYou", { goal });
         }

@@ -600,6 +600,10 @@ export const translations = {
       en: "A friend challenges you to reach {goal}!",
       es: "¡Un amigo te desafía a llegar a {goal}!",
     },
+    friendChallengeWithMoves: {
+      en: "🎯 <strong>Friend's Challenge!</strong><br>Beat their {moves} moves to reach {goal}!",
+      es: "🎯 <strong>¡Desafío de Amigo!</strong><br>¡Supera sus {moves} movimientos para llegar a {goal}!",
+    },
   },
 };
 
