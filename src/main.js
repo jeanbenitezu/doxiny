@@ -21,10 +21,6 @@ import {
   languages,
 } from "./i18n.js";
 import {
-  generateShareURL,
-  generateShareMessage,
-  shareContent,
-  showShareFeedback,
   handleShareVictory,
   handleShareChallenge,
   handleSharedPuzzleURL,
@@ -1086,17 +1082,21 @@ function handleOperationClick(operation) {
 }
 
 /**
+ * Load game with specified goal and difficulty
+ */
+function loadGame(goal, difficulty) {
+  clearHintEffects();
+  cleanupSuccessAnimations();
+  gameState = resetGame(goal, difficulty);
+  updateDisplay();
+  scrollToTop();
+}
+
+/**
  * Handle reset button click
  */
 function handleReset() {
-  clearHintEffects();
-  cleanupSuccessAnimations();
-  gameState = resetGame(
-    gameManager.currentExercise.goal,
-    gameManager.currentDifficulty,
-  );
-  updateDisplay();
-  scrollToTop();
+  loadGame(gameManager.currentExercise.goal, gameManager.currentDifficulty);
 }
 
 /**
@@ -1503,32 +1503,35 @@ function setupCustomExerciseModal() {
       return;
     }
 
-    // Allow loading any number, even if not solvable
-    const validation = validateExercise(targetValue);
-
-    // Create custom exercise using GameManager
-    gameManager.setCustomExercise(
-      targetValue,
-      validation.solvable ? validation.minMoves : Infinity,
-      validation.solutionPath || [],
-    );
-
-    // Reset game state with new target
-    gameState = createGameState(targetValue, gameManager.currentDifficulty);
-
-    // Update move limit
-    updateMoveLimit();
-
-    // Re-render UI
-    const app = document.getElementById("app");
-    app.innerHTML = createGameUI();
-    updateDisplay();
-
+    loadCustomExercise(targetValue);
     closeModal();
   });
 
   // Focus input
   input.focus();
+}
+
+function loadCustomExercise(targetValue) {
+  // Allow loading any number, even if not solvable
+  const validation = validateExercise(targetValue);
+
+  // Create custom exercise using GameManager
+  gameManager.setCustomExercise(
+    targetValue,
+    validation.solvable ? validation.minMoves : Infinity,
+    validation.solutionPath || [],
+  );
+
+  // Reset game state with new target
+  gameState = createGameState(targetValue, gameManager.currentDifficulty);
+
+  // Update move limit
+  updateMoveLimit();
+
+  // Re-render UI
+  const app = document.getElementById("app");
+  app.innerHTML = createGameUI();
+  updateDisplay();
 }
 
 // Global event handler - only set up once
@@ -1568,9 +1571,9 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#share-victory-btn")) {
       handleShareVictory(gameState, gameManager);
     } else if (e.target.closest("#share-challenge-btn")) {
-      handleShareChallenge(gameState, gameManager);
+      handleShareChallenge(gameState);
     } else if (e.target.closest("#share-puzzle-btn")) {
-      handleShareChallenge(gameState, gameManager);
+      handleShareChallenge(gameState);
     } else if (e.target.closest(".level-btn")) {
       const levelBtn = e.target.closest(".level-btn");
       const level = levelBtn.dataset.level;
@@ -1648,16 +1651,12 @@ function init() {
   scrollToTop();
 
   // Handle shared puzzle URLs
-  const shareResult = handleSharedPuzzleURL(
-    gameManager,
-    resetGame,
-    (newGameState) => {
-      gameState = newGameState;
-      updateDisplay();
-    },
-  );
+  const shareResult = handleSharedPuzzleURL();
 
-  if (!shareResult.processed) {
+  if (shareResult.processed) {
+    loadCustomExercise(shareResult.goal);
+    console.log("🔗 Loaded shared puzzle from URL");
+  } else {
     // No shared puzzle, continue with normal initialization
     console.log("🎮 Normal game initialization");
   }

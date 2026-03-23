@@ -8,17 +8,11 @@ import { t } from "./i18n.js";
 /**
  * Get current game URL with puzzle parameters for sharing
  */
-export function generateShareURL(
-  goal,
-  difficulty = null,
-  moves = null,
-  solved = false,
-) {
+export function generateShareURL(goal, moves = null, solved = false) {
   const baseURL = window.location.origin + window.location.pathname;
   const params = new URLSearchParams();
 
   params.set("puzzle", goal.toString());
-  if (difficulty) params.set("difficulty", difficulty.toString());
   if (moves && solved) params.set("challenge_moves", moves.toString());
   if (solved) params.set("solved", "1");
 
@@ -34,13 +28,12 @@ export function generateShareMessage(
   efficiency,
   isPerfect,
   solved = true,
-  currentDifficulty = 1,
 ) {
-  const baseURL = generateShareURL(goal, currentDifficulty, moves, solved);
+  const baseURL = generateShareURL(goal, moves, solved);
 
   if (!solved) {
-    // Sharing unsolved puzzle invitation
-    const isExpert = currentDifficulty >= 5;
+    // Sharing unsolved puzzle invitation - determine if expert level based on goal
+    const isExpert = goal >= 300; // Expert level goals are typically 300+
     const messageKey = isExpert
       ? "sharing.expertInviteMessage"
       : "sharing.inviteMessage";
@@ -139,7 +132,6 @@ export async function handleShareVictory(gameState, gameManager) {
     efficiency,
     isPerfect,
     true,
-    gameManager.currentDifficulty,
   );
 
   const result = await shareContent(message, t("sharing.sharedPuzzle"));
@@ -149,14 +141,13 @@ export async function handleShareVictory(gameState, gameManager) {
 /**
  * Handle sharing current unsolved puzzle as challenge
  */
-export async function handleShareChallenge(gameState, gameManager) {
+export async function handleShareChallenge(gameState) {
   const message = generateShareMessage(
     gameState.goal,
     null,
     null,
     false,
     false,
-    gameManager.currentDifficulty,
   );
 
   const result = await shareContent(message, t("sharing.sharedPuzzle"));
@@ -166,10 +157,9 @@ export async function handleShareChallenge(gameState, gameManager) {
 /**
  * Handle URL parameters for shared puzzles
  */
-export function handleSharedPuzzleURL(gameManager, resetGame, renderCallback) {
+export function handleSharedPuzzleURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const puzzleGoal = urlParams.get("puzzle");
-  const difficulty = urlParams.get("difficulty");
   const challengeMoves = urlParams.get("challenge_moves");
   const solved = urlParams.get("solved");
 
@@ -189,23 +179,7 @@ export function handleSharedPuzzleURL(gameManager, resetGame, renderCallback) {
 
       document.body.appendChild(notification);
 
-      // Load the shared puzzle
       setTimeout(() => {
-        if (difficulty) {
-          gameManager.currentDifficulty = parseInt(difficulty);
-        }
-
-        // Create custom exercise for the shared goal
-        gameManager.currentExercise = {
-          goal: goal,
-          difficulty: difficulty ? parseInt(difficulty) : 1,
-          optimalMoves: "?", // Will be calculated if needed
-          isCustom: true,
-        };
-
-        const newGameState = resetGame(1, goal);
-        renderCallback(newGameState);
-
         // Remove notification
         notification.style.opacity = "0";
         setTimeout(() => {
@@ -217,8 +191,8 @@ export function handleSharedPuzzleURL(gameManager, resetGame, renderCallback) {
 
       // Clear URL parameters to avoid re-triggering
       window.history.replaceState({}, document.title, window.location.pathname);
-      return { processed: true, newGameState: null }; // Will be set in timeout
+      return { processed: true, goal };
     }
   }
-  return { processed: false, newGameState: null };
+  return { processed: false, goal: null };
 }
