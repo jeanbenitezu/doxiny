@@ -150,8 +150,8 @@ export const translations = {
   },
 
   nextLevel: {
-    en: "Next Level",
-    es: "Siguiente Nivel",
+    en: "Next Level 🎯 ",
+    es: "Siguiente 🎯",
   },
 
   language: {

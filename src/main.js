@@ -440,7 +440,7 @@ function createGameUI() {
     
     <!-- Goal Display with Share button on left, Moves and New Exercise on the right -->  
     <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-2 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between gap-1" style="height: 7rem;">
-      <div class="flex flex-row sm:flex-col justify-center sm:justify-end items-end sm:items-center gap-1 sm:mr-2">
+      <div class="flex flex-row sm:flex-col justify-center items-center gap-1 sm:mr-2">
         <button class="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap shadow-lg shadow-black-800 drop-shadow-lg" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="share-puzzle-btn">
           🫶 <span>${translate("sharing.shareCurrentPuzzle")}</span>
         </button>
@@ -597,12 +597,12 @@ function createGameUI() {
         <!-- Action buttons row -->
         <div class="flex flex-col gap-3 justify-center">
           <!-- Main action buttons -->
-          <div class="flex gap-4 justify-center">
-            <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")} 🎯</button>
+          <div class="flex gap-2 justify-between">
+            <button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")}</button>
             <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
           </div>
           <!-- Share buttons row -->
-          <div class="flex gap-2 justify-center">
+          <div class="flex gap-2 justify-between">
             <button class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-orange-500/30" id="share-victory-btn">${translate("sharing.shareVictory")}</button>
             <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/30" id="share-challenge-btn">${translate("sharing.shareChallenge")}</button>
           </div>
