@@ -438,8 +438,13 @@ function createGameUI() {
       </div>
     </nav>
     
-    <!-- Goal Display with Moves and New Exercise on the right -->  
+    <!-- Goal Display with Share button on left, Moves and New Exercise on the right -->  
     <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-2 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1" style="height: 7rem;">
+      <div class="flex flex-row sm:flex-col justify-center sm:justify-center gap-1 sm:mr-2">
+        <button class="bg-indigo-500/80 hover:bg-indigo-600/80 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="share-puzzle-btn">
+          🫶 <span>${translate("sharing.shareCurrentPuzzle")}</span>
+        </button>
+      </div>
       <div class="text-center flex-1">
         <div class="text-white font-semibold uppercase tracking-wide mb-1" style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem);">${translate("targetNumber")}</div>
         <div class="text-white font-black tracking-tight" style="font-size: clamp(1.2rem, 3vh, 1.8rem); font-size: clamp(1.2rem, 3svh, 1.8rem);">${translate("reach")} ${exercise.goal}</div>
@@ -510,13 +515,6 @@ function createGameUI() {
           </button>`;
           })
           .join("")}
-      </section>
-      
-      <!-- Share Row -->
-      <section class="flex justify-center flex-shrink-0" style="max-height: 6vh; max-height: 6svh;" data-purpose="share-controls">
-        <button class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 border border-white/20 rounded-xl flex items-center justify-center gap-2 font-bold transition-all active:scale-95 h-full px-4" id="share-puzzle-btn" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem);">
-          <span>🧠</span> <span>${translate("sharing.shareCurrentPuzzle")}</span>
-        </button>
       </section>
       
       <!-- Utility Row -->

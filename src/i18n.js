@@ -577,8 +577,8 @@ export const translations = {
       es: "Retar Amigos 💪",
     },
     shareCurrentPuzzle: {
-      en: "Share Puzzle 🧠",
-      es: "Compartir Puzzle 🧠",
+      en: "Share",
+      es: "Compartir",
     },
 
     // Feedback messages
