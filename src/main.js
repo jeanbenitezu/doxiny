@@ -951,13 +951,6 @@ function showSuccessModal() {
     const currentNumberEl = document.getElementById("current-number");
     if (currentNumberEl) {
       currentNumberEl.classList.add("rainbow-celebrate");
-
-      // Remove rainbow animation after 30 seconds for extended celebration
-      setTimeout(() => {
-        if (currentNumberEl) {
-          currentNumberEl.classList.remove("rainbow-celebrate");
-        }
-      }, 30000);
     }
 
     // Animate celebration emoji
