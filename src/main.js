@@ -246,14 +246,10 @@ class GameManager {
           const nextLevel = this.currentDifficulty + 1;
           if (this.gameModeManager.unlockLevel(nextLevel)) {
             levelUnlocked = nextLevel;
-            
-            // Check if they just became a master by unlocking level 6
-            if (nextLevel === 6) {
-              masterAchieved = this.gameModeManager.checkAndAwardMasterStatus();
-            }
+            // Note: Master status is only awarded when level 6 is completed, not unlocked
           }
         }
-        // Check for mastery when completing level 6 itself
+        // Award mastery only when successfully completing level 6
         else if (this.currentDifficulty === 6) {
           masterAchieved = this.gameModeManager.checkAndAwardMasterStatus();
         }
