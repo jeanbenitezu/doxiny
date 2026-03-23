@@ -132,13 +132,12 @@ function generateShareMessage(goal, moves, efficiency, isPerfect, solved = true)
 
 ### URL Parameter Routing for Shared Content
 ```javascript  
-// URL structure: ?puzzle=128&difficulty=3&challenge_moves=5&solved=1
+// URL structure: ?puzzle=128&challenge_moves=5&solved=1
 function generateShareURL(goal, difficulty = null, moves = null, solved = false) {
   const baseURL = window.location.origin + window.location.pathname;
   const params = new URLSearchParams();
   
   params.set('puzzle', goal.toString());
-  if (difficulty) params.set('difficulty', difficulty.toString());
   if (moves && solved) params.set('challenge_moves', moves.toString());
   if (solved) params.set('solved', '1');
   
