@@ -1342,7 +1342,6 @@ function handleLanguageChange(langCode) {
   if (setLanguage(langCode)) {
     cleanupSuccessAnimations();
     // Re-render the entire UI with new language
-    const app = document.getElementById("app");
     app.innerHTML = createGameUI();
     // Set up event listeners again after re-render
     updateDisplay();
@@ -1529,7 +1528,6 @@ function loadCustomExercise(targetValue) {
   updateMoveLimit();
 
   // Re-render UI
-  const app = document.getElementById("app");
   app.innerHTML = createGameUI();
   updateDisplay();
 }

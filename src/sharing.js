@@ -94,7 +94,7 @@ export function showShareFeedback(shareResult) {
   // Create temporary feedback element
   const feedback = document.createElement("div");
   feedback.className =
-    "fixed top-4 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all";
+    "fixed top-4 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all";
 
   if (shareResult.success) {
     feedback.textContent = t("sharing.linkCopied");
