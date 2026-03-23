@@ -207,7 +207,7 @@ export function handleSharedPuzzleURL() {
               document.body.removeChild(notification);
             }
           }, 300);
-        }, 2000);
+        }, 5000);
 
         // Clear URL parameters to avoid re-triggering
         window.history.replaceState({}, document.title, window.location.pathname);
