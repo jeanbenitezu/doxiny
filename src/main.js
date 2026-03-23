@@ -5,7 +5,14 @@
 
 import { createGameState, applyMove, resetGame } from "./game.js";
 import { operations } from "./operations.js";
-import { generateExercise, generateHints, getDifficultyLevels, calculateProgressToTarget, validateExercise, detectCustomExerciseLevel } from "./exerciseGenerator.js";
+import {
+  generateExercise,
+  generateHints,
+  getDifficultyLevels,
+  calculateProgressToTarget,
+  validateExercise,
+  detectCustomExerciseLevel,
+} from "./exerciseGenerator.js";
 import {
   translate,
   t,
@@ -13,14 +20,14 @@ import {
   setLanguage,
   languages,
 } from "./i18n.js";
-import { 
-  generateShareURL, 
-  generateShareMessage, 
-  shareContent, 
-  showShareFeedback, 
-  handleShareVictory, 
-  handleShareChallenge, 
-  handleSharedPuzzleURL 
+import {
+  generateShareURL,
+  generateShareMessage,
+  shareContent,
+  showShareFeedback,
+  handleShareVictory,
+  handleShareChallenge,
+  handleSharedPuzzleURL,
 } from "./sharing.js";
 import "./style.css";
 
@@ -157,17 +164,19 @@ class GameManager {
   setCustomExercise(goal, optimalMoves, solutionPath = []) {
     // Detect appropriate level for this custom exercise
     this.customExerciseLevel = detectCustomExerciseLevel(goal, optimalMoves);
-    
+
     this.currentExercise = {
       goal: goal,
       optimalMoves: optimalMoves,
       solutionPath: solutionPath,
-      isCustom: true
+      isCustom: true,
     };
-    
+
     this.isCustomExercise = true;
-    
-    console.log(`🎯 Custom Exercise: 1 → ${goal} (detected level: ${this.customExerciseLevel}, ${optimalMoves} moves optimal)`);
+
+    console.log(
+      `🎯 Custom Exercise: 1 → ${goal} (detected level: ${this.customExerciseLevel}, ${optimalMoves} moves optimal)`,
+    );
     return this.currentExercise;
   }
 
@@ -217,28 +226,34 @@ const availableLevels = [...baseLevels, customLevel];
 function calculateProgress(currentNumber, targetNumber) {
   const exerciseInfo = gameManager.getCurrentExerciseInfo();
   const optimalMoves = exerciseInfo.exercise.optimalMoves || 10;
-  
-  return calculateProgressToTarget(currentNumber, targetNumber, gameState.moves, optimalMoves);
+
+  return calculateProgressToTarget(
+    currentNumber,
+    targetNumber,
+    gameState.moves,
+    optimalMoves,
+  );
 }
 
 /**
  * Get progress indicator with smooth color transitions
  */
 function getProgressIndicator(currentNumber, targetNumber) {
-  const progress = currentNumber === 1 ? 0 : calculateProgress(currentNumber, targetNumber);
-  
+  const progress =
+    currentNumber === 1 ? 0 : calculateProgress(currentNumber, targetNumber);
+
   // Define RGB values for smooth transitions
   let color1, color2;
-  
+
   if (progress == 100) {
     color1 = "16, 185, 129"; // emerald-500
-    color2 = "34, 197, 94";  // green-500
+    color2 = "34, 197, 94"; // green-500
   } else if (progress >= 80) {
     color1 = "249, 115, 22"; // orange-500
-    color2 = "234, 179, 8";  // yellow-500
+    color2 = "234, 179, 8"; // yellow-500
   } else if (progress >= 60) {
     color1 = "59, 130, 246"; // blue-500
-    color2 = "6, 182, 212";  // cyan-500
+    color2 = "6, 182, 212"; // cyan-500
   } else if (progress >= 40) {
     color1 = "168, 85, 247"; // purple-500
     color2 = "59, 130, 246"; // blue-500
@@ -249,7 +264,7 @@ function getProgressIndicator(currentNumber, targetNumber) {
     color1 = "107, 114, 128"; // gray-500
     color2 = "100, 116, 139"; // slate-500
   }
-  
+
   return { progress, color1, color2 };
 }
 
@@ -257,8 +272,11 @@ function getProgressIndicator(currentNumber, targetNumber) {
  * Generate compact progress bar with smooth animations
  */
 function getProgressHTML(currentNumber, targetNumber) {
-  const { progress, color1, color2 } = getProgressIndicator(currentNumber, targetNumber);
-  
+  const { progress, color1, color2 } = getProgressIndicator(
+    currentNumber,
+    targetNumber,
+  );
+
   return `
     <div class="relative bg-gray-800/50 rounded-full h-6 border border-white/10 overflow-hidden">
       <div id="progress-bar-fill" class="h-full rounded-full transition-all duration-700 ease-out" 
@@ -342,7 +360,7 @@ function scrollToTop() {
   window.scrollTo({
     top: 0,
     left: 0,
-    behavior: 'smooth'
+    behavior: "smooth",
   });
 }
 
@@ -384,38 +402,42 @@ function createGameUI() {
     <nav class="w-full mb-3" style="height: 6vh; height: 6svh; min-height: 2.5rem; max-height: 4rem;" data-purpose="level-selector">
       <div class="grid grid-cols-7 gap-1 h-full">
         ${availableLevels
-          .map(
-            (lvl) => {
-              const isCustom = lvl.level === "custom";
-              // For custom exercises, highlight the detected level
-              const isCustomActive = gameManager.isCustomExercise && !isCustom && lvl.level === gameManager.customExerciseLevel;
-              const isRegularActive = !gameManager.isCustomExercise && !isCustom && lvl.level === gameManager.currentDifficulty;
-              const isActive = isCustomActive || isRegularActive;
-              
-              let buttonClass;
-              if (isCustom) {
-                // Custom button - purple when not active, orange when a custom exercise is loaded
-                buttonClass = gameManager.isCustomExercise 
-                  ? "bg-orange-600 border border-orange-400 text-white" 
-                  : "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500";
-              } else {
-                // Regular level buttons
-                buttonClass = isActive 
-                  ? "bg-orange-600 border border-orange-400" 
-                  : "bg-[#2a2f3a] border border-white/10 opacity-60";
-              }
-              
-              return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
+          .map((lvl) => {
+            const isCustom = lvl.level === "custom";
+            // For custom exercises, highlight the detected level
+            const isCustomActive =
+              gameManager.isCustomExercise &&
+              !isCustom &&
+              lvl.level === gameManager.customExerciseLevel;
+            const isRegularActive =
+              !gameManager.isCustomExercise &&
+              !isCustom &&
+              lvl.level === gameManager.currentDifficulty;
+            const isActive = isCustomActive || isRegularActive;
+
+            let buttonClass;
+            if (isCustom) {
+              // Custom button - purple when not active, orange when a custom exercise is loaded
+              buttonClass = gameManager.isCustomExercise
+                ? "bg-orange-600 border border-orange-400 text-white"
+                : "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500";
+            } else {
+              // Regular level buttons
+              buttonClass = isActive
+                ? "bg-orange-600 border border-orange-400"
+                : "bg-[#2a2f3a] border border-white/10 opacity-60";
+            }
+
+            return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
                    data-level="${lvl.level}">
                 <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem); font-size: clamp(0.7rem, 2svh, 1rem);">
                   ${isCustom ? "🎯" : lvl.level}
                 </span>
                 <span class="uppercase font-bold leading-tight" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem); font-size: clamp(0.5rem, 1.2svh, 0.7rem);">
-                  ${isCustom ? (translate("custom") || "Custom") : translate(`difficultyLevels.${lvl.nameKey}`)}
+                  ${isCustom ? translate("custom") || "Custom" : translate(`difficultyLevels.${lvl.nameKey}`)}
                 </span>
               </button>`;
-            }
-          )
+          })
           .join("")}
       </div>
     </nav>
@@ -702,17 +724,23 @@ function updateDisplay() {
     const exerciseInfo = gameManager.getCurrentExerciseInfo();
     const progressBarFill = document.getElementById("progress-bar-fill");
     const progressPercentage = document.getElementById("progress-percentage");
-    
+
     if (progressBarFill && progressPercentage) {
       // Update existing elements for smooth transitions
-      const { progress, color1, color2 } = getProgressIndicator(gameState.current, exerciseInfo.exercise.goal);
-      
+      const { progress, color1, color2 } = getProgressIndicator(
+        gameState.current,
+        exerciseInfo.exercise.goal,
+      );
+
       progressBarFill.style.width = `${progress}%`;
       progressBarFill.style.background = `linear-gradient(to right, rgb(${color1}), rgb(${color2}))`;
       progressPercentage.textContent = `${progress}%`;
     } else {
       // Fallback: recreate if elements don't exist
-      progressContainer.innerHTML = getProgressHTML(gameState.current, exerciseInfo.exercise.goal);
+      progressContainer.innerHTML = getProgressHTML(
+        gameState.current,
+        exerciseInfo.exercise.goal,
+      );
     }
   }
 
@@ -726,7 +754,9 @@ function updateDisplay() {
 
     // Update preview text and visibility
     if (previewEl) {
-      previewEl.textContent = isBlocked ? translate("blocked") : previews[operation];
+      previewEl.textContent = isBlocked
+        ? translate("blocked")
+        : previews[operation];
       if (showPreviews) {
         previewEl.classList.remove("invisible");
       } else {
@@ -802,13 +832,15 @@ function updateDisplay() {
     if (hintText) {
       hintText.textContent = `${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})`;
     }
-    
+
     // Update button styling based on hints remaining
     if (gameState.hints.used >= gameState.hints.maxHints) {
-      hintBtn.className = "bg-gray-600 text-gray-400 cursor-not-allowed border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
+      hintBtn.className =
+        "bg-gray-600 text-gray-400 cursor-not-allowed border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
       hintBtn.disabled = true;
     } else {
-      hintBtn.className = "bg-amber-600 hover:bg-amber-500 border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
+      hintBtn.className =
+        "bg-amber-600 hover:bg-amber-500 border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
       hintBtn.disabled = false;
     }
   }
@@ -866,11 +898,16 @@ function showSuccessModal() {
     // Check for level progression
     const levelChange = completionResult.levelChange;
     if (levelChange.changed) {
-      const levelText = translate("levelProgression.advancedToLevel").replace("{level}", levelChange.nextDifficulty);
+      const levelText = translate("levelProgression.advancedToLevel").replace(
+        "{level}",
+        levelChange.nextDifficulty,
+      );
       difficultyChangeText.textContent = levelText;
       difficultyChangeMessage.classList.remove("hidden");
     } else if (gameManager.currentDifficulty === 6) {
-      difficultyChangeText.textContent = translate("levelProgression.masteredAllLevels");
+      difficultyChangeText.textContent = translate(
+        "levelProgression.masteredAllLevels",
+      );
       difficultyChangeMessage.classList.remove("hidden");
     } else {
       difficultyChangeMessage.classList.add("hidden");
@@ -920,7 +957,7 @@ function showSuccessModal() {
     const currentNumberEl = document.getElementById("current-number");
     if (currentNumberEl) {
       currentNumberEl.classList.add("rainbow-celebrate");
-      
+
       // Remove rainbow animation after 30 seconds for extended celebration
       setTimeout(() => {
         if (currentNumberEl) {
@@ -945,37 +982,48 @@ function showSuccessModal() {
  * Create spectacular confetti explosion
  */
 function createConfettiExplosion() {
-  const colors = ['#ff0000', '#ff7700', '#ffff00', '#00ff00', '#0099ff', '#6633ff', '#ff00ff', '#ff1493', '#00ced1'];
-  const shapes = ['square', 'circle', 'triangle', 'star', 'heart'];
+  const colors = [
+    "#ff0000",
+    "#ff7700",
+    "#ffff00",
+    "#00ff00",
+    "#0099ff",
+    "#6633ff",
+    "#ff00ff",
+    "#ff1493",
+    "#00ced1",
+  ];
+  const shapes = ["square", "circle", "triangle", "star", "heart"];
   const confettiCount = 100;
-  
+
   for (let i = 0; i < confettiCount; i++) {
-    const confetti = document.createElement('div');
+    const confetti = document.createElement("div");
     const shape = shapes[Math.floor(Math.random() * shapes.length)];
-    
+
     confetti.className = `confetti confetti-${shape}`;
-    
+
     // Random position across screen width
-    confetti.style.left = Math.random() * 100 + '%';
-    
+    confetti.style.left = Math.random() * 100 + "%";
+
     // Random delay for staggered effect
-    confetti.style.animationDelay = Math.random() * 0.5 + 's';
-    
+    confetti.style.animationDelay = Math.random() * 0.5 + "s";
+
     // Random duration for varied fall speed
-    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-    
+    confetti.style.animationDuration = Math.random() * 2 + 2 + "s";
+
     // Random color for non-shaped confetti
-    if (shape === 'square' || shape === 'circle') {
-      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+    if (shape === "square" || shape === "circle") {
+      confetti.style.background =
+        colors[Math.floor(Math.random() * colors.length)];
     }
-    
+
     // Random size variation
     const size = Math.random() * 6 + 8;
-    confetti.style.width = size + 'px';
-    confetti.style.height = size + 'px';
-    
+    confetti.style.width = size + "px";
+    confetti.style.height = size + "px";
+
     document.body.appendChild(confetti);
-    
+
     // Remove confetti after animation completes
     setTimeout(() => {
       if (confetti.parentNode) {
@@ -991,18 +1039,21 @@ function createConfettiExplosion() {
 function cleanupSuccessAnimations() {
   // Remove rainbow animation from current number
   const currentNumberEl = document.getElementById("current-number");
-  if (currentNumberEl && currentNumberEl.classList.contains("rainbow-celebrate")) {
+  if (
+    currentNumberEl &&
+    currentNumberEl.classList.contains("rainbow-celebrate")
+  ) {
     currentNumberEl.classList.remove("rainbow-celebrate");
   }
-  
+
   // Clean up any remaining confetti
-  const remainingConfetti = document.querySelectorAll('.confetti');
-  remainingConfetti.forEach(confetti => {
+  const remainingConfetti = document.querySelectorAll(".confetti");
+  remainingConfetti.forEach((confetti) => {
     if (confetti.parentNode) {
       confetti.parentNode.removeChild(confetti);
     }
   });
-  
+
   // Reset celebration emoji animation
   const emoji = document.getElementById("celebration-emoji");
   if (emoji) {
@@ -1016,7 +1067,7 @@ function cleanupSuccessAnimations() {
 function handleOperationClick(operation) {
   // Clear any hint effects when user takes action
   clearHintEffects();
-  
+
   if (!gameState.isComplete && gameState.moves < moveLimit) {
     try {
       // Calculate what the result would be
@@ -1071,7 +1122,7 @@ function handleNewExercise() {
 function togglePreviews() {
   clearHintEffects();
   showPreviews = !showPreviews;
-  
+
   // Re-render UI to update all button states and toggle button appearance
   app.innerHTML = createGameUI();
 
@@ -1088,34 +1139,37 @@ function handleHintRequest() {
     console.log("💡 No more hints available for this exercise");
     return;
   }
-  
+
   // Generate hint based on current state
   const hints = generateHints(
-    gameState.current, 
-    gameState.goal, 
-    gameState.moves, 
-    gameState.hints.used
+    gameState.current,
+    gameState.goal,
+    gameState.moves,
+    gameState.hints.used,
   );
-  
+
   if (hints.length === 0) {
     console.log("💡 No hints available for current state");
     return;
   }
-  
+
   // Get the next hint (based on how many have been used)
   const nextHint = hints[gameState.hints.used] ?? hints[hints.length - 1]; // Fallback to last hint if out of range
-  
+
   // Update game state
   gameState.hints.used += 1;
   gameState.hints.hintsData.push(nextHint);
-  
+
   // Show hint (modal or button blink depending on type)
   showHint(nextHint, gameState.hints.used, gameState.hints.maxHints);
-  
+
   // Update UI to reflect hint usage
   updateDisplay();
-  
-  console.log(`💡 Hint ${gameState.hints.used}/${gameState.hints.maxHints} provided:`, nextHint.message);
+
+  console.log(
+    `💡 Hint ${gameState.hints.used}/${gameState.hints.maxHints} provided:`,
+    nextHint.message,
+  );
 }
 
 // Global variables for managing hint timeouts
@@ -1126,7 +1180,7 @@ let hintBlinkTimeout = null;
  * Show hint modal with hint information
  */
 function showHint(hint, hintsUsed, maxHints) {
-  if (hint.type === 'direct') {
+  if (hint.type === "direct") {
     // For direct hints, blink the relevant operation button
     blinkOperationButton(hint);
   } else {
@@ -1141,34 +1195,37 @@ function showHintDisplay(hint, hintsUsed, maxHints) {
   const hintLevel = document.getElementById("hint-level-display");
   const hintMessage = document.getElementById("hint-message-display");
   const hintRemaining = document.getElementById("hint-remaining-display");
-  
+
   // Set hint icon based on type
   const icons = {
     strategic: "💡",
-    tactical: "🎯", 
-    direct: "⚡"
+    tactical: "🎯",
+    direct: "⚡",
   };
-  
+
   hintIcon.textContent = icons[hint.type] || "💡";
   const hintTypeCopy = translate(`hints.ui.types.${hint.type}`) || hint.type;
   hintLevel.textContent = `${translate("hint")} #${hintsUsed} (${hintTypeCopy})`;
   hintMessage.textContent = hint.message;
-  
+
   const remaining = maxHints - hintsUsed;
   if (remaining > 0) {
-    const plural = remaining === 1 ? '' : 's';
-    hintRemaining.textContent = t('hints.ui.hintsRemaining', { count: remaining, plural });
+    const plural = remaining === 1 ? "" : "s";
+    hintRemaining.textContent = t("hints.ui.hintsRemaining", {
+      count: remaining,
+      plural,
+    });
   } else {
-    hintRemaining.textContent = t('hints.ui.finalHint');
+    hintRemaining.textContent = t("hints.ui.finalHint");
   }
-  
+
   display.classList.remove("hidden");
-  
+
   // Clear any existing timeout and set new one
   if (hintDisplayTimeout) {
     clearTimeout(hintDisplayTimeout);
   }
-  
+
   // Auto-hide after 8 seconds for non-direct hints
   hintDisplayTimeout = setTimeout(() => {
     display.classList.add("hidden");
@@ -1179,20 +1236,22 @@ function showHintDisplay(hint, hintsUsed, maxHints) {
 function blinkOperationButton(hint) {
   // Use the recommendedOperation field if available
   const targetOperation = hint.recommendedOperation;
-  
+
   if (targetOperation) {
-    const targetButton = document.querySelector(`[data-operation="${targetOperation}"]`);
+    const targetButton = document.querySelector(
+      `[data-operation="${targetOperation}"]`,
+    );
     if (targetButton) {
-      targetButton.classList.add('hint-blink');
-      
+      targetButton.classList.add("hint-blink");
+
       // Clear any existing timeout and set new one
       if (hintBlinkTimeout) {
         clearTimeout(hintBlinkTimeout);
       }
-      
+
       // Remove blink class after 3 seconds
       hintBlinkTimeout = setTimeout(() => {
-        targetButton.classList.remove('hint-blink');
+        targetButton.classList.remove("hint-blink");
         hintBlinkTimeout = null;
       }, 3000);
     }
@@ -1208,22 +1267,22 @@ function clearHintEffects() {
     clearTimeout(hintDisplayTimeout);
     hintDisplayTimeout = null;
   }
-  
+
   if (hintBlinkTimeout) {
     clearTimeout(hintBlinkTimeout);
     hintBlinkTimeout = null;
   }
-  
+
   // Remove blinking effect from operation buttons
-  const blinkingButtons = document.querySelectorAll('.hint-blink');
-  blinkingButtons.forEach(button => {
-    button.classList.remove('hint-blink');
+  const blinkingButtons = document.querySelectorAll(".hint-blink");
+  blinkingButtons.forEach((button) => {
+    button.classList.remove("hint-blink");
   });
-  
+
   // Hide hint display if visible
-  const hintDisplay = document.getElementById('hint-display');
-  if (hintDisplay && !hintDisplay.classList.contains('hidden')) {
-    hintDisplay.classList.add('hidden');
+  const hintDisplay = document.getElementById("hint-display");
+  if (hintDisplay && !hintDisplay.classList.contains("hidden")) {
+    hintDisplay.classList.add("hidden");
   }
 }
 
@@ -1264,7 +1323,6 @@ function handleDifficultySelect(difficulty) {
  * Show info modal with game help
  */
 function showInfoModal() {
-
   // Update difficulty tip
   const difficultyTip = document.getElementById("difficulty-tip");
   if (difficultyTip) {
@@ -1347,10 +1405,10 @@ function showCustomExerciseModal() {
       </div>
     </div>
   `;
-  
+
   // Add modal to page
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-  
+  document.body.insertAdjacentHTML("beforeend", modalHTML);
+
   // Set up modal functionality
   setupCustomExerciseModal();
 }
@@ -1364,18 +1422,20 @@ function setupCustomExerciseModal() {
   const loadBtn = document.getElementById("load-custom-btn");
   const validationInfo = document.getElementById("validation-info");
   const validationContent = document.getElementById("validation-content");
-  
+
   // Close modal handlers
   const closeModal = () => {
     modal.remove();
     scrollToTop();
   };
-  
-  document.getElementById("close-custom-modal").addEventListener("click", closeModal);
+
+  document
+    .getElementById("close-custom-modal")
+    .addEventListener("click", closeModal);
   modal.addEventListener("click", (e) => {
     if (e.target === modal) closeModal();
   });
-  
+
   // Validate on input change with debouncing
   let validationTimeout;
   input.addEventListener("input", () => {
@@ -1384,80 +1444,89 @@ function setupCustomExerciseModal() {
       validateInput();
     }, 500);
   });
-  
+
   function validateInput() {
     const targetValue = parseInt(input.value);
-    
+
     if (!targetValue || targetValue < 2 || targetValue > 10000) {
       validationInfo.classList.add("hidden");
       return;
     }
-    
+
     const validation = validateExercise(targetValue);
-    
+
     // Detect difficulty level for display
-    const detectedLevel = detectCustomExerciseLevel(targetValue, validation.solvable ? validation.minMoves : 15);
-    const levelConfig = getDifficultyLevels().find(d => d.level === detectedLevel);
-    const levelName = levelConfig ? translate(`difficultyLevels.${levelConfig.nameKey}`) : translate('difficultyLevels.insane');
-    
+    const detectedLevel = detectCustomExerciseLevel(
+      targetValue,
+      validation.solvable ? validation.minMoves : 15,
+    );
+    const levelConfig = getDifficultyLevels().find(
+      (d) => d.level === detectedLevel,
+    );
+    const levelName = levelConfig
+      ? translate(`difficultyLevels.${levelConfig.nameKey}`)
+      : translate("difficultyLevels.insane");
+
     if (validation.solvable) {
       validationContent.innerHTML = `
         <div class="text-emerald-300">
-          ✅ <strong>${t('customExerciseModal.validation.solvable')}</strong><br>
-          ${t('customExerciseModal.validation.optimalSolution', { moves: validation.minMoves })}<br>
-          <span class="text-xs text-white/70">${t('customExerciseModal.validation.reachableFrom')}</span><br>
-          <span class="text-xs text-blue-300 font-semibold">${t('customExerciseModal.validation.detectedLevel', { level: levelName })}</span>
+          ✅ <strong>${t("customExerciseModal.validation.solvable")}</strong><br>
+          ${t("customExerciseModal.validation.optimalSolution", { moves: validation.minMoves })}<br>
+          <span class="text-xs text-white/70">${t("customExerciseModal.validation.reachableFrom")}</span><br>
+          <span class="text-xs text-blue-300 font-semibold">${t("customExerciseModal.validation.detectedLevel", { level: levelName })}</span>
         </div>
       `;
-      validationContent.className = "p-3 rounded-lg text-sm bg-emerald-900/20 border border-emerald-500/30";
+      validationContent.className =
+        "p-3 rounded-lg text-sm bg-emerald-900/20 border border-emerald-500/30";
     } else {
       validationContent.innerHTML = `
         <div class="text-yellow-300">
-          ❓ <strong>${t('customExerciseModal.validation.unknownSolvability')}</strong><br>
-          ${t('customExerciseModal.validation.notReachable')}<br>
-          <span class="text-xs text-white/70">${t('customExerciseModal.validation.canStillTry')}</span><br>
-          <span class="text-xs text-blue-300 font-semibold">${t('customExerciseModal.validation.detectedLevel', { level: levelName })}</span>
+          ❓ <strong>${t("customExerciseModal.validation.unknownSolvability")}</strong><br>
+          ${t("customExerciseModal.validation.notReachable")}<br>
+          <span class="text-xs text-white/70">${t("customExerciseModal.validation.canStillTry")}</span><br>
+          <span class="text-xs text-blue-300 font-semibold">${t("customExerciseModal.validation.detectedLevel", { level: levelName })}</span>
         </div>
       `;
-      validationContent.className = "p-3 rounded-lg text-sm bg-yellow-900/20 border border-yellow-500/30";
+      validationContent.className =
+        "p-3 rounded-lg text-sm bg-yellow-900/20 border border-yellow-500/30";
     }
-    
+
     validationInfo.classList.remove("hidden");
   }
-  
+
   // Load button
   loadBtn.addEventListener("click", () => {
     const targetValue = parseInt(input.value);
-    
+
     if (!targetValue || targetValue < 2 || targetValue > 10000) {
       alert(translate("invalidNumberAlert"));
       return;
     }
-    
+
     // Allow loading any number, even if not solvable
     const validation = validateExercise(targetValue);
-    
+
     // Create custom exercise using GameManager
     gameManager.setCustomExercise(
       targetValue,
       validation.solvable ? validation.minMoves : Infinity,
-      validation.solutionPath || []
+      validation.solutionPath || [],
     );
-    
+
     // Reset game state with new target
     gameState = createGameState(targetValue, gameManager.currentDifficulty);
-    
+
     // Update move limit
     updateMoveLimit();
-    
+
     // Re-render UI
     const app = document.getElementById("app");
     app.innerHTML = createGameUI();
     updateDisplay();
-    
+
     closeModal();
   });
-  
+
   // Focus input
   input.focus();
 }
@@ -1499,7 +1568,7 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#share-victory-btn")) {
       handleShareVictory(gameState, gameManager);
     } else if (e.target.closest("#share-challenge-btn")) {
-      handleShareChallenge(gameState, gameManager); 
+      handleShareChallenge(gameState, gameManager);
     } else if (e.target.closest("#share-puzzle-btn")) {
       handleShareChallenge(gameState, gameManager);
     } else if (e.target.closest(".level-btn")) {
@@ -1533,31 +1602,33 @@ function setupGlobalEventListeners() {
  */
 function init() {
   // Handle service worker cleanup for existing users
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.addEventListener('message', (event) => {
-      if (event.data && event.data.action === 'cleanup-complete') {
-        console.log('🧹 Cleanup message received:', event.data.message);
-        
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.addEventListener("message", (event) => {
+      if (event.data && event.data.action === "cleanup-complete") {
+        console.log("🧹 Cleanup message received:", event.data.message);
+
         // Unregister the service worker
         navigator.serviceWorker.getRegistration().then((registration) => {
           if (registration) {
             registration.unregister().then((success) => {
               if (success) {
-                console.log('✅ Service Worker unregistered successfully');
+                console.log("✅ Service Worker unregistered successfully");
               }
             });
           }
         });
       }
     });
-    
+
     // Also try to unregister any existing service worker immediately
     navigator.serviceWorker.getRegistration().then((registration) => {
       if (registration) {
-        console.log('🧹 Found existing service worker, attempting to unregister...');
+        console.log(
+          "🧹 Found existing service worker, attempting to unregister...",
+        );
         registration.unregister().then((success) => {
           if (success) {
-            console.log('✅ Existing service worker unregistered successfully');
+            console.log("✅ Existing service worker unregistered successfully");
           }
         });
       }
@@ -1572,23 +1643,27 @@ function init() {
 
   // Render initial UI
   app.innerHTML = createGameUI();
-  
+
   // Ensure we start at the top of the page
   scrollToTop();
 
   // Handle shared puzzle URLs
-  const shareResult = handleSharedPuzzleURL(gameManager, resetGame, (newGameState) => {
-    gameState = newGameState;
-    render();
-  });
-  
+  const shareResult = handleSharedPuzzleURL(
+    gameManager,
+    resetGame,
+    (newGameState) => {
+      gameState = newGameState;
+      updateDisplay();
+    },
+  );
+
   if (!shareResult.processed) {
     // No shared puzzle, continue with normal initialization
-    console.log('🎮 Normal game initialization');
+    console.log("🎮 Normal game initialization");
   }
 
   // Expose functions for dev tools testing
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     window.doxinyDev = {
       validateExercise: validateExercise,
       calculateProgress: calculateProgress,
@@ -1596,9 +1671,9 @@ function init() {
       gameManager: gameManager,
       gameState: () => gameState,
       operations: operations,
-      generateExercise: generateExercise
+      generateExercise: generateExercise,
     };
-    console.log('🔧 Dev tools available: window.doxinyDev');
+    console.log("🔧 Dev tools available: window.doxinyDev");
   }
 
   const exercise = gameManager.currentExercise;

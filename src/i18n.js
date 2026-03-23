@@ -492,7 +492,7 @@ export const translations = {
           en: "Direct",
           es: "Directa",
         },
-      }
+      },
     },
   },
 
@@ -556,8 +556,8 @@ export const translations = {
       en: "💪 Can you reach {goal} faster than {moves} moves? I dare you to try! Play Doxiny Number Puzzle:",
       es: "💪 ¿Puedes llegar a {goal} más rápido que en {moves} movimientos? ¡Te reto a intentarlo! Juega Doxiny Number Puzzle:",
     },
-    
-    // Share exercise invitation  
+
+    // Share exercise invitation
     inviteMessage: {
       en: "🧠 I challenge you to solve this brain twister: Reach {goal} starting from 1! Can you do it? Try Doxiny Number Puzzle:",
       es: "🧠 Te desafío a resolver este acertijo mental: ¡Llega a {goal} empezando desde 1! ¿Puedes hacerlo? Prueba Doxiny Number Puzzle:",
@@ -566,21 +566,21 @@ export const translations = {
       en: "🔥 Think you're smart? Try reaching {goal} in this EXPERT level challenge! Only math geniuses can solve it. Doxiny Number Puzzle:",
       es: "🔥 ¿Crees que eres inteligente? ¡Intenta llegar a {goal} en este desafío nivel EXPERTO! Solo los genios matemáticos pueden resolverlo. Doxiny Number Puzzle:",
     },
-    
+
     // Button labels
     shareVictory: {
       en: "Share Victory 🏆",
       es: "Compartir Victoria 🏆",
     },
     shareChallenge: {
-      en: "Challenge Friends 💪",  
+      en: "Challenge Friends 💪",
       es: "Retar Amigos 💪",
     },
     shareCurrentPuzzle: {
       en: "Share Puzzle 🧠",
       es: "Compartir Puzzle 🧠",
     },
-    
+
     // Feedback messages
     linkCopied: {
       en: "🎉 Challenge link copied! Paste it anywhere to invite friends!",
@@ -590,7 +590,7 @@ export const translations = {
       en: "📋 Couldn't share automatically, but link is copied to clipboard!",
       es: "📋 ¡No se pudo compartir automáticamente, pero el enlace está copiado al portapapeles!",
     },
-    
+
     // URL parameter handling
     sharedPuzzle: {
       en: "🎯 Shared Puzzle Challenge",
