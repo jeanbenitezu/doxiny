@@ -34,6 +34,53 @@ export const translations = {
     es: "Actual",
   },
 
+  // Game Modes
+  gameMode: {
+    en: "Game Mode",
+    es: "Modo de Juego",
+  },
+
+  gameModes: {
+    normal: {
+      en: "Normal Game",
+      es: "Juego Normal",
+    },
+    freeplay: {
+      en: "Free Play",
+      es: "Juego Libre",
+    },
+  },
+
+  gameModeDescriptions: {
+    normal: {
+      en: "Progressive difficulty with unlock requirements",
+      es: "Dificultad progresiva con requisitos de desbloqueo",
+    },
+    freeplay: {
+      en: "All levels available, create custom exercises",
+      es: "Todos los niveles disponibles, crea ejercicios personalizados",
+    },
+  },
+
+  gameModeMessages: {
+    levelLocked: {
+      en: "Complete previous level with {efficiency}% efficiency to unlock",
+      es: "Completa el nivel anterior con {efficiency}% de eficiencia para desbloquear",
+    },
+    levelUnlocked: {
+      en: "🎉 Level {level} Unlocked!",
+      es: "🎉 ¡Nivel {level} Desbloqueado!",
+    },
+    switchedToNormal: {
+      en: "Switched to Normal Game mode",
+      es: "Cambiado a modo Juego Normal",
+    },
+    switchedToFreeplay: {
+      en: "Switched to Free Play mode",
+      es: "Cambiado a modo Juego Libre",
+    },
+  },
+
   targetNumber: {
     en: "Goal",
     es: "Objetivo",

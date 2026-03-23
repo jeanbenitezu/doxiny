@@ -308,3 +308,58 @@ button:active:not(:disabled) {
     transition: none;
   }
 }
+
+/* Game Mode Dropdown Styles */
+#game-mode-dropdown {
+  min-width: 200px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.game-mode-option:first-child {
+  border-radius: 0.375rem 0.375rem 0 0;
+}
+
+.game-mode-option:last-child {
+  border-radius: 0 0 0.375rem 0.375rem;
+}
+
+/* Notification Styles */
+.notification {
+  font-size: 0.875rem;
+  max-width: 320px;
+  word-wrap: break-word;
+}
+
+/* Celebration Animation for Level Unlock */
+@keyframes celebrateBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translate(-50%, -50%);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translate(-50%, -50%);
+  }
+  70% {
+    transform: scale(0.95) translate(-50%, -50%);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}
+
+/* Locked level indicator */
+.level-btn[disabled] .lock-icon {
+  animation: lockPulse 2s infinite;
+}
+
+@keyframes lockPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}

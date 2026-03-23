@@ -27,10 +27,106 @@ import {
 } from "./sharing.js";
 import "./style.css";
 
+// Game Mode Management
+class GameModeManager {
+  constructor() {
+    this.modes = {
+      NORMAL: 'normal',
+      FREEPLAY: 'freeplay'
+    };
+    this.currentMode = this.loadGameMode();
+    this.unlockedLevels = this.loadUnlockedLevels();
+  }
+
+  loadGameMode() {
+    const saved = localStorage.getItem("doxiny-gamemode");
+    return saved === 'freeplay' ? this.modes.FREEPLAY : this.modes.NORMAL; // Default to Normal
+  }
+
+  saveGameMode() {
+    localStorage.setItem("doxiny-gamemode", this.currentMode);
+  }
+
+  loadUnlockedLevels() {
+    const saved = localStorage.getItem("doxiny-unlocked-levels");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.warn('Failed to parse unlocked levels:', e);
+      }
+    }
+    return [1]; // Level 1 is always unlocked
+  }
+
+  saveUnlockedLevels() {
+    localStorage.setItem("doxiny-unlocked-levels", JSON.stringify(this.unlockedLevels));
+  }
+
+  getGameMode() {
+    return this.currentMode;
+  }
+
+  setGameMode(mode) {
+    if (mode === this.modes.NORMAL || mode === this.modes.FREEPLAY) {
+      this.currentMode = mode;
+      this.saveGameMode();
+      return true;
+    }
+    return false;
+  }
+
+  isLevelUnlocked(level) {
+    // In Free Play mode, all levels are unlocked
+    if (this.currentMode === this.modes.FREEPLAY) {
+      return true;
+    }
+    // In Normal mode, check unlocked levels
+    return this.unlockedLevels.includes(level);
+  }
+
+  unlockLevel(level) {
+    if (!this.unlockedLevels.includes(level)) {
+      this.unlockedLevels.push(level);
+      this.unlockedLevels.sort((a, b) => a - b);
+      this.saveUnlockedLevels();
+      return true; // Level was newly unlocked
+    }
+    return false; // Level was already unlocked
+  }
+
+  getUnlockedLevels() {
+    return [...this.unlockedLevels];
+  }
+
+  getEfficiencyRequirement(level) {
+    // 80% for levels 1-3, 90% for levels 4+ (Hard and above)
+    return level >= 4 ? 0.90 : 0.80;
+  }
+
+  canCreateCustomExercases() {
+    return this.currentMode === this.modes.FREEPLAY;
+  }
+
+  resetProgression() {
+    this.unlockedLevels = [1];
+    this.saveUnlockedLevels();
+  }
+}
+
 // Dynamic game manager with exercise generation
 class GameManager {
   constructor() {
-    this.currentDifficulty = 1;
+    this.gameModeManager = new GameModeManager();
+    
+    // In Normal mode, start at highest unlocked level
+    if (this.gameModeManager.getGameMode() === this.gameModeManager.modes.NORMAL) {
+      const unlockedLevels = this.gameModeManager.getUnlockedLevels();
+      this.currentDifficulty = Math.max(...unlockedLevels);
+    } else {
+      this.currentDifficulty = 1; // Default for Free Play mode
+    }
+    
     this.currentExercise = null;
     this.isCustomExercise = false;
     this.customExerciseLevel = null;
@@ -76,7 +172,19 @@ class GameManager {
       this.playerStats.recentPerformance.shift();
     }
 
-    // Calculate level change
+    // Handle Normal Game mode progression
+    let levelUnlocked = null;
+    if (this.gameModeManager.getGameMode() === this.gameModeManager.modes.NORMAL) {
+      const requiredEfficiency = this.gameModeManager.getEfficiencyRequirement(this.currentDifficulty);
+      if (efficiency >= requiredEfficiency && this.currentDifficulty < 6) {
+        const nextLevel = this.currentDifficulty + 1;
+        if (this.gameModeManager.unlockLevel(nextLevel)) {
+          levelUnlocked = nextLevel;
+        }
+      }
+    }
+
+    // Calculate level change (only for display, actual unlocking handled above)
     const levelChange = this.getNextLevelInfo();
 
     return {
@@ -84,6 +192,7 @@ class GameManager {
       isPerfect,
       grade: this.getPerformanceGrade(efficiency),
       levelChange,
+      levelUnlocked,
     };
   }
 
@@ -150,6 +259,12 @@ class GameManager {
 
   setDifficulty(newDifficulty) {
     if (newDifficulty >= 1 && newDifficulty <= 6) {
+      // Check if level is unlocked in Normal mode
+      if (!this.gameModeManager.isLevelUnlocked(newDifficulty)) {
+        console.log(`Level ${newDifficulty} is locked in Normal Game mode`);
+        return false;
+      }
+      
       this.currentDifficulty = newDifficulty;
       this.generateNewExercise();
       return true;
@@ -212,9 +327,22 @@ function updateMoveLimit() {
 }
 
 // Get available difficulty levels for UI
-const baseLevels = getDifficultyLevels().slice(0, 6); // Show 6 regular levels
-const customLevel = { level: "custom", nameKey: "custom" };
-const availableLevels = [...baseLevels, customLevel];
+function getAvailableLevels() {
+  const baseLevels = getDifficultyLevels().slice(0, 6); // Show 6 regular levels
+  const customLevel = { level: "custom", nameKey: "custom" };
+  
+  // In Normal mode, only show custom level if in Free Play mode
+  if (gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.NORMAL && 
+      !gameManager.gameModeManager.canCreateCustomExercases()) {
+    return baseLevels;
+  }
+  
+  return [...baseLevels, customLevel];
+}
+
+function isLevelLocked(level) {
+  return !gameManager.gameModeManager.isLevelUnlocked(level);
+}
 
 /**
  * Calculate progress toward goal as percentage (0-100) using dynamic path calculation
@@ -375,8 +503,36 @@ function createGameUI() {
         <h1 class="font-bold tracking-wide uppercase" style="font-size: clamp(0.8rem, 2vh, 1.2rem); font-size: clamp(0.8rem, 2svh, 1.2rem)">Doxiny</h1>
       </div>
       
-      <!-- Language Switcher - Compact -->
-      <div class="flex gap-1 justify-center sm:justify-end">
+      <!-- Game Mode & Language Controls -->
+      <div class="flex gap-2 justify-center sm:justify-end items-center">
+        <!-- Game Mode Dropdown -->
+        <div class="relative">
+          <button id="game-mode-dropdown-btn" class="bg-gray-700/80 hover:bg-gray-600/80 border border-white/20 rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
+                  style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem); height: clamp(1.5rem, 3vh, 2rem); height: clamp(1.5rem, 3svh, 2rem);">
+            <span id="current-mode-label">${gameManager.gameModeManager.getGameMode() === 'normal' ? '🎯' : '🔓'}</span>
+            <span id="current-mode-text">${translate(`gameModes.${gameManager.gameModeManager.getGameMode()}`)}</span>
+            <span>▼</span>
+          </button>
+          <div id="game-mode-dropdown" class="hidden absolute top-full left-0 mt-1 bg-gray-800 border border-white/20 rounded shadow-lg shadow-black/50 z-50 min-w-full">
+            <button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="normal">
+              <span>🎯</span>
+              <div>
+                <div class="font-semibold">${translate('gameModes.normal')}</div>
+                <div class="text-xs text-gray-400">${translate('gameModeDescriptions.normal')}</div>
+              </div>
+            </button>
+            <button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="freeplay">
+              <span>🔓</span>
+              <div>
+                <div class="font-semibold">${translate('gameModes.freeplay')}</div>
+                <div class="text-xs text-gray-400">${translate('gameModeDescriptions.freeplay')}</div>
+              </div>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Language Switcher - Compact -->
+        <div class="flex gap-1">
         ${Object.values(languages)
           .map(
             (lang) => `
@@ -390,16 +546,19 @@ function createGameUI() {
         `,
           )
           .join("")}
+        </div>
       </div>
     </header>
     <!-- END: MainHeader -->
     
     <!-- Level Selector -->
     <nav class="w-full mb-3" style="height: 6vh; height: 6svh; min-height: 2.5rem; max-height: 4rem;" data-purpose="level-selector">
-      <div class="grid grid-cols-7 gap-1 h-full">
-        ${availableLevels
+      <div class="grid gap-1 h-full" style="grid-template-columns: repeat(${getAvailableLevels().length}, 1fr);">
+        ${getAvailableLevels()
           .map((lvl) => {
             const isCustom = lvl.level === "custom";
+            const isLocked = !isCustom && isLevelLocked(lvl.level);
+            
             // For custom exercises, highlight the detected level
             const isCustomActive =
               gameManager.isCustomExercise &&
@@ -417,6 +576,9 @@ function createGameUI() {
               buttonClass = gameManager.isCustomExercise
                 ? "bg-orange-600 border border-orange-400 text-white"
                 : "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500";
+            } else if (isLocked) {
+              // Locked levels
+              buttonClass = "bg-gray-800/50 border border-gray-600/20 text-gray-500 cursor-not-allowed";
             } else {
               // Regular level buttons
               buttonClass = isActive
@@ -424,13 +586,17 @@ function createGameUI() {
                 : "bg-[#2a2f3a] border border-white/10 opacity-60";
             }
 
+            const title = isLocked ? translate('gameModeMessages.levelLocked', { efficiency: gameManager.gameModeManager.getEfficiencyRequirement(lvl.level) * 100 }) : '';
+
             return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
-                   data-level="${lvl.level}">
+                   data-level="${lvl.level}"
+                   ${isLocked ? 'disabled' : ''}
+                   ${title ? `title="${title}"` : ''}>
                 <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem); font-size: clamp(0.7rem, 2svh, 1rem);">
-                  ${isCustom ? "🎯" : lvl.level}
+                  ${isCustom ? "🎯" : isLocked ? "🔒" : lvl.level}
                 </span>
-                <span class="uppercase font-bold leading-tight" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem); font-size: clamp(0.5rem, 1.2svh, 0.7rem);">
-                  ${isCustom ? translate("custom") || "Custom" : translate(`difficultyLevels.${lvl.nameKey}`)}
+                <span class="uppercase font-bold leading-tight${isLocked ? " hidden" : ""}" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem); font-size: clamp(0.5rem, 1.2svh, 0.7rem);">
+                  ${isCustom ? translate("custom") || "Custom" : isLocked ? translate("blocked") : translate(`difficultyLevels.${lvl.nameKey}`)}
                 </span>
               </button>`;
           })
@@ -455,9 +621,11 @@ function createGameUI() {
           <div class="text-emerald-200 uppercase tracking-wide font-semibold" style="font-size: clamp(0.6rem, 1.3vh, 0.8rem); font-size: clamp(0.6rem, 1.3svh, 0.8rem);">${translate("moves")}</div>
           <div id="moves-count" class="text-white font-bold" style="font-size: clamp(0.9rem, 2.2vh, 1.3rem); font-size: clamp(0.9rem, 2.2svh, 1.3rem);">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
         </div>
+        ${gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.FREEPLAY ? `
         <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="new-exercise-btn">
           🎲 <span>${translate("gameStates.newGame")}</span>
         </button>
+        ` : ''}
       </div>
     </div>
     
@@ -591,9 +759,11 @@ function createGameUI() {
           </div>
         </div>
         
+        ${gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.NORMAL ? `
         <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-2 hidden">
           📈 <span id="difficulty-change-text"></span>
         </div>
+        ` : ''}
         <!-- Action buttons row -->
         <div class="flex flex-col gap-3 justify-center">
           <!-- Main action buttons -->
@@ -889,22 +1059,38 @@ function showSuccessModal() {
     message.textContent = gradeData.description;
     emoji.textContent = gradeData.emoji;
 
+    // Handle level unlock notification
+    if (completionResult.levelUnlocked) {
+      setTimeout(() => {
+        showLevelUnlockNotification(completionResult.levelUnlocked);
+      }, 1000); // Show after success modal appears
+    }
+
+    // Handle level unlock notification
+    if (completionResult.levelUnlocked) {
+      setTimeout(() => {
+        showLevelUnlockNotification(completionResult.levelUnlocked);
+      }, 1000); // Show after success modal appears
+    }
+
     // Check for level progression
-    const levelChange = completionResult.levelChange;
-    if (levelChange.changed) {
-      const levelText = translate("levelProgression.advancedToLevel").replace(
-        "{level}",
-        levelChange.nextDifficulty,
-      );
-      difficultyChangeText.textContent = levelText;
-      difficultyChangeMessage.classList.remove("hidden");
-    } else if (gameManager.currentDifficulty === 6) {
-      difficultyChangeText.textContent = translate(
-        "levelProgression.masteredAllLevels",
-      );
-      difficultyChangeMessage.classList.remove("hidden");
-    } else {
-      difficultyChangeMessage.classList.add("hidden");
+    if (difficultyChangeMessage && difficultyChangeText) {
+      const levelChange = completionResult.levelChange;
+      if (levelChange.changed) {
+        const levelText = translate("levelProgression.advancedToLevel").replace(
+          "{level}",
+          levelChange.nextDifficulty,
+        );
+        difficultyChangeText.textContent = levelText;
+        difficultyChangeMessage.classList.remove("hidden");
+      } else if (gameManager.currentDifficulty === 6) {
+        difficultyChangeText.textContent = translate(
+          "levelProgression.masteredAllLevels",
+        );
+        difficultyChangeMessage.classList.remove("hidden");
+      } else {
+        difficultyChangeMessage.classList.add("hidden");
+      }
     }
 
     modal.classList.remove("hidden");
@@ -1563,14 +1749,29 @@ function setupGlobalEventListeners() {
       handleShareChallenge(gameState);
     } else if (e.target.closest("#share-puzzle-btn")) {
       handleShareChallenge(gameState);
+    } else if (e.target.closest("#game-mode-dropdown-btn")) {
+      toggleGameModeDropdown();
+    } else if (e.target.closest(".game-mode-option")) {
+      const modeBtn = e.target.closest(".game-mode-option");
+      const mode = modeBtn.dataset.mode;
+      handleGameModeChange(mode);
     } else if (e.target.closest(".level-btn")) {
       const levelBtn = e.target.closest(".level-btn");
       const level = levelBtn.dataset.level;
       if (level === "custom") {
+        if (!gameManager.gameModeManager.canCreateCustomExercases()) {
+          showNotification(translate('gameModeMessages.switchedToFreeplay'), 'info');
+          return;
+        }
         showCustomExerciseModal();
       } else {
-        const difficulty = parseInt(level);
-        handleDifficultySelect(difficulty);
+        const levelNum = parseInt(level);
+        if (!gameManager.gameModeManager.isLevelUnlocked(levelNum)) {
+          const requirement = gameManager.gameModeManager.getEfficiencyRequirement(levelNum);
+          showNotification(translate('gameModeMessages.levelLocked', { efficiency: Math.round(requirement * 100) }), 'warning');
+          return;
+        }
+        handleDifficultySelect(levelNum);
       }
     } else if (e.target.closest(".language-btn")) {
       const langBtn = e.target.closest(".language-btn");
@@ -1583,6 +1784,14 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#close-hint-display")) {
       document.getElementById("hint-display").classList.add("hidden");
       scrollToTop();
+    }
+
+    // Close game mode dropdown if clicking outside
+    if (!e.target.closest('#game-mode-dropdown-btn') && !e.target.closest('#game-mode-dropdown')) {
+      const dropdown = document.getElementById('game-mode-dropdown');
+      if (dropdown && !dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+      }
     }
   });
 
@@ -1669,6 +1878,115 @@ function init() {
     `🧮 Number Puzzle loaded! Difficulty: ${gameManager.currentDifficulty}, Goal: 1 → ${exercise.goal}`,
   );
   console.log(`🎯 This exercise: ${exercise.optimalMoves} moves optimal`);
+}
+
+/**
+ * Toggle game mode dropdown visibility
+ */
+function toggleGameModeDropdown() {
+  const dropdown = document.getElementById('game-mode-dropdown');
+  dropdown.classList.toggle('hidden');
+}
+
+/**
+ * Handle game mode change
+ */
+function handleGameModeChange(mode) {
+  const currentMode = gameManager.gameModeManager.getGameMode();
+  if (mode === currentMode) {
+    document.getElementById('game-mode-dropdown').classList.add('hidden');
+    return;
+  }
+
+  // Change the mode
+  gameManager.gameModeManager.setGameMode(mode);
+  
+  // Close dropdown
+  document.getElementById('game-mode-dropdown').classList.add('hidden');
+  
+  // Show notification
+  const modeKey = mode === 'normal' ? 'switchedToNormal' : 'switchedToFreeplay';
+  showNotification(translate(`gameModeMessages.${modeKey}`), 'success');
+  
+  // If switching to Normal mode and current level is locked, move to level 1
+  if (mode === 'normal' && !gameManager.gameModeManager.isLevelUnlocked(gameManager.currentDifficulty)) {
+    gameManager.setDifficulty(1);
+  }
+  
+  // Re-render UI to update mode selector and level states
+  app.innerHTML = createGameUI();
+  updateDisplay();
+}
+
+/**
+ * Show temporary notification to user
+ */
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full`;
+  
+  // Style based on type
+  if (type === 'success') {
+    notification.classList.add('bg-green-600', 'text-white');
+  } else if (type === 'warning') {
+    notification.classList.add('bg-orange-600', 'text-white');
+  } else {
+    notification.classList.add('bg-blue-600', 'text-white');
+  }
+  
+  notification.innerHTML = `<div class="font-semibold">${message}</div>`;
+  
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => {
+    notification.classList.remove('translate-x-full');
+  }, 10);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.classList.add('translate-x-full');
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, 3000);
+}
+
+/**
+ * Show level unlock notification with celebration
+ */
+function showLevelUnlockNotification(level) {
+  const message = t('gameModeMessages.levelUnlocked', { level });
+  
+  // Create special celebration notification 
+  const notification = document.createElement('div');
+  notification.className = 'notification fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-4 rounded-xl shadow-2xl z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center';
+  notification.style.minWidth = '280px';
+  
+  notification.innerHTML = `
+    <div class="text-2xl mb-2">🎉</div>
+    <div class="font-bold text-lg mb-1">${message}</div>
+    <div class="text-sm opacity-90">${translate(`difficultyLevels.${getDifficultyLevels()[level-1]?.nameKey}`)}</div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Add celebration animation
+  notification.style.animation = 'celebrateBounce 0.6s ease-out';
+  
+  // Remove after 4 seconds
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'scale(0.8) translate(-50%, -50%)';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, 4000);
 }
 
 // Start the game
