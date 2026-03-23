@@ -12,11 +12,19 @@ export function generateShareURL(goal, moves = null, solved = false) {
   const baseURL = window.location.origin + window.location.pathname;
   const params = new URLSearchParams();
 
-  params.set("puzzle", goal.toString());
-  if (moves && solved) params.set("challenge_moves", moves.toString());
-  if (solved) params.set("solved", "1");
+  // Combine all parameters into single encoded string: puzzle_moves_solved
+  const movesStr = (moves && solved) ? moves.toString() : "";
+  const solvedStr = solved ? "1" : "";
+  const combinedData = `${goal}_${movesStr}_${solvedStr}`;
+  
+  // Encode the combined data to prevent manipulation
+  params.set("d", btoa(combinedData));
 
-  return `${baseURL}?${params.toString()}`;
+  const url = `${baseURL}?${params.toString()}`;
+
+  console.log("Generated share URL:", url);
+
+  return url;
 }
 
 /**
@@ -159,39 +167,49 @@ export async function handleShareChallenge(gameState) {
  */
 export function handleSharedPuzzleURL() {
   const urlParams = new URLSearchParams(window.location.search);
-  const puzzleGoal = urlParams.get("puzzle");
-  const challengeMoves = urlParams.get("challenge_moves");
-  const solved = urlParams.get("solved");
+  const dataParam = urlParams.get("d");
 
-  if (puzzleGoal) {
-    const goal = parseInt(puzzleGoal);
-    if (goal >= 2 && goal <= 10000) {
-      // Show shared puzzle notification
-      const notification = document.createElement("div");
-      notification.className =
-        "fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-sm text-center";
+  if (dataParam) {
+    try {
+      // Decode and split the combined data: puzzle_moves_solved
+      const decodedData = atob(dataParam);
+      const [goalStr, movesStr, solvedStr] = decodedData.split("_");
+      
+      const goal = parseInt(goalStr);
+      const challengeMoves = movesStr ? parseInt(movesStr) : null;
+      const solved = solvedStr || null;
+      
+      if (goal >= 2 && goal <= 10000) {
+        // Show shared puzzle notification
+        const notification = document.createElement("div");
+        notification.className =
+          "fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-sm text-center";
 
-      if (solved === "1" && challengeMoves) {
-        notification.innerHTML = `🎯 <strong>Friend's Challenge!</strong><br>Beat their ${challengeMoves} moves to reach ${goal}!`;
-      } else {
-        notification.textContent = t("sharing.friendChallengesYou", { goal });
-      }
+        if (solved === "1" && challengeMoves) {
+          notification.innerHTML = `🎯 <strong>Friend's Challenge!</strong><br>Beat their ${challengeMoves} moves to reach ${goal}!`;
+        } else {
+          notification.textContent = t("sharing.friendChallengesYou", { goal });
+        }
 
-      document.body.appendChild(notification);
+        document.body.appendChild(notification);
 
-      setTimeout(() => {
-        // Remove notification
-        notification.style.opacity = "0";
         setTimeout(() => {
-          if (document.body.contains(notification)) {
-            document.body.removeChild(notification);
-          }
-        }, 300);
-      }, 2000);
+          // Remove notification
+          notification.style.opacity = "0";
+          setTimeout(() => {
+            if (document.body.contains(notification)) {
+              document.body.removeChild(notification);
+            }
+          }, 300);
+        }, 2000);
 
-      // Clear URL parameters to avoid re-triggering
-      window.history.replaceState({}, document.title, window.location.pathname);
-      return { processed: true, goal };
+        // Clear URL parameters to avoid re-triggering
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return { processed: true, goal };
+      }
+    } catch (error) {
+      // Invalid base64 or malformed data - ignore silently
+      console.warn("Invalid shared puzzle URL parameters", error);
     }
   }
   return { processed: false, goal: null };
