@@ -112,8 +112,9 @@ class GameModeManager {
   resetProgression() {
     this.unlockedLevels = [1];
     this.saveUnlockedLevels();
-    // Also reset master status
+    // Also reset master status and player stats
     localStorage.removeItem("doxiny-master-status");
+    localStorage.removeItem("doxiny-player-stats");
   }
 
   // === MASTERY SYSTEM ===
@@ -158,13 +159,47 @@ class GameManager {
     this.currentExercise = null;
     this.isCustomExercise = false;
     this.customExerciseLevel = null;
-    this.playerStats = {
+    this.playerStats = this.loadPlayerStats();
+    this.generateNewExercise();
+  }
+
+  loadPlayerStats() {
+    const saved = localStorage.getItem("doxiny-player-stats");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Ensure all required properties exist with defaults
+        return {
+          exercisesCompleted: parsed.exercisesCompleted || 0,
+          totalMoves: parsed.totalMoves || 0,
+          perfectSolutions: parsed.perfectSolutions || 0,
+          recentPerformance: parsed.recentPerformance || [],
+        };
+      } catch (e) {
+        console.warn('Failed to parse player stats:', e);
+      }
+    }
+    // Default stats for new players
+    return {
       exercisesCompleted: 0,
       totalMoves: 0,
       perfectSolutions: 0,
       recentPerformance: [], // Last 5 exercises
     };
-    this.generateNewExercise();
+  }
+
+  savePlayerStats() {
+    localStorage.setItem("doxiny-player-stats", JSON.stringify(this.playerStats));
+  }
+
+  resetPlayerStats() {
+    this.playerStats = {
+      exercisesCompleted: 0,
+      totalMoves: 0,
+      perfectSolutions: 0,
+      recentPerformance: [],
+    };
+    localStorage.removeItem("doxiny-player-stats");
   }
 
   generateNewExercise() {
@@ -227,6 +262,9 @@ class GameManager {
 
     // Calculate level change (only for display, actual unlocking handled above)
     const levelChange = this.getNextLevelInfo();
+
+    // Save updated player stats to localStorage
+    this.savePlayerStats();
 
     return {
       efficiency,

@@ -196,6 +196,90 @@ newUIText: {
 - **Progress Color Coding**: Green/orange/red based on efficiency
 - **Immediate Validation**: Disable invalid operations, show why
 
+### Event Delegation Pattern (March 2026)
+**REQUIRED PATTERN**: Use event delegation for all dynamic modals and UI components instead of inline onclick handlers.
+
+```javascript
+// ✅ Preferred: Event delegation pattern
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#show-journey-btn')) {
+    showJourneyModal();
+  } else if (e.target.closest('#reset-stats-btn')) {
+    resetPlayerStats();
+    updateUI();
+  }
+});
+
+// ❌ Avoid: Inline onclick handlers
+button.onclick = () => showJourneyModal(); // Creates global function requirements
+modal.innerHTML = `<button onclick="resetStats()">Reset</button>`; // Requires global exposure
+```
+
+**Benefits:**
+- No global function pollution 
+- Consistent across all components
+- Handles dynamically created elements
+- Better encapsulation and maintainability
+
+### localStorage Persistence Patterns (March 2026)
+**Player Statistics Persistence**: All game progress must persist across browser sessions.
+
+```javascript
+// Complete persistence pattern with error handling
+loadPlayerStats() {
+  try {
+    const saved = localStorage.getItem('doxiny-player-stats');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Merge with defaults to handle missing properties
+      return { ...this.getDefaultStats(), ...parsed };
+    }
+  } catch (error) {
+    console.warn('Failed to load player stats:', error);
+  }
+  return this.getDefaultStats(); // Safe fallback
+}
+
+savePlayerStats() {
+  try {
+    localStorage.setItem('doxiny-player-stats', JSON.stringify(this.playerStats));
+  } catch (error) {
+    console.warn('Failed to save player stats:', error);
+  }
+}
+
+// Auto-save after every exercise completion
+onExerciseComplete() {
+  this.updatePlayerStats(/* ... */);
+  this.savePlayerStats(); // Ensure persistence
+  // ... rest of completion logic
+}
+```
+
+### Modal Event Handling Improvements (March 2026)
+**Click-outside-to-close Pattern**: Use addEventListener instead of direct onclick assignment.
+
+```javascript
+// ✅ Preferred: Event listener approach 
+function showModal(modalId) {
+  const modal = document.getElementById(modalId);
+  modal.style.display = 'flex';
+  
+  // Clean event handling with proper cleanup
+  const handleClickOutside = (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+      document.removeEventListener('click', handleClickOutside);
+    }
+  };
+  
+  document.addEventListener('click', handleClickOutside);
+}
+
+// ❌ Avoid: Direct onclick assignment
+modal.onclick = (e) => { /* ... */ }; // Less clean, harder to debug
+```
+
 ## Error Handling Patterns
 
 ### Graceful Fallbacks

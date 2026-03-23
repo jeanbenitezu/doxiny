@@ -109,6 +109,16 @@ class GameModeManager {
 "doxiny-unlocked-levels": [1, 2, 3, 4, 5, 6] // Array of completed levels
 "doxiny-master-status": "true" | null // Master achievement status
 "doxiny-language": "en" | "es"
+
+// Player statistics (persistent across sessions)
+"doxiny-player-stats": {
+  exercisesCompleted: number,    // Total puzzles solved
+  totalMoves: number,           // Cumulative moves across all exercises
+  perfectSolutions: number,     // Count of optimal solutions achieved  
+  recentPerformance: [          // Last 5 exercise performance data
+    {moves, optimal, efficiency, isPerfect}, ...
+  ]
+}
 ```
 
 ### Component-based UI Updates
@@ -133,4 +143,4 @@ class GameModeManager {
 - **Build tools**: Vite for bundling, development server
 - **Styling**: Tailwind CSS via CDN (no build step needed)
 
-Last Updated: March 21, 2026
+Last Updated: March 23, 2026

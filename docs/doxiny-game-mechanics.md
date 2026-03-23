@@ -129,16 +129,38 @@ const progress = calculateProgressToTarget(currentNumber, goal, movesSoFar);
 - **Needs Practice**: Moves > optimal + 6 (C grade)
 
 ## Player Statistics Tracking
+
+**Added March 23, 2026**: Player statistics now persist across sessions via localStorage.
+
 ```javascript
+// Player stats structure with localStorage persistence
 const playerStats = {
-  exercisesCompleted: 0,
-  totalMoves: 0,
-  perfectSolutions: 0,
-  recentPerformance: [], // Last 5 exercises for trending
-  currentDifficulty: 1,
-  difficultyProgression: {} // Unlock history
+  exercisesCompleted: 0,       // Total puzzles solved (persistent)
+  totalMoves: 0,              // Cumulative moves across all exercises (persistent)
+  perfectSolutions: 0,         // Count of optimal solutions achieved (persistent) 
+  recentPerformance: [],       // Last 5 exercises for trending (persistent)
+  currentDifficulty: 1,        // Current level
+  difficultyProgression: {}    // Unlock history
 };
+
+// localStorage Integration
+function loadPlayerStats() {
+  // Loads from "doxiny-player-stats" with error handling
+  // Returns defaults if no saved data exists
+  // Ensures all required properties are present
+}
+
+function savePlayerStats() {
+  // Called automatically after each exercise completion
+  // Preserves complete gaming history across sessions
+}
 ```
+
+### Statistics Usage in Mastery System
+- **Journey Modal**: Displays lifetime statistics for masters
+- **Achievement Tracking**: Master status based on persistent progress
+- **Performance Analysis**: Recent performance trends maintained
+- **Session Continuity**: Players retain progress when resuming game
 
 ## Mastery Achievement System
 
