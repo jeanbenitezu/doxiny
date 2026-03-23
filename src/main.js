@@ -439,9 +439,9 @@ function createGameUI() {
     </nav>
     
     <!-- Goal Display with Share button on left, Moves and New Exercise on the right -->  
-    <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-2 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1" style="height: 7rem;">
-      <div class="flex flex-row sm:flex-col justify-center sm:justify-center gap-1 sm:mr-2">
-        <button class="bg-indigo-500/80 hover:bg-indigo-600/80 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="share-puzzle-btn">
+    <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-2 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between gap-1" style="height: 7rem;">
+      <div class="flex flex-row sm:flex-col justify-center sm:justify-end items-end sm:items-center gap-1 sm:mr-2">
+        <button class="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap shadow-lg shadow-black-800 drop-shadow-lg" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="share-puzzle-btn">
           🫶 <span>${translate("sharing.shareCurrentPuzzle")}</span>
         </button>
       </div>
@@ -526,7 +526,7 @@ function createGameUI() {
           <span>ℹ️</span> <span>${translate("help")}</span>
         </button>
         <button class="bg-[#6b46c1] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          <span>${showPreviews ? "👁️" : "🙈"}</span> <span>${translate("preview")}</span>
+          <span class="p-1">${showPreviews ? "👁️" : "🙈"}</span> <span>${translate("preview")}</span>
         </button>
         <button class="${gameState.hints.used >= gameState.hints.maxHints ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-500"} border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full" id="hint-btn" ${gameState.hints.used >= gameState.hints.maxHints ? "disabled" : ""} style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           <span>💡</span> <span>${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})</span>
