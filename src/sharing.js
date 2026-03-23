@@ -32,32 +32,29 @@ export function generateShareURL(goal, moves = null, solved = false) {
  */
 export function generateShareMessage(
   goal,
-  moves,
-  efficiency,
-  isPerfect,
-  solved = true,
+  level,
+  moves = null,
+  efficiency = null,
+  isPerfect = false,
+  solved = false,
 ) {
   const baseURL = generateShareURL(goal, moves, solved);
+  let message = "";
 
   if (!solved) {
-    // Sharing unsolved puzzle invitation - determine if expert level based on goal
-    const isExpert = goal >= 300; // Expert level goals are typically 300+
-    const messageKey = isExpert
+    const messageKey = level >= 4 // Expert level gets a different message
       ? "sharing.expertInviteMessage"
       : "sharing.inviteMessage";
-    return t(messageKey, { goal }) + " " + baseURL;
+    message = t(messageKey, { goal });
+  } else if (isPerfect) {
+    message = t("sharing.perfectVictoryMessage", { goal, moves });
+  } else if (efficiency >= 80) {
+    message = t("sharing.victoryMessage", { goal, moves, efficiency });
+  } else {
+    message = t("sharing.challengeMessage", { goal, moves });
   }
 
-  // Sharing solved puzzle victory
-  if (isPerfect) {
-    return t("sharing.perfectVictoryMessage", { goal, moves }) + " " + baseURL;
-  } else if (efficiency >= 80) {
-    return (
-      t("sharing.victoryMessage", { goal, moves, efficiency }) + " " + baseURL
-    );
-  } else {
-    return t("sharing.challengeMessage", { goal, moves }) + " " + baseURL;
-  }
+  return { message: message, url: baseURL };
 }
 
 /**
@@ -69,13 +66,13 @@ export async function shareContent(message, title = "Doxiny Number Puzzle") {
     if (navigator.share && navigator.canShare) {
       await navigator.share({
         title: title,
-        text: message,
-        url: "", // URL is already included in the message
+        text: message.message,
+        url: message.url
       });
       return { success: true, method: "native" };
     } else {
       // Fallback to clipboard
-      await navigator.clipboard.writeText(message);
+      await navigator.clipboard.writeText(message.message + " " + message.url);
       return { success: true, method: "clipboard" };
     }
   } catch (error) {
@@ -83,7 +80,7 @@ export async function shareContent(message, title = "Doxiny Number Puzzle") {
     try {
       // Final fallback - create temporary textarea for older browsers
       const textarea = document.createElement("textarea");
-      textarea.value = message;
+      textarea.value = message.message + " " + message.url;
       document.body.appendChild(textarea);
       textarea.select();
       document.execCommand("copy");
@@ -136,6 +133,7 @@ export async function handleShareVictory(gameState, gameManager) {
 
   const message = generateShareMessage(
     gameState.goal,
+    gameState.level,
     gameState.moves,
     efficiency,
     isPerfect,
@@ -152,10 +150,7 @@ export async function handleShareVictory(gameState, gameManager) {
 export async function handleShareChallenge(gameState) {
   const message = generateShareMessage(
     gameState.goal,
-    null,
-    null,
-    false,
-    false,
+    gameState.level,
   );
 
   const result = await shareContent(message, t("sharing.sharedPuzzle"));
