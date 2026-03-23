@@ -596,6 +596,10 @@ export const translations = {
       en: "🎯 Shared Puzzle Challenge",
       es: "🎯 Desafío de Puzzle Compartido",
     },
+    sharedPuzzleTitle: {
+      en: "Doxiny - Reach {goal}!",
+      es: "Doxiny - ¡Obtén {goal}!",
+    },
     friendChallengesYou: {
       en: "A friend challenges you to reach {goal}!",
       es: "¡Un amigo te desafía a llegar a {goal}!",

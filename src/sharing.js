@@ -180,6 +180,9 @@ export function handleSharedPuzzleURL() {
       const solved = solvedStr || null;
       
       if (goal >= 2 && goal <= 10000) {
+        // Update document title for social media previews
+        document.title = t("sharing.sharedPuzzleTitle", { goal });
+        
         // Show shared puzzle notification
         const notification = document.createElement("div");
         notification.className =
