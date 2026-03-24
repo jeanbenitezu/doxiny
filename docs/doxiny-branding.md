@@ -1,5 +1,5 @@
 # Doxiny Branding Decisions
-*Last Updated: March 24, 2026 - Added animated game mode backgrounds and enhanced mode indicators*
+*Last Updated: March 24, 2026 - Simplified background animations for performance optimization*
 
 ## Core Brand Identity
 - **Name**: Doxiny = "Do X in Y moves"
@@ -32,18 +32,25 @@
 - **Friend challenges** with specific move targets to beat
 
 ## Animated Game Mode Visual System
-**Added March 24, 2026**: Dynamic background patterns that reinforce game mode identity
+**Updated March 24, 2026**: Simplified background animations for better performance
 
 ### Mode-Specific Backgrounds
-- **Normal Mode**: Focused, structured gradient pattern
-  - Colors: Blue-purple spectrum (#1a1f26, #2d3748, #1a202c, #2a2f3a)
-  - Animation: 8-second gentle shift, goal-oriented feeling
-  - Subtle geometric patterns for structured progression
+**Design Philosophy**: Clean, performant animations that reinforce mode identity without complexity
+
+- **Normal Mode**: Focused, structured gradient
+  - Colors: Blue-purple linear gradient (#1a1f26 → #2d3748 → #1a202c)
+  - Animation: Simple 6-second left-right slide (200% background-size)
+  - Clean geometric progression suggesting goal-oriented focus
   
-- **Free Play Mode**: Creative, organic gradient pattern  
-  - Colors: Green-teal spectrum (#1a1f26, #2d4a3d, #1e293b, #374151)
-  - Animation: 10-second complex movement, exploratory feeling
-  - Organic radial gradients suggesting creativity and freedom
+- **Free Play Mode**: Creative, exploratory gradient  
+  - Colors: Green-teal linear gradient (#1a1f26 → #2d4a3d → #1e293b)
+  - Animation: Gentle 8-second left-right slide (200% background-size)
+  - Organic color transitions suggesting creative exploration
+
+**Performance Optimizations**:
+- Removed multi-layered radial gradients for simpler linear gradients
+- Simplified animations from complex multi-step to basic sliding motion
+- Reduced resource usage while maintaining visual identity
 
 ### Mode Transition Effects
 - **Transition Overlay**: Radial gradient pulse animation (0.6s duration)

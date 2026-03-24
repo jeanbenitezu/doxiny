@@ -1,5 +1,5 @@
 # Doxiny - Development Patterns & Best Practices
-*Last Updated: March 24, 2026 - Cleaned up dead code references and corrected function names*
+*Last Updated: March 24, 2026 - Added modal space management pattern and simplified animations*
 
 ## Code Organization Principles
 
@@ -190,6 +190,56 @@ function generateShareMessage(goal, moves, efficiency, isPerfect, solved = true)
   }
 }
 ```
+
+### Modal Space Management Pattern (Added March 24, 2026)
+Smooth height adjustments for better modal visibility without layout jarring:
+
+```css
+/* CSS classes for smooth height transitions */
+.number-display-compact {
+  height: 11vh !important;
+  height: 11svh !important;
+  transition: height 0.3s ease;
+}
+
+.number-display-normal {
+  height: 18vh !important;
+  height: 18svh !important;
+  transition: height 0.3s ease;
+}
+```
+
+```javascript
+// Modal show: Compact number display for more modal space
+function showSuccessModal() {
+  // ... modal setup logic ...
+  
+  // Reduce number display height when success modal is shown
+  const numberDisplay = document.getElementById("number-display");
+  if (numberDisplay) {
+    numberDisplay.classList.add("number-display-compact");
+    numberDisplay.classList.remove("number-display-normal");
+  }
+}
+
+// Modal cleanup: Restore normal height when modal closes
+function cleanupSuccessAnimations() {
+  // ... other cleanup ...
+  
+  // Restore number display height when success modal is hidden
+  const numberDisplay = document.getElementById("number-display");
+  if (numberDisplay) {
+    numberDisplay.classList.add("number-display-normal");
+    numberDisplay.classList.remove("number-display-compact");
+  }
+}
+```
+
+**Benefits**:
+- Creates more space for modal content without layout shift
+- Smooth 0.3s transition prevents jarring visual changes
+- Integrates with existing cleanup pattern for consistency
+- Works with all modal dismiss methods (buttons, gestures, etc.)
 
 ### URL Parameter Routing for Shared Content
 ```javascript  
