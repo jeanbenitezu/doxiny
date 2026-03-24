@@ -661,14 +661,6 @@ export const translations = {
     },
   },
 
-  // Master Status System
-  masterStatus: {
-    title: {
-      en: "Master Status - All levels completed!",
-      es: "Estado de Maestro - ¡Todos los niveles completados!",
-    },
-  },
-
   // Master Achievement
   masterAchievement: {
     title: {
@@ -678,60 +670,6 @@ export const translations = {
     message: {
       en: "You've completed all 6 levels with excellence! You are now a Doxiny Master with access to unlimited custom exercises.",
       es: "¡Has completado los 6 niveles con excelencia! Ahora eres un Maestro Doxiny con acceso a ejercicios personalizados ilimitados.",
-    },
-  },
-
-  // Master Journey Modal
-  masterJourney: {
-    title: {
-      en: "Master Journey",
-      es: "Jornada del Maestro",
-    },
-    subtitle: {
-      en: "Your path to mastery",
-      es: "Tu camino a la maestría",
-    },
-    showJourney: {
-      en: "Show Journey",
-      es: "Mostrar Jornada",
-    },
-    goToFreePlay: {
-      en: "Go to Free Play",
-      es: "Ir a Juego Libre",
-    },
-    stats: {
-      levelsCompleted: {
-        en: "Levels Completed",
-        es: "Niveles Completados",
-      },
-      levels: {
-        en: "Levels",
-        es: "Niveles",
-      },
-      exercisesCompleted: {
-        en: "Exercises Completed",
-        es: "Ejercicios Completados",
-      },
-      totalMoves: {
-        en: "Total Moves",
-        es: "Movimientos Totales",
-      },
-      perfectSolutions: {
-        en: "Perfect Solutions",
-        es: "Soluciones Perfectas",
-      },
-      status: {
-        en: "Status",
-        es: "Estado",
-      },
-      masterUnlocked: {
-        en: "Master Unlocked!",
-        es: "¡Maestría Desbloqueada!",
-      },
-      customExerciseAccess: {
-        en: "Custom Exercise Access Granted",
-        es: "Acceso a Ejercicios Personalizados Otorgado",
-      },
     },
   },
 

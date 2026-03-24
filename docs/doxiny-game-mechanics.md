@@ -130,41 +130,34 @@ const progress = calculateProgressToTarget(currentNumber, goal, movesSoFar);
 
 ## Player Statistics Tracking
 
-**Added March 23, 2026**: Player statistics now persist across sessions via localStorage.
+**Updated March 24, 2026**: Player statistics tracking has been removed. The game focuses on simple mastery achievement without detailed statistics persistence.
 
 ```javascript
-// Player stats structure with localStorage persistence
-const playerStats = {
-  exercisesCompleted: 0,       // Total puzzles solved (persistent)
-  totalMoves: 0,              // Cumulative moves across all exercises (persistent)
-  perfectSolutions: 0,         // Count of optimal solutions achieved (persistent) 
-  recentPerformance: [],       // Last 5 exercises for trending (persistent)
-  currentDifficulty: 1,        // Current level
-  difficultyProgression: {}    // Unlock history
-};
-
-// localStorage Integration
-function loadPlayerStats() {
-  // Loads from "doxiny-player-stats" with error handling
-  // Returns defaults if no saved data exists
-  // Ensures all required properties are present
+// Simplified completion without stats tracking
+function onExerciseComplete(moves) {
+  const efficiency = optimal / moves;
+  const isPerfect = moves <= optimal;
+  
+  // Only handle level progression and master status
+  let levelUnlocked = null;
+  let masterAchieved = false;
+  
+  // Master achievement logic remains
+  if (gameModeManager.getGameMode() === 'normal') {
+    // Check efficiency requirements for progression
+    if (efficiency >= requiredEfficiency) {
+      // Unlock next level or award master status
+    }
+  }
+  
+  return { efficiency, isPerfect, masterAchieved, levelUnlocked };
 }
 
-function savePlayerStats() {
-  // Called automatically after each exercise completion
-  // Preserves complete gaming history across sessions
-}
+// No localStorage persistence for statistics
+// Only master status persists: "doxiny-master-status"
 ```
 
-### Statistics Usage in Mastery System
-- **Journey Modal**: Displays lifetime statistics for masters
-- **Achievement Tracking**: Master status based on persistent progress
-- **Performance Analysis**: Recent performance trends maintained
-- **Session Continuity**: Players retain progress when resuming game
-
-## Mastery Achievement System
-
-### Dual Game Mode System
+### Simplified Master Achievement System
 - **Normal Game**: Progressive unlocking with efficiency requirements
 - **Free Play**: Unrestricted level access (masters only for custom exercises)
 
@@ -184,21 +177,16 @@ function checkMasteryAchievement() {
 ```
 
 ### Master Benefits & Features
-- **Visual Recognition**: Crown indicator (👑) with gold glow animation
+- **Visual Recognition**: Crown indicator (👑) with gold celebration modal
 - **Exclusive Access**: Custom exercise creation restricted to masters in Free Play
-- **Achievement Celebration**: Multi-modal celebration with journey statistics
-- **Journey Modal**: Comprehensive progress view with master status display
+- **Achievement Celebration**: Simple gold modal celebration without detailed statistics
 
 ### Master UI Adaptations
 ```javascript
-// Conditional UI rendering based on master status
-if (isMaster && currentDifficulty === 6) {
-  showButton("Show Journey"); // Replace "Next Level"
-} else {
-  showButton("Next Level");
-}
+// Simplified UI - always show Next Exercise button
+const nextButton = `<button id="next-exercise-btn">${translate("nextLevel")}</button>`;
 
-// Custom exercise gating
+// Custom exercise gating remains unchanged
 canCreateCustomExercases() {
   return currentMode === 'freeplay' && isMaster();
 }
@@ -273,4 +261,4 @@ function generateHints(currentNumber, targetNumber, movesMade, hintsUsed = 0) {
 - **Smart progression**: When user makes move, hint progression continues (strategic→tactical→direct) but hints are regenerated for new current number
 - **Fresh context**: Each hint is always relevant to current game state
 
-Last Updated: March 23, 2026 (Added mastery achievement system with dual game modes)
+Last Updated: March 24, 2026 (Simplified mastery system - removed player statistics and journey modal)

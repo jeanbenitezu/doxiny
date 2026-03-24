@@ -112,9 +112,8 @@ class GameModeManager {
   resetProgression() {
     this.unlockedLevels = [1];
     this.saveUnlockedLevels();
-    // Also reset master status and player stats
+    // Also reset master status
     localStorage.removeItem("doxiny-master-status");
-    this.resetPlayerStats();
   }
 
   // === MASTERY SYSTEM ===
@@ -159,48 +158,10 @@ class GameManager {
     this.currentExercise = null;
     this.isCustomExercise = false;
     this.customExerciseLevel = null;
-    this.playerStats = this.loadPlayerStats();
     this.generateNewExercise();
   }
 
-  loadPlayerStats() {
-    const saved = localStorage.getItem("doxiny-player-stats");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Ensure all required properties exist with defaults
-        return {
-          exercisesCompleted: parsed.exercisesCompleted || 0,
-          totalMoves: parsed.totalMoves || 0,
-          perfectSolutions: parsed.perfectSolutions || 0,
-          recentPerformance: parsed.recentPerformance || [],
-        };
-      } catch (e) {
-        console.warn('Failed to parse player stats:', e);
-      }
-    }
-    // Default stats for new players
-    return {
-      exercisesCompleted: 0,
-      totalMoves: 0,
-      perfectSolutions: 0,
-      recentPerformance: [], // Last 5 exercises
-    };
-  }
 
-  savePlayerStats() {
-    localStorage.setItem("doxiny-player-stats", JSON.stringify(this.playerStats));
-  }
-
-  resetPlayerStats() {
-    this.playerStats = {
-      exercisesCompleted: 0,
-      totalMoves: 0,
-      perfectSolutions: 0,
-      recentPerformance: [],
-    };
-    localStorage.removeItem("doxiny-player-stats");
-  }
 
   generateNewExercise() {
     this.currentExercise = generateExercise(this.currentDifficulty);
@@ -216,24 +177,6 @@ class GameManager {
     const optimal = this.currentExercise.optimalMoves;
     const efficiency = optimal / moves;
     const isPerfect = moves <= optimal;
-
-    // Update stats
-    this.playerStats.exercisesCompleted++;
-    this.playerStats.totalMoves += moves;
-    if (isPerfect) this.playerStats.perfectSolutions++;
-
-    // Track recent performance
-    this.playerStats.recentPerformance.push({
-      moves,
-      optimal,
-      efficiency,
-      isPerfect,
-    });
-
-    // Keep only last 5 exercises
-    if (this.playerStats.recentPerformance.length > 5) {
-      this.playerStats.recentPerformance.shift();
-    }
 
     // Handle Normal Game mode progression
     let levelUnlocked = null;
@@ -258,9 +201,6 @@ class GameManager {
 
     // Calculate level change (only for display, actual unlocking handled above)
     const levelChange = this.getNextLevelInfo();
-
-    // Save updated player stats to localStorage
-    this.savePlayerStats();
 
     return {
       efficiency,
@@ -374,7 +314,6 @@ class GameManager {
     return {
       exercise: this.currentExercise,
       difficulty: difficultyInfo,
-      stats: this.playerStats,
     };
   }
 }
@@ -479,14 +418,9 @@ function showMasterAchievementModal() {
       <div class="text-6xl mb-4 animate-spin-once">👑</div>
       <h2 class="text-2xl font-bold text-white mb-2">${translate('masterAchievement.title')}</h2>
       <p class="text-white/90 mb-4">${translate('masterAchievement.message')}</p>
-      <div class="flex gap-2">
-        <button id="master-achievement-show-journey-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all">
-          ${translate('masterJourney.showJourney')}
-        </button>
-        <button id="master-achievement-continue-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all">
-          ${translate('common.continue')}
-        </button>
-      </div>
+      <button id="master-achievement-continue-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all w-full">
+        ${translate('common.continue')}
+      </button>
     </div>
   `;
   
@@ -498,76 +432,7 @@ function hideMasterAchievementModal() {
   if (modal) modal.remove();
 }
 
-/**
- * Show journey statistics modal for masters
- */
-function showJourneyModal() {
-  // Hide achievement modal first if present
-  hideMasterAchievementModal();
-  
-  const stats = gameManager.playerStats;
-  const unlockedLevels = gameManager.gameModeManager.getUnlockedLevels();
-  
-  const modal = document.createElement("div");
-  modal.className = "fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fade-in";
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) hideJourneyModal();
-  });
-  
-  modal.innerHTML = `
-    <div class="bg-gray-800 p-6 rounded-2xl max-w-md mx-4 shadow-2xl border border-gold-500/30">
-      <div class="text-center mb-4">
-        <div class="text-4xl mb-2">👑</div>
-        <h2 class="text-2xl font-bold text-gold-400 mb-1">${translate('masterJourney.title')}</h2>
-        <p class="text-gray-300 text-sm">${translate('masterJourney.subtitle')}</p>
-      </div>
-      
-      <div class="space-y-3 text-gray-200">
-        <div class="bg-gray-700/50 p-3 rounded-lg">
-          <div class="text-sm text-gray-400 uppercase tracking-wide">${translate('masterJourney.stats.levelsCompleted')}</div>
-          <div class="text-lg font-bold text-white">${unlockedLevels.length}/6 ${translate('masterJourney.stats.levels')}</div>
-        </div>
-        
-        <div class="bg-gray-700/50 p-3 rounded-lg">
-          <div class="text-sm text-gray-400 uppercase tracking-wide">${translate('masterJourney.stats.exercisesCompleted')}</div>
-          <div class="text-lg font-bold text-white">${stats.exercisesCompleted}</div>
-        </div>
-        
-        <div class="bg-gray-700/50 p-3 rounded-lg">
-          <div class="text-sm text-gray-400 uppercase tracking-wide">${translate('masterJourney.stats.totalMoves')}</div>
-          <div class="text-lg font-bold text-white">${stats.totalMoves}</div>
-        </div>
-        
-        <div class="bg-gray-700/50 p-3 rounded-lg">
-          <div class="text-sm text-gray-400 uppercase tracking-wide">${translate('masterJourney.stats.perfectSolutions')}</div>
-          <div class="text-lg font-bold text-white">${stats.perfectSolutions}</div>
-        </div>
-        
-        <div class="bg-gold-500/20 border border-gold-500/30 p-3 rounded-lg">
-          <div class="text-sm text-gold-400 uppercase tracking-wide">${translate('masterJourney.stats.status')}</div>
-          <div class="text-lg font-bold text-gold-300">${translate('masterJourney.stats.masterUnlocked')}</div>
-          <div class="text-xs text-gold-400 mt-1">${translate('masterJourney.stats.customExerciseAccess')}</div>
-        </div>
-      </div>
-      
-      <div class="mt-6 flex gap-2">
-        <button id="journey-go-to-freeplay-btn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-all">
-          ${translate('masterJourney.goToFreePlay')}
-        </button>
-        <button id="journey-close-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition-all">
-          ${translate('common.close')}
-        </button>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-}
 
-function hideJourneyModal() {
-  const modal = document.querySelector('.fixed.inset-0.bg-black\\/80');
-  if (modal) modal.remove();
-}
 
 // === END MASTERY SYSTEM UI FUNCTIONS ===
 
@@ -995,11 +860,7 @@ function createGameUI() {
           <!-- Main action buttons -->
           <div class="flex gap-2 justify-between">
             <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
-            ${gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.NORMAL && 
-              gameManager.gameModeManager.isMaster() && gameManager.currentDifficulty === 6 ? 
-              `<button class="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-gold-500/30 text-nowrap" id="show-journey-btn">${translate("masterJourney.showJourney")}</button>` :
-              `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")}</button>`
-            }
+            ${`<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")}</button>`}
           </div>
           <!-- Share buttons row -->
           <div class="flex gap-2 justify-around">
@@ -2005,13 +1866,6 @@ function setupGlobalEventListeners() {
       cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
       scrollToTop();
-      handleNextExercise();
-    } else if (e.target.closest("#show-journey-btn")) {
-      showJourneyModal();
-    } else if (e.target.closest("#retry-exercise-btn")) {
-      cleanupSuccessAnimations();
-      document.getElementById("success-modal").classList.add("hidden");
-      scrollToTop();
       handleRetryExercise();
     } else if (e.target.closest("#share-victory-btn")) {
       handleShareVictory(gameState, gameManager);
@@ -2054,17 +1908,8 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#close-hint-display")) {
       document.getElementById("hint-display").classList.add("hidden");
       scrollToTop();
-    } else if (e.target.closest("#master-achievement-show-journey-btn")) {
-      showJourneyModal();
     } else if (e.target.closest("#master-achievement-continue-btn")) {
       hideMasterAchievementModal();
-    } else if (e.target.closest("#journey-go-to-freeplay-btn")) {
-      hideJourneyModal();
-      gameManager.gameModeManager.setGameMode('freeplay');
-      app.innerHTML = createGameUI();
-      // Event listeners are already set up globally
-    } else if (e.target.closest("#journey-close-btn")) {
-      hideJourneyModal();
     }
 
     // Close game mode dropdown if clicking outside
