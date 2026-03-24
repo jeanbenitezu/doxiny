@@ -685,7 +685,7 @@ function createGameUI() {
         ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold relative" title="${translate('masterStatus.title')}">👑${gameManager.gameModeManager.getCompletionDisplay() ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 0.6rem; min-width: 1rem; min-height: 1rem;">${gameManager.gameModeManager.getCompletionDisplay()}</span>` : ''}</span>` : ''}
         <!-- Game Mode Dropdown -->
         <div class="relative">
-          <button id="game-mode-dropdown-btn" class="bg-gray-700/80 hover:bg-gray-600/80 border border-white/20 rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
+          <button id="game-mode-dropdown-btn" class="mode-indicator ${gameManager.gameModeManager.getGameMode()} btn-mode-${gameManager.gameModeManager.getGameMode()} hover:brightness-110 border border-white/20 rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
                   style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem); height: clamp(1.5rem, 3vh, 2rem); height: clamp(1.5rem, 3svh, 2rem);">
             <span id="current-mode-label">${gameManager.gameModeManager.getGameMode() === 'normal' ? '🎯' : '🔓'}</span>
             <span id="current-mode-text">${translate(`gameModes.${gameManager.gameModeManager.getGameMode()}`)}</span>
@@ -1994,6 +1994,11 @@ function init() {
   // Set up global event listeners (only once)
   setupGlobalEventListeners();
 
+  // Apply initial game mode background
+  const currentMode = gameManager.gameModeManager.getGameMode();
+  applyGameModeBackground(currentMode);
+  console.log(`🎨 Applied ${currentMode} mode background`);
+
   // Update move limit for initial exercise
   updateMoveLimit();
 
@@ -2045,7 +2050,58 @@ function toggleGameModeDropdown() {
 }
 
 /**
- * Handle game mode change
+ * Apply mode-specific background class to body
+ */
+function applyGameModeBackground(mode) {
+  const body = document.body;
+  
+  // Remove existing mode classes
+  body.classList.remove('game-mode-normal', 'game-mode-freeplay');
+  
+  // Add new mode class
+  body.classList.add(`game-mode-${mode}`);
+}
+
+/**
+ * Show transition overlay effect when switching modes
+ */
+function showModeTransitionEffect() {
+  const overlay = document.getElementById('mode-transition-overlay');
+  if (overlay) {
+    overlay.classList.add('active');
+    setTimeout(() => {
+      overlay.classList.remove('active');
+    }, 600);
+  }
+}
+
+/**
+ * Update mode indicator styling
+ */
+function updateModeIndicator(mode) {
+  const modeBtn = document.getElementById('game-mode-dropdown-btn');
+  const modeLabel = document.getElementById('current-mode-label');
+  const modeText = document.getElementById('current-mode-text');
+  
+  if (modeBtn) {
+    // Remove existing mode classes
+    modeBtn.classList.remove('btn-mode-normal', 'btn-mode-freeplay', 'mode-indicator', 'normal', 'freeplay');
+    
+    // Add new mode classes
+    modeBtn.classList.add('mode-indicator', mode, `btn-mode-${mode}`);
+  }
+  
+  if (modeLabel) {
+    modeLabel.textContent = mode === 'normal' ? '🎯' : '🔓';
+  }
+  
+  if (modeText) {
+    modeText.textContent = translate(`gameModes.${mode}`);
+  }
+}
+
+/**
+ * Handle game mode change with enhanced animations
  */
 function handleGameModeChange(mode) {
   document.getElementById('game-mode-dropdown').classList.add('hidden');
@@ -2053,13 +2109,27 @@ function handleGameModeChange(mode) {
   const currentMode = gameManager.gameModeManager.getGameMode();
   if (mode === currentMode) return;
 
+  // Show transition effect
+  showModeTransitionEffect();
+  
   // Change the mode
   gameManager.gameModeManager.setGameMode(mode);
+  
+  // Apply new background
+  applyGameModeBackground(mode);
+  
+  // Update mode indicator
+  updateModeIndicator(mode);
 
   const newDifficulty = mode === 'normal' ? gameManager.gameModeManager.getHighestUnlockedLevel() : gameManager.currentDifficulty;
   console.log(`🎮 Game mode changed to ${mode}. Setting difficulty to ${newDifficulty}.`);
-  handleDifficultySelect(newDifficulty);
+  
+  // Slight delay to let background transition start
+  setTimeout(() => {
+    handleDifficultySelect(newDifficulty);
+  }, 100);
 }
+
 
 /**
  * Show level unlock notification with celebration
