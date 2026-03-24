@@ -83,6 +83,14 @@ export const translations = {
       en: "Switched to Free Play mode",
       es: "Cambiado a modo Juego Libre",
     },
+    tryFreePlay: {
+      en: "Try Free Play",
+      es: "Probar Juego Libre",
+    },
+    tryNormalMode: {
+      en: "Try Normal Mode",
+      es: "Probar Juego Normal",
+    },
   },
 
   targetNumber: {

@@ -884,7 +884,7 @@ function createGameUI() {
           </div>
         </div>
         
-        ${gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.NORMAL ? `
+        ${gameManager.gameModeManager.isNormal() ? `
         <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-2 hidden">
           📈 <span id="difficulty-change-text"></span>
         </div>
@@ -894,7 +894,13 @@ function createGameUI() {
           <!-- Main action buttons -->
           <div class="flex gap-2 justify-between">
             <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
-            ${`<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")}</button>`}
+            ${gameManager.gameModeManager.isNormal() ? 
+              (gameManager.gameModeManager.isMaster() ? 
+                `<button class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-teal-500/30" id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")}</button>` :
+                `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")}</button>`
+              ) : 
+              `<button class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-indigo-500/30" id="try-normal-btn">${translate("gameModeMessages.tryNormalMode")}</button>`
+            }
           </div>
           <!-- Share buttons row -->
           <div class="flex gap-2 justify-around">
@@ -1640,6 +1646,22 @@ function handleRetryExercise() {
 }
 
 /**
+ * Handle "Try Free Play" button from success modal
+ */
+function handleTryFreePlay() {
+  // Switch to Free Play mode
+  handleGameModeChange(gameManager.gameModeManager.modes.FREEPLAY);
+}
+
+/**
+ * Handle "Try Normal Mode" button from success modal
+ */
+function handleTryNormalMode() {
+  // Switch to Normal mode
+  handleGameModeChange(gameManager.gameModeManager.modes.NORMAL);
+}
+
+/**
  * Handle difficulty level selection
  */
 function handleDifficultySelect(difficulty) {
@@ -1903,6 +1925,16 @@ function setupGlobalEventListeners() {
       document.getElementById("success-modal").classList.add("hidden");
       scrollToTop();
       handleNextExercise();
+    } else if (e.target.closest("#try-freeplay-btn")) {
+      cleanupSuccessAnimations();
+      document.getElementById("success-modal").classList.add("hidden");
+      scrollToTop();
+      handleTryFreePlay();
+    } else if (e.target.closest("#try-normal-btn")) {
+      cleanupSuccessAnimations();
+      document.getElementById("success-modal").classList.add("hidden");
+      scrollToTop();
+      handleTryNormalMode();
     } else if (e.target.closest("#retry-exercise-btn")) {
       cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
