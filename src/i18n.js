@@ -68,8 +68,8 @@ export const translations = {
       es: "Completa el nivel anterior con {efficiency}% de eficiencia para desbloquear",
     },
     efficiencyNotMet: {
-      en: "Need {required}% efficiency to proceed. Achieved: {achieved}%",
-      es: "Se necesita {required}% de eficiencia para continuar. Logrado: {achieved}%",
+      en: "Need {required}% efficiency to proceed",
+      es: "Se necesita {required}% de eficiencia para continuar",
     },
     levelUnlocked: {
       en: "🎉 Level {level} Unlocked!",

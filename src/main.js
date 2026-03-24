@@ -1207,8 +1207,7 @@ function showSuccessModal() {
     }
 
     const efficiencyNotMetMessage = t("gameModeMessages.efficiencyNotMet", {
-      required: Math.round(requiredEfficiency * 100),
-      achieved: efficiency
+      required: Math.round(requiredEfficiency * 100)
     });
 
     // Check for level progression
