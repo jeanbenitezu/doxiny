@@ -1,4 +1,5 @@
 # Doxiny - Game Mechanics & Algorithms
+*Last Updated: March 24, 2026 - Cleaned up dead code references and corrected mastery system documentation*
 
 ## Core Game Concept
 **Goal**: Transform number 1 to a target number using exactly 4 operations in minimum moves possible.
@@ -128,38 +129,55 @@ const progress = calculateProgressToTarget(currentNumber, goal, movesSoFar);
 - **Okay**: Moves <= optimal + 6 (B grade)
 - **Needs Practice**: Moves > optimal + 6 (C grade)
 
-## Player Statistics Tracking
+## Mastery System
 
-**Updated March 24, 2026**: Player statistics tracking has been removed. The game focuses on simple mastery achievement without detailed statistics persistence.
+**Implementation**: Simplified mastery system with **completion counter** and **level reset** functionality.
 
-```javascript
-// Simplified completion without stats tracking
-function onExerciseComplete(moves) {
-  const efficiency = optimal / moves;
-  const isPerfect = moves <= optimal;
-  
-  // Only handle level progression and master status
-  let levelUnlocked = null;
-  let masterAchieved = false;
-  
-  // Master achievement logic remains
-  if (gameModeManager.getGameMode() === 'normal') {
-    // Check efficiency requirements for progression
-    if (efficiency >= requiredEfficiency) {
-      // Unlock next level or award master status
-    }
-  }
-  
-  return { efficiency, isPerfect, masterAchieved, levelUnlocked };
-}
+The mastery system is implemented in the `GameModeManager` class with the following key methods:
+- `checkAndAwardMasterStatus()` - Handles mastery achievement and completion counter
+- `isMaster()` - Checks if player has achieved master status
+- `unlockLevel()` - Manages level progression
+- `getEfficiencyRequirement()` - Returns efficiency thresholds per level
 
-// No localStorage persistence for statistics
-// Only master status persists: "doxiny-master-status"
-```
+**Persistent Storage:**
+- `\"doxiny-master-status\"`: `\"true\"` | `null`
+- `\"doxiny-completion-count\"`: `\"1\"` | `\"2\"` | ... | `\"15\"`
 
-### Simplified Master Achievement System
+### Cross-Mode Invitation System
+**Added March 24, 2026**: Bidirectional mode switching via success modal buttons
+
 - **Normal Game**: Progressive unlocking with efficiency requirements
 - **Free Play**: Unrestricted level access (masters only for custom exercises)
+
+### Success Modal Button Logic
+```javascript
+// Dynamic button system based on mode and master status:
+// Normal Mode + Regular User → "Next Level" button
+// Normal Mode + Master User → "Try Free Play" button  
+// Free Play Mode (any user) → "Try Normal Mode" button
+
+${gameManager.gameModeManager.isNormal() ? 
+  (gameManager.gameModeManager.isMaster() ? 
+    `<button id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")}</button>` :
+    `<button id="next-exercise-btn">${translate("nextLevel")}</button>`
+  ) : 
+  `<button id="try-normal-btn">${translate("gameModeMessages.tryNormalMode")}</button>`
+}
+```
+
+### Mode Transition Handlers
+```javascript
+// Automatic mode switching with visual feedback
+function handleTryFreePlay() {
+  // Master users invited to explore Free Play
+  handleGameModeChange('freeplay');
+}
+
+function handleTryNormalMode() {
+  // Free Play users invited to try structured progression
+  handleGameModeChange('normal');
+}
+```
 
 ### Master Achievement Criteria
 ```javascript
@@ -183,8 +201,14 @@ function checkMasteryAchievement() {
 
 ### Master UI Adaptations
 ```javascript
-// Simplified UI - always show Next Exercise button
-const nextButton = `<button id="next-exercise-btn">${translate("nextLevel")}</button>`;
+// Enhanced success modal with mode-specific invitations
+// Replaces simple "Next Exercise" button with smart mode suggestions
+
+// Master Achievement Flow:
+// 1. Complete all levels in Normal mode → Master status achieved
+// 2. Success modal shows "Try Free Play" instead of "Next Level"
+// 3. Free Play mode shows "Try Normal Mode" for return journey
+// 4. Creates engagement loop between structured and creative play
 
 // Custom exercise gating remains unchanged
 canCreateCustomExercases() {
@@ -261,4 +285,4 @@ function generateHints(currentNumber, targetNumber, movesMade, hintsUsed = 0) {
 - **Smart progression**: When user makes move, hint progression continues (strategic→tactical→direct) but hints are regenerated for new current number
 - **Fresh context**: Each hint is always relevant to current game state
 
-Last Updated: March 24, 2026 (Simplified mastery system - removed player statistics and journey modal)
+Last Updated: March 24, 2026 (Added completion counter system and level reset functionality)

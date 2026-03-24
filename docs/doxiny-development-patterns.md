@@ -1,5 +1,5 @@
 # Doxiny - Development Patterns & Best Practices
-*Last Updated: March 24, 2026*
+*Last Updated: March 24, 2026 - Cleaned up dead code references and corrected function names*
 
 ## Code Organization Principles
 
@@ -8,8 +8,8 @@ All game operations are implemented as pure functions:
 ```javascript
 // operations.js - No side effects, predictable outputs
 const reverse = (num) => parseInt(num.toString().split('').reverse().join('')) || 0;
-const sumDigits = (num) => num.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
-const appendOne = (num) => parseInt(num.toString() + '1');
+const sum = (num) => num.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+const append1 = (num) => parseInt(num.toString() + '1');
 const double = (num) => num * 2;
 ```
 
@@ -83,13 +83,74 @@ async function shareContent(message, title = "Doxiny Number Puzzle") {
 ```
 
 ### Component-Based UI Updates
-Each UI section has dedicated update functions:
+UI updates happen through the main render cycle in `createGameUI()` and selective updates via `updateLevelSelectorUI()`. The game uses a reactive approach where state changes trigger re-renders of specific components rather than individual update functions.
+
+### Modular UI Component System (Added March 24, 2026)
+Level selector extracted into dedicated rendering methods:
 ```javascript
-// main.js - Modular UI updates
-function updateCurrentNumber(number) { /* Updates #current-number display */ }
-function updateProgressBar(progress) { /* Updates progress visualization */ }
-function updateOperationButtons(gameState) { /* Updates button states and previews */ }
-function updateGameHistory(moves) { /* Updates move history display */ }
+// Level selector component rendering - separates logic from UI generation
+function renderLevelSelectorUI() {
+  const availableLevels = getAvailableLevels();
+  
+  const levelButtons = availableLevels.map((lvl) => {
+    const isCustom = lvl.level === "custom";
+    const isLocked = !isCustom && isLevelLocked(lvl.level);
+    const isActive = /* complex active state logic */;
+    
+    // Apply appropriate styling based on state
+    let buttonClass = isCustom ? "bg-purple-600..." : 
+                     isLocked ? "bg-gray-800..." : 
+                     isActive ? "bg-orange-600..." : "bg-[#2a2f3a]...";
+    
+    return `<button class="${buttonClass}" data-level="${lvl.level}">...</button>`;
+  }).join("");
+  
+  return `<nav class="level-selector">${levelButtons}</nav>`;
+}
+
+// Selective UI updates - no full page re-render needed
+function updateLevelSelectorUI() {
+  const levelSelector = document.querySelector('[data-purpose="level-selector"]');
+  if (levelSelector) {
+    const newHTML = renderLevelSelectorUI();
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = newHTML;
+    const newNav = tempDiv.querySelector('nav[data-purpose="level-selector"]');
+    if (newNav) {
+      levelSelector.replaceWith(newNav);
+      console.log('🎮 Level selector UI updated');
+    }
+  }
+}
+
+// Usage: Immediate visual feedback when levels unlock
+if (this.gameModeManager.unlockLevel(nextLevel)) {
+  levelUnlocked = nextLevel;
+  updateLevelSelectorUI(); // Instant update, no full render
+}
+```
+
+### Game Mode State Synchronization (Fixed March 24, 2026)
+Critical fix for exercise completion detection after mode switching:
+```javascript
+function handleGameModeChange(mode) {
+  // ... existing mode change logic ...
+  
+  if (mode === 'normal') {
+    const highestUnlockedLevel = gameManager.gameModeManager.getHighestUnlockedLevel();
+    gameManager.setDifficulty(highestUnlockedLevel);
+    
+    // CRITICAL: Recreate gameState to match the new exercise after mode switch
+    // Without this, win condition fails because old target goal is cached
+    gameState = createGameState(
+      gameManager.currentExercise.goal,
+      gameManager.currentDifficulty,
+    );
+  }
+  
+  app.innerHTML = createGameUI();
+  updateDisplay();
+}
 ```
 
 ## UI/UX Patterns
@@ -222,23 +283,37 @@ modal.innerHTML = `<button onclick="resetStats()">Reset</button>`; // Requires g
 - Better encapsulation and maintainability
 
 ### localStorage Persistence Patterns (March 2026)
-**Player Statistics Removed**: Player statistics tracking has been removed as of March 24, 2026. The game focuses on simple mastery achievement without detailed analytics.
+**Completion Counter System**: Added prestige system with completion tracking and level reset functionality as of March 24, 2026.
 
 ```javascript
-// Simplified completion handling without stats persistence
-onExerciseComplete() {
-  // Only handle level progression and master status
-  const efficiency = optimal / moves;
-  const isPerfect = moves <= optimal;
-
-  // Progress unlocking logic remains unchanged
-  if (gameModeManager.getGameMode() === 'normal') {
-    // Check efficiency requirements and unlock next levels
-    // Award master status when completing level 6
+// Enhanced master achievement with counter and reset
+function checkAndAwardMasterStatus() {
+  if (!isMaster() && isAllLevelsCompleted()) {
+    setMasterStatus(true);
+    
+    // Increment completion counter for prestige
+    incrementCompletionCount();
+    
+    // Reset levels for replayability
+    unlockedLevels = [1];
+    saveUnlockedLevels();
+    
+    return true; // Mastery achieved + progression reset
   }
+  return false;
+}
 
-  return { efficiency, isPerfect, masterAchieved, levelUnlocked };
-  // No stats tracking or localStorage persistence
+// Crown display with completion badge (inline pattern)
+function renderMasterIndicator() {
+  if (!gameManager.gameModeManager.isMaster()) return '';
+  
+  const completionDisplay = gameManager.gameModeManager.getCompletionDisplay();
+  return `
+    <span class="master-indicator text-yellow-400 font-bold relative">
+      👑
+      ${completionDisplay ? `<span class="completion-badge">${completionDisplay}</span>` : ''}
+    </span>
+  `;
 }
 ```
 
@@ -264,6 +339,69 @@ function showModal(modalId) {
 
 // ❌ Avoid: Direct onclick assignment
 modal.onclick = (e) => { /* ... */ }; // Less clean, harder to debug
+```
+
+### UI Component Modularization Pattern
+**Added March 24, 2026**: Extracted complex UI rendering into dedicated methods.
+
+```javascript
+// Level Selector Component System
+function renderLevelSelectorUI() {
+  const availableLevels = getAvailableLevels();
+  const levelButtons = availableLevels.map(lvl => {
+    // Complete level button rendering logic with state management
+    const isCustom = lvl.level === "custom";
+    const isLocked = !isCustom && isLevelLocked(lvl.level);
+    const isActive = /* complex active state logic */;
+    
+    return `<button class="${buttonClass}" data-level="${lvl.level}">...</button>`;
+  }).join("");
+  
+  return /* Complete level selector HTML */;
+}
+
+function updateLevelSelectorUI() {
+  const levelSelector = document.querySelector('[data-purpose="level-selector"]');
+  if (levelSelector) {
+    // Parse new HTML and replace existing component
+    const newLevelSelectorHTML = renderLevelSelectorUI();
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = newLevelSelectorHTML;
+    const newNav = tempDiv.querySelector('nav[data-purpose="level-selector"]');
+    if (newNav) {
+      levelSelector.replaceWith(newNav);
+    }
+  }
+}
+
+// Usage: Immediate level selector updates without full page re-render
+if (this.gameModeManager.unlockLevel(nextLevel)) {
+  levelUnlocked = nextLevel;
+  updateLevelSelectorUI(); // Instant visual feedback
+}
+```
+
+### Game Mode Switching State Management
+**Fixed March 24, 2026**: Proper gameState synchronization during mode switches.
+
+```javascript
+function handleGameModeChange(mode) {
+  // ... mode switching logic ...
+  
+  if (mode === 'normal') {
+    const highestUnlockedLevel = gameManager.gameModeManager.getHighestUnlockedLevel();
+    gameManager.setDifficulty(highestUnlockedLevel);
+    
+    // CRITICAL: Recreate gameState to match new exercise
+    gameState = createGameState(
+      gameManager.currentExercise.goal,
+      gameManager.currentDifficulty,
+    );
+  }
+  
+  app.innerHTML = createGameUI();
+  updateDisplay();
+}
 ```
 
 ## Error Handling Patterns
@@ -326,8 +464,8 @@ Reduce translation needs with universal symbols:
 ```javascript
 const operationLabels = {
   reverse: { icon: '🔄', key: 'operations.reverse' },
-  sumDigits: { icon: '➕', key: 'operations.sumDigits' },
-  appendOne: { icon: '1️⃣', key: 'operations.appendOne' },
+  sum: { icon: '➕', key: 'operations.sum' },
+  append1: { icon: '1️⃣', key: 'operations.append1' },
   double: { icon: '✖️', key: 'operations.double' }
 };
 ```
@@ -429,8 +567,8 @@ function clearHintEffects() {
 // Test cases to always verify
 const testCases = [
   { input: 1000, reverse: 1 },      // Leading zeros removed
-  { input: 999, sumDigits: 27 },   // Large digit sum
-  { input: 32, appendOne: 321 },   // Append to multi-digit
+  { input: 999, sum: 27 },   // Large digit sum
+  { input: 32, append1: 321 },   // Append to multi-digit
   { input: 5000, double: 10000 }   // Boundary maximum
 ];
 ```
@@ -459,31 +597,43 @@ class GameModeManager {
 }
 ```
 
-### Simplified Button Logic Pattern
+### Crown Badge UI Pattern
 ```javascript
-// Always show Next Exercise button instead of conditional Show Journey
-const nextButton = `<button id="next-exercise-btn">${translate("nextLevel")}</button>`;
+// Master crown with completion counter badge (inline template pattern)
+const crownWithBadge = `
+  <span class="master-indicator text-yellow-400 font-bold relative">
+    👑
+    ${gameManager.gameModeManager.getCompletionDisplay() ? `
+      <span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 0.6rem; min-width: 1rem; min-height: 1rem;">
+        ${gameManager.gameModeManager.getCompletionDisplay()}
+      </span>
+    ` : ''}
+  </span>
+`;
 
-// Event handling simplified - no journey-related handlers
-if (e.target.closest("#next-exercise-btn")) {
-  handleNextExercise();
-}
+// Persistent counter management methods (in GameModeManager)
+getCompletionCount(): number // From localStorage - returns raw number
+incrementCompletionCount(): void // Increment and save to localStorage  
+getCompletionDisplay(): string // Returns formatted display "1"-"9" or "∞"
 ```
 
-### Simplified Master Achievement Celebration
+### Enhanced Master Achievement with Prestige System
 ```javascript
-// Single gold modal celebration without journey statistics
+// Replayable mastery system with completion tracking
 function showMasterAchievementModal() {
   // 1. Master achievement modal with crown animation
-  // 2. Simple congratulations message
-  // 3. Continue button to resume play
+  // 2. Increment completion counter
+  // 3. Reset levels to [1] for fresh progression
+  // 4. Simple congratulations message
+  // 5. Continue button to resume play
   
-  // No statistics display or journey modal
+  // Crown badge updates automatically to show completion count
 }
 
-// Exercise completion with mastery detection
+// Exercise completion with enhanced mastery detection
 const result = gameManager.onExerciseComplete(moves);
 if (result.masterAchieved) {
+  // Auto-reset levels and increment counter
   setTimeout(() => showMasterAchievementModal(), 2000);
 }
 ```

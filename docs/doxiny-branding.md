@@ -1,5 +1,5 @@
 # Doxiny Branding Decisions
-*Last Updated: March 22, 2026*
+*Last Updated: March 24, 2026 - Added animated game mode backgrounds and enhanced mode indicators*
 
 ## Core Brand Identity
 - **Name**: Doxiny = "Do X in Y moves"
@@ -30,6 +30,39 @@
 - **Efficiency percentage** creates achievement levels
 - **Perfect solutions** get special recognition with trophy emoji
 - **Friend challenges** with specific move targets to beat
+
+## Animated Game Mode Visual System
+**Added March 24, 2026**: Dynamic background patterns that reinforce game mode identity
+
+### Mode-Specific Backgrounds
+- **Normal Mode**: Focused, structured gradient pattern
+  - Colors: Blue-purple spectrum (#1a1f26, #2d3748, #1a202c, #2a2f3a)
+  - Animation: 8-second gentle shift, goal-oriented feeling
+  - Subtle geometric patterns for structured progression
+  
+- **Free Play Mode**: Creative, organic gradient pattern  
+  - Colors: Green-teal spectrum (#1a1f26, #2d4a3d, #1e293b, #374151)
+  - Animation: 10-second complex movement, exploratory feeling
+  - Organic radial gradients suggesting creativity and freedom
+
+### Mode Transition Effects
+- **Transition Overlay**: Radial gradient pulse animation (0.6s duration)
+- **CSS Transitions**: Smooth 0.8s cubic-bezier background changes
+- **Visual Continuity**: Seamless experience when switching modes
+
+### Mode Indicator Enhancement
+```css
+/* Mode-specific button styling */
+.btn-mode-normal {
+  background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.btn-mode-freeplay {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+```
 
 ## Visual Design System
 

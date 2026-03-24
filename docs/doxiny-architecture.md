@@ -1,5 +1,5 @@
 # Doxiny - Architecture & Code Structure
-*Last Updated: March 24, 2026*
+*Last Updated: March 24, 2026 - Added modular UI component system and fixed game mode state synchronization*
 
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
@@ -17,13 +17,64 @@
 - **`src/exerciseGenerator.js`** - BFS-based exercise generation and solvability validation
 - **`src/sharing.js`** - Progressive enhancement sharing system with Web Share API
 - **`src/i18n.js`** - Bilingual support system (EN/ES) with sharing messages and master status translations
-- **`src/style.css`** - Custom styles, animations, responsive design, gold accent system for masters
+- **`src/style.css`** - Custom styles, animated game mode backgrounds, mode transitions, responsive design, gold accent system for masters
 
 ### Configuration Files
 - **`vite.config.js`** - Build configuration
 - **`package.json`** - Dependencies, scripts
 
 ## Architecture Patterns
+
+### Animated Game Mode Background System
+```css
+/* Dynamic backgrounds for visual mode distinction */
+.game-mode-normal {
+  background: radial-gradient + linear-gradient with 8s animation;
+  /* Focused, goal-oriented visual theme */
+}
+
+.game-mode-freeplay {
+  background: multi-layer radial-gradients + linear-gradient with 10s animation;
+  /* Creative, open-ended visual theme */
+}
+
+.mode-transition-overlay {
+  /* Smooth transition effect when switching modes */
+  animation: modeTransitionPulse 0.6s ease-in-out;
+}
+```
+
+### Mode Transition JavaScript Architecture
+```javascript
+// Coordinated mode switching with visual feedback
+function handleGameModeChange(mode) {
+  showModeTransitionEffect();        // Visual transition overlay
+  gameManager.gameModeManager.setGameMode(mode);
+  applyGameModeBackground(mode);     // CSS class management
+  updateModeIndicator(mode);         // UI state synchronization
+  handleDifficultySelect(newDifficulty); // Game state update
+}
+
+// CSS class management for backgrounds
+function applyGameModeBackground(mode) {
+  document.body.classList.remove('game-mode-normal', 'game-mode-freeplay');
+  document.body.classList.add(`game-mode-${mode}`);
+}
+```
+
+### Enhanced Mode Indicator System
+```javascript
+// Mode-specific button styling and animations
+.btn-mode-normal {
+  background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.btn-mode-freeplay {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+```
 
 ### Progressive Enhancement Sharing System
 ```javascript
@@ -96,9 +147,10 @@ class GameModeManager {
 }
 
 // UI Integration
-- Master crown indicator (👑) with gold celebration modal
+- Master crown indicator (👑) with completion counter badge
 - Simple Next Exercise button for all scenarios
-- Achievement celebration modal with gold styling (no statistics display)
+- Achievement celebration modal with gold styling
+- Replayable progression with automatic level reset
 ```
 
 ### localStorage Persistence Schema
@@ -107,16 +159,24 @@ class GameModeManager {
 "doxiny-gamemode": "normal" | "freeplay"
 "doxiny-unlocked-levels": [1, 2, 3, 4, 5, 6] // Array of completed levels
 "doxiny-master-status": "true" | null // Master achievement status
+"doxiny-completion-count": "1" | "2" | ... | "15" // Master completions counter
 "doxiny-language": "en" | "es"
 
-// Note: Player statistics persistence removed as of March 24, 2026
-// Only essential progression data is maintained
+// Updated March 24, 2026: Added completion counter for prestige system
+// Levels auto-reset to [1] upon each mastery achievement
 ```
 
 ### Component-based UI Updates
 - Each UI section has dedicated update functions
-- State changes trigger specific UI updates
+- State changes trigger specific UI updates  
 - Animation states managed via CSS classes
+- **Modular Component System (Added March 24, 2026)**:
+  - `renderLevelSelectorUI()` - Generates level selector HTML with current state
+  - `updateLevelSelectorUI()` - Updates just the level selector without full page re-render
+  - **Benefits**: Improved performance, immediate visual feedback, better code organization
+- **State Synchronization Fixes (March 24, 2026)**:
+  - Fixed game state desync when switching from Freeplay to Normal mode
+  - Ensures proper exercise completion detection across mode changes
 
 ## Code Quality Standards
 - ES6+ features preferred (modules, arrow functions, destructuring)

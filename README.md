@@ -6,6 +6,36 @@ A minimalist mathematical puzzle game where you transform numbers using 4 operat
 
 **DOXINY** = **"Do X in Y moves"** - Transform number X into target Y with optimal strategy.
 
+## 🎮 Game Modes
+
+### 🎯 Normal Mode
+- **Progression System**: Unlock levels through efficient completion (80-90% efficiency required)
+- **Visual Theme**: Focused blue-purple gradient background with structured animations
+- **Master Path**: Complete all 6 levels to achieve Master status
+- **Success Modal**: "Next Level" button (or "Try Free Play" for Masters)
+
+### 🔓 Free Play Mode  
+- **Open Access**: All difficulty levels available immediately
+- **Visual Theme**: Creative green-teal gradient background with organic animations
+- **Custom Exercises**: Masters can create and share custom puzzles
+- **Success Modal**: "Try Normal Mode" button to invite structured gameplay
+
+### 🏆 Master Achievement
+- **Recognition**: Crown indicator (👑) with completion counter badge (1-9, then ∞)
+- **Exclusive Features**: Custom exercise creation in Free Play mode
+- **Prestige System**: Completion counter tracks how many times you've mastered all levels
+- **Replayable Progression**: Levels automatically reset to 1 after each mastery for endless challenge
+- **Cross-Mode Flow**: Special "Try Free Play" invitation after achieving Master status
+
+## 🎨 Visual Experience
+
+Doxiny features a sophisticated visual system that adapts to your gameplay mode:
+
+- **Dynamic Backgrounds**: Animated gradient patterns that reflect your current game mode
+- **Smooth Transitions**: 0.8-second CSS transitions with pulse overlay effects when switching modes
+- **Mode Indicators**: Enhanced button styling with distinctive colors and glowing effects
+- **Visual Continuity**: Consistent design language across all UI elements
+
 ## 🎮 How to Play
 
 - **Goal**: Transform numbers using 4 operations to reach the target
@@ -29,14 +59,16 @@ The game automatically detects your browser language and provides seamless trans
 
 ## ✨ Features
 
-- � **Doxiny Branding** - "Do X in Y moves" with elegant visual identity
+- 🎨 **Animated Game Mode Backgrounds** - Dynamic visual themes for Normal and Free Play modes
+- 🔄 **Smooth Mode Transitions** - Elegant 0.8s transitions with pulse overlay effects  
+- 🎯 **Cross-Mode Invitations** - Smart success modal buttons guide players between game modes
 - 🌍 **Multi-language Support** - English and Spanish localization
 - 📱 **Mobile-first design** with touch-optimized controls
 - ⚡ **Always Latest** - No caching, ensures fresh content on every visit
 - 📊 **Move history tracking** for learning patterns
 - ⌨️ **Keyboard shortcuts** (1-4 for operations, R for reset)
-- 🎯 **Multiple goals** and difficulty levels
-- 🏆 **Optimized for fewest moves**
+- 🏆 **Master Achievement System** - Unlock Free Play mode and custom exercises
+- 💫 **Enhanced Visual Feedback** - Mode-specific styling and hover animations
 - 🎨 **Doxiny Blue color scheme** with visual consistency
 
 ## 🚀 Development
