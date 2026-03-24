@@ -114,7 +114,7 @@ class GameModeManager {
     this.saveUnlockedLevels();
     // Also reset master status and player stats
     localStorage.removeItem("doxiny-master-status");
-    localStorage.removeItem("doxiny-player-stats");
+    this.resetPlayerStats();
   }
 
   // === MASTERY SYSTEM ===
