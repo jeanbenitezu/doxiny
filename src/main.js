@@ -486,48 +486,6 @@ function updateLevelSelectorUI() {
   }
 }
 
-// === NOTIFICATION SYSTEM ===
-
-/**
- * Show UI notification with animation
- */
-function showNotification(message, type = 'info', duration = 3000) {
-  const notification = document.createElement('div');
-  notification.className = `notification fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 max-w-xs text-sm font-semibold animate-slide-in ${
-    type === 'success' ? 'bg-green-600 text-white' :
-    type === 'warning' ? 'bg-orange-600 text-white' :
-    type === 'error' ? 'bg-red-600 text-white' :
-    'bg-blue-600 text-white'
-  }`;
-  notification.textContent = message;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.classList.add('animate-slide-out');
-    setTimeout(() => notification.remove(), 300);
-  }, duration);
-}
-
-/**
- * Show celebration notification for achievements
- */
-function showCelebrationNotification(message) {
-  showNotification(message, 'success', 4000);
-  
-  // Add some confetti-like celebration effect
-  const celebration = document.createElement('div');
-  celebration.className = 'fixed inset-0 pointer-events-none z-40';
-  celebration.innerHTML = `
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl animate-bounce">
-      🎉
-    </div>
-  `;
-  document.body.appendChild(celebration);
-  
-  setTimeout(() => celebration.remove(), 3000);
-}
-
 // === MASTERY SYSTEM UI FUNCTIONS ===
 
 /**
@@ -1966,13 +1924,7 @@ function setupGlobalEventListeners() {
       if (level === "custom") {
         showCustomExerciseModal();
       } else {
-        const levelNum = parseInt(level);
-        if (!gameManager.gameModeManager.isLevelUnlocked(levelNum)) {
-          const requirement = gameManager.gameModeManager.getEfficiencyRequirement(levelNum);
-          showNotification(translate('gameModeMessages.levelLocked', { efficiency: Math.round(requirement * 100) }), 'warning');
-          return;
-        }
-        handleDifficultySelect(levelNum);
+        handleDifficultySelect(parseInt(level));
       }
     } else if (e.target.closest(".language-btn")) {
       const langBtn = e.target.closest(".language-btn");
@@ -2096,31 +2048,17 @@ function toggleGameModeDropdown() {
  * Handle game mode change
  */
 function handleGameModeChange(mode) {
+  document.getElementById('game-mode-dropdown').classList.add('hidden');
+
   const currentMode = gameManager.gameModeManager.getGameMode();
-  if (mode === currentMode) {
-    document.getElementById('game-mode-dropdown').classList.add('hidden');
-    return;
-  }
+  if (mode === currentMode) return;
 
   // Change the mode
   gameManager.gameModeManager.setGameMode(mode);
-  
-  // Close dropdown
-  document.getElementById('game-mode-dropdown').classList.add('hidden');
-  
-  // Show notification
-  const modeKey = mode === 'normal' ? 'switchedToNormal' : 'switchedToFreeplay';
-  showNotification(translate(`gameModeMessages.${modeKey}`), 'success');
-  
-  // If switching to Normal mode and current level is locked, move to the last unlocked level
-  if (mode === 'normal') {
-    const highestUnlockedLevel = gameManager.gameModeManager.getHighestUnlockedLevel();
-    gameManager.setDifficulty(highestUnlockedLevel);
-  }
-  
-  // Re-render UI to update mode selector and level states
-  app.innerHTML = createGameUI();
-  updateDisplay();
+
+  const newDifficulty = mode === 'normal' ? gameManager.gameModeManager.getHighestUnlockedLevel() : gameManager.currentDifficulty;
+  console.log(`🎮 Game mode changed to ${mode}. Setting difficulty to ${newDifficulty}.`);
+  handleDifficultySelect(newDifficulty);
 }
 
 /**
