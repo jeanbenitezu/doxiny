@@ -37,11 +37,6 @@
   background: multi-layer radial-gradients + linear-gradient with 10s animation;
   /* Creative, open-ended visual theme */
 }
-
-.mode-transition-overlay {
-  /* Smooth transition effect when switching modes */
-  animation: modeTransitionPulse 0.6s ease-in-out;
-}
 ```
 
 ### Mode Transition JavaScript Architecture

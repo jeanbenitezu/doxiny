@@ -22,37 +22,8 @@
       }
     }
   </script>
-  <style data-purpose="custom-shadows">
-    .glow-orange {
-      box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
-    }
-    .glow-active {
-      box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
-    }
-    .current-number.updated {
-      transform: scale(1.05);
-      transition: all 0.3s ease;
-    }
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-20px); }
-      60% { transform: translateY(-10px); }
-    }
-    .celebration-emoji {
-      animation: bounce 1s ease-in-out infinite;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, .celebration-emoji {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
 </head>
 <body class="game-mode-normal text-white font-sans h-screen overflow-hidden flex flex-col items-center p-2">
-  <!-- Mode transition overlay -->
-  <div id="mode-transition-overlay" class="mode-transition-overlay"></div>
   <div id="app" class="w-full max-w-sm sm:max-w-md h-full flex flex-col items-center"></div>
   <script type="module" src="./src/main.js"></script>
 </body>

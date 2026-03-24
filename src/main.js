@@ -2097,19 +2097,6 @@ function applyGameModeBackground(mode) {
 }
 
 /**
- * Show transition overlay effect when switching modes
- */
-function showModeTransitionEffect() {
-  const overlay = document.getElementById('mode-transition-overlay');
-  if (overlay) {
-    overlay.classList.add('active');
-    setTimeout(() => {
-      overlay.classList.remove('active');
-    }, 600);
-  }
-}
-
-/**
  * Update mode indicator styling
  */
 function updateModeIndicator(mode) {
@@ -2142,9 +2129,6 @@ function handleGameModeChange(mode) {
 
   const currentMode = gameManager.gameModeManager.getGameMode();
   if (mode === currentMode) return;
-
-  // Show transition effect
-  showModeTransitionEffect();
   
   // Change the mode
   gameManager.gameModeManager.setGameMode(mode);
