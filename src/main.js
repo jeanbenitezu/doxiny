@@ -768,7 +768,7 @@ function createGameUI() {
     <!-- BEGIN: GameBoard -->
     <main class="w-full flex-1 flex flex-col" style="height: 70vh; height: 70svh; gap: 1vh; gap: 1svh;">
       <!-- Central Number Display -->
-      <section class="rounded-xl flex justify-center items-center" style="height: 18vh; height: 18svh; min-height: 4rem;" data-purpose="number-display">
+      <section class="rounded-xl flex justify-center items-center" style="height: 18vh; height: 18svh; min-height: 4rem;" id="number-display" data-purpose="number-display">
         <span class="font-black text-white tracking-tighter current-number" id="current-number" style="font-size: clamp(2.5rem, 8vh, 5rem); font-size: clamp(2.5rem, 8svh, 5rem);">${gameState.current}</span>
       </section>
       
@@ -1315,6 +1315,13 @@ function showSuccessModal() {
 
     // Create confetti explosion
     createConfettiExplosion();
+    
+    // Reduce number display height when success modal is shown
+    const numberDisplay = document.getElementById("number-display");
+    if (numberDisplay) {
+      numberDisplay.classList.add("number-display-compact");
+      numberDisplay.classList.remove("number-display-normal");
+    }
   }
 }
 
@@ -1398,6 +1405,13 @@ function cleanupSuccessAnimations() {
   const emoji = document.getElementById("celebration-emoji");
   if (emoji) {
     emoji.style.animation = "";
+  }
+  
+  // Restore number display height when success modal is hidden
+  const numberDisplay = document.getElementById("number-display");
+  if (numberDisplay) {
+    numberDisplay.classList.add("number-display-normal");
+    numberDisplay.classList.remove("number-display-compact");
   }
 }
 

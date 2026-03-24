@@ -261,6 +261,19 @@ h3 {
     transform 0.3s ease;
 }
 
+/* Number display height adjustments */
+.number-display-compact {
+  height: 11vh !important;
+  height: 11svh !important;
+  transition: height 0.3s ease;
+}
+
+.number-display-normal {
+  height: 18vh !important;
+  height: 18svh !important;
+  transition: height 0.3s ease;
+}
+
 .hint-display.hidden,
 .success-modal.hidden {
   opacity: 0;
