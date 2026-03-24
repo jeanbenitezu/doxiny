@@ -225,7 +225,7 @@ class GameManager {
           const nextLevel = this.currentDifficulty + 1;
           if (this.gameModeManager.unlockLevel(nextLevel)) {
             levelUnlocked = nextLevel;
-            // Note: Master status is only awarded when level 6 is completed, not unlocked
+            updateLevelSelectorUI();
           }
         }
         // Award mastery only when successfully completing level 6
@@ -393,6 +393,92 @@ function getAvailableLevels() {
 
 function isLevelLocked(level) {
   return !gameManager.gameModeManager.isLevelUnlocked(level);
+}
+
+/**
+ * Render level selector navigation HTML
+ */
+function renderLevelSelectorUI() {
+  const availableLevels = getAvailableLevels();
+  
+  const levelButtons = availableLevels
+    .map((lvl) => {
+      const isCustom = lvl.level === "custom";
+      const isLocked = !isCustom && isLevelLocked(lvl.level);
+      
+      // For custom exercises, highlight the detected level
+      const isCustomActive =
+        gameManager.isCustomExercise &&
+        !isCustom &&
+        lvl.level === gameManager.customExerciseLevel;
+      const isRegularActive =
+        !gameManager.isCustomExercise &&
+        !isCustom &&
+        lvl.level === gameManager.currentDifficulty;
+      const isActive = isCustomActive || isRegularActive;
+
+      let buttonClass;
+      if (isCustom) {
+        // Custom button - purple when not active, orange when a custom exercise is loaded
+        buttonClass = gameManager.isCustomExercise
+          ? "bg-orange-600 border border-orange-400 text-white"
+          : "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500";
+      } else if (isLocked) {
+        // Locked levels
+        buttonClass = "bg-gray-800/50 border border-gray-600/20 text-gray-500 cursor-not-allowed";
+      } else {
+        // Regular level buttons
+        buttonClass = isActive
+          ? "bg-orange-600 border border-orange-400"
+          : "bg-[#2a2f3a] border border-white/10 opacity-60";
+      }
+
+      const title = isLocked ? translate('gameModeMessages.levelLocked', { efficiency: gameManager.gameModeManager.getEfficiencyRequirement(lvl.level) * 100 }) : '';
+
+      return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
+             data-level="${lvl.level}"
+             ${isLocked ? 'disabled' : ''}
+             ${title ? `title="${title}"` : ''}>
+          <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem); font-size: clamp(0.7rem, 2svh, 1rem);">
+            ${isCustom ? "🎯" : isLocked ? "🔒" : lvl.level}
+          </span>
+          <span class="uppercase font-bold leading-tight${isLocked ? " hidden" : ""}" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem); font-size: clamp(0.5rem, 1.2svh, 0.7rem);">
+            ${isCustom ? translate("custom") || "Custom" : isLocked ? translate("blocked") : translate(`difficultyLevels.${lvl.nameKey}`)}
+          </span>
+        </button>`;
+    })
+    .join("");
+
+  return `
+    <!-- Level Selector -->
+    <nav class="w-full mb-3" style="height: 6vh; height: 6svh; min-height: 2.5rem; max-height: 4rem;" data-purpose="level-selector">
+      <div class="grid gap-1 h-full" style="grid-template-columns: repeat(${availableLevels.length}, 1fr);">
+        ${levelButtons}
+      </div>
+    </nav>
+  `;
+}
+
+/**
+ * Update just the level selector UI without full page re-render
+ */
+function updateLevelSelectorUI() {
+  const levelSelector = document.querySelector('[data-purpose="level-selector"]');
+  if (levelSelector) {
+    // Get the new HTML from renderLevelSelectorUI and extract just the inner content
+    const newLevelSelectorHTML = renderLevelSelectorUI();
+    
+    // Create a temporary element to parse the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = newLevelSelectorHTML;
+    
+    // Extract the nav element and replace the existing one
+    const newNav = tempDiv.querySelector('nav[data-purpose="level-selector"]');
+    if (newNav) {
+      levelSelector.replaceWith(newNav);
+      console.log('🎮 Level selector UI updated');
+    }
+  }
 }
 
 // === NOTIFICATION SYSTEM ===
@@ -680,58 +766,7 @@ function createGameUI() {
     </header>
     <!-- END: MainHeader -->
     
-    <!-- Level Selector -->
-    <nav class="w-full mb-3" style="height: 6vh; height: 6svh; min-height: 2.5rem; max-height: 4rem;" data-purpose="level-selector">
-      <div class="grid gap-1 h-full" style="grid-template-columns: repeat(${getAvailableLevels().length}, 1fr);">
-        ${getAvailableLevels()
-          .map((lvl) => {
-            const isCustom = lvl.level === "custom";
-            const isLocked = !isCustom && isLevelLocked(lvl.level);
-            
-            // For custom exercises, highlight the detected level
-            const isCustomActive =
-              gameManager.isCustomExercise &&
-              !isCustom &&
-              lvl.level === gameManager.customExerciseLevel;
-            const isRegularActive =
-              !gameManager.isCustomExercise &&
-              !isCustom &&
-              lvl.level === gameManager.currentDifficulty;
-            const isActive = isCustomActive || isRegularActive;
-
-            let buttonClass;
-            if (isCustom) {
-              // Custom button - purple when not active, orange when a custom exercise is loaded
-              buttonClass = gameManager.isCustomExercise
-                ? "bg-orange-600 border border-orange-400 text-white"
-                : "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500";
-            } else if (isLocked) {
-              // Locked levels
-              buttonClass = "bg-gray-800/50 border border-gray-600/20 text-gray-500 cursor-not-allowed";
-            } else {
-              // Regular level buttons
-              buttonClass = isActive
-                ? "bg-orange-600 border border-orange-400"
-                : "bg-[#2a2f3a] border border-white/10 opacity-60";
-            }
-
-            const title = isLocked ? translate('gameModeMessages.levelLocked', { efficiency: gameManager.gameModeManager.getEfficiencyRequirement(lvl.level) * 100 }) : '';
-
-            return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
-                   data-level="${lvl.level}"
-                   ${isLocked ? 'disabled' : ''}
-                   ${title ? `title="${title}"` : ''}>
-                <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem); font-size: clamp(0.7rem, 2svh, 1rem);">
-                  ${isCustom ? "🎯" : isLocked ? "🔒" : lvl.level}
-                </span>
-                <span class="uppercase font-bold leading-tight${isLocked ? " hidden" : ""}" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem); font-size: clamp(0.5rem, 1.2svh, 0.7rem);">
-                  ${isCustom ? translate("custom") || "Custom" : isLocked ? translate("blocked") : translate(`difficultyLevels.${lvl.nameKey}`)}
-                </span>
-              </button>`;
-          })
-          .join("")}
-      </div>
-    </nav>
+    ${renderLevelSelectorUI()}
     
     <!-- Goal Display with Share button on left, Moves and New Exercise on the right -->  
     <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-2 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between gap-1" style="height: 7rem;">
