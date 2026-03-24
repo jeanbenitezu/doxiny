@@ -47,6 +47,14 @@ class GameModeManager {
     localStorage.setItem("doxiny-gamemode", this.currentMode);
   }
 
+  isFreePlay() {
+    return this.currentMode === this.modes.FREEPLAY;
+  }
+
+  isNormal() {
+    return this.currentMode === this.modes.NORMAL;
+  }
+
   loadUnlockedLevels() {
     const saved = localStorage.getItem("doxiny-unlocked-levels");
     if (saved) {
@@ -81,7 +89,7 @@ class GameModeManager {
 
   isLevelUnlocked(level) {
     // In Free Play mode, all levels are unlocked
-    if (this.currentMode === this.modes.FREEPLAY) {
+    if (this.isFreePlay()) {
       return true;
     }
     // In Normal mode, check unlocked levels
@@ -102,14 +110,13 @@ class GameModeManager {
     return [...this.unlockedLevels];
   }
 
+  getHighestUnlockedLevel() {
+    return Math.max(...this.unlockedLevels);
+  }
+
   getEfficiencyRequirement(level) {
     // 80% for levels 1-3, 90% for levels 4+ (Hard and above)
     return level >= 4 ? 0.9 : 0.8;
-  }
-
-  canCreateCustomExercases() {
-    // Custom exercises only available to masters
-    return this.isMaster();
   }
 
   resetProgression() {
@@ -183,10 +190,9 @@ class GameManager {
   constructor() {
     this.gameModeManager = new GameModeManager();
     
-    // In non-master Normal mode, start at highest unlocked level
-    if (this.gameModeManager.getGameMode() === this.gameModeManager.modes.NORMAL && !this.gameModeManager.isMaster()) {
-      const unlockedLevels = this.gameModeManager.getUnlockedLevels();
-      this.currentDifficulty = Math.max(...unlockedLevels);
+    // In Normal mode, start at highest unlocked level
+    if (this.gameModeManager.isNormal()) {
+      this.currentDifficulty = this.gameModeManager.getHighestUnlockedLevel();
     } else {
       this.currentDifficulty = 1; // Default for Free Play mode
     }
@@ -217,7 +223,7 @@ class GameManager {
     // Handle Normal Game mode progression
     let levelUnlocked = null;
     let masterAchieved = false;
-    if (this.gameModeManager.getGameMode() === this.gameModeManager.modes.NORMAL) {
+    if (this.gameModeManager.isNormal()) {
       const requiredEfficiency = this.gameModeManager.getEfficiencyRequirement(this.currentDifficulty);
       if (efficiency >= requiredEfficiency) {
         // Check for unlocking next level (if not at max level)
@@ -380,15 +386,14 @@ function updateMoveLimit() {
 // Get available difficulty levels for UI
 function getAvailableLevels() {
   const baseLevels = getDifficultyLevels().slice(0, 6); // Show 6 regular levels
-  const customLevel = { level: "custom", nameKey: "custom" };
   
-  // In Normal mode, only show custom level if in Free Play mode
-  if (gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.NORMAL && 
-      !gameManager.gameModeManager.canCreateCustomExercases()) {
-    return baseLevels;
+  // Only show custom level if in Free Play mode and player has mastery to create custom exercises
+  if (gameManager.gameModeManager.isFreePlay() && gameManager.gameModeManager.isMaster()) {
+    const customLevel = { level: "custom", nameKey: "custom" };
+    return [...baseLevels, customLevel];
   }
   
-  return [...baseLevels, customLevel];
+  return baseLevels;
 }
 
 function isLevelLocked(level) {
@@ -1959,10 +1964,6 @@ function setupGlobalEventListeners() {
       const levelBtn = e.target.closest(".level-btn");
       const level = levelBtn.dataset.level;
       if (level === "custom") {
-        if (!gameManager.gameModeManager.canCreateCustomExercases()) {
-          showNotification(translate('gameModeMessages.switchedToFreeplay'), 'info');
-          return;
-        }
         showCustomExerciseModal();
       } else {
         const levelNum = parseInt(level);
@@ -2111,9 +2112,10 @@ function handleGameModeChange(mode) {
   const modeKey = mode === 'normal' ? 'switchedToNormal' : 'switchedToFreeplay';
   showNotification(translate(`gameModeMessages.${modeKey}`), 'success');
   
-  // If switching to Normal mode and current level is locked, move to level 1
-  if (mode === 'normal' && !gameManager.gameModeManager.isLevelUnlocked(gameManager.currentDifficulty)) {
-    gameManager.setDifficulty(1);
+  // If switching to Normal mode and current level is locked, move to the last unlocked level
+  if (mode === 'normal') {
+    const highestUnlockedLevel = gameManager.gameModeManager.getHighestUnlockedLevel();
+    gameManager.setDifficulty(highestUnlockedLevel);
   }
   
   // Re-render UI to update mode selector and level states
