@@ -31,8 +31,8 @@ import "./style.css";
 class GameModeManager {
   constructor() {
     this.modes = {
-      NORMAL: 'normal',
-      FREEPLAY: 'freeplay'
+      NORMAL: "normal",
+      FREEPLAY: "freeplay",
     };
     this.currentMode = this.loadGameMode();
     this.unlockedLevels = this.loadUnlockedLevels();
@@ -40,7 +40,7 @@ class GameModeManager {
 
   loadGameMode() {
     const saved = localStorage.getItem("doxiny-gamemode");
-    return saved === 'freeplay' ? this.modes.FREEPLAY : this.modes.NORMAL; // Default to Normal
+    return saved === "freeplay" ? this.modes.FREEPLAY : this.modes.NORMAL; // Default to Normal
   }
 
   saveGameMode() {
@@ -53,14 +53,17 @@ class GameModeManager {
       try {
         return JSON.parse(saved);
       } catch (e) {
-        console.warn('Failed to parse unlocked levels:', e);
+        console.warn("Failed to parse unlocked levels:", e);
       }
     }
     return [1]; // Level 1 is always unlocked
   }
 
   saveUnlockedLevels() {
-    localStorage.setItem("doxiny-unlocked-levels", JSON.stringify(this.unlockedLevels));
+    localStorage.setItem(
+      "doxiny-unlocked-levels",
+      JSON.stringify(this.unlockedLevels),
+    );
   }
 
   getGameMode() {
@@ -101,7 +104,7 @@ class GameModeManager {
 
   getEfficiencyRequirement(level) {
     // 80% for levels 1-3, 90% for levels 4+ (Hard and above)
-    return level >= 4 ? 0.90 : 0.80;
+    return level >= 4 ? 0.9 : 0.8;
   }
 
   canCreateCustomExercases() {
@@ -114,29 +117,62 @@ class GameModeManager {
     this.saveUnlockedLevels();
     // Also reset master status
     localStorage.removeItem("doxiny-master-status");
+    localStorage.removeItem("doxiny-completion-count");
   }
 
   // === MASTERY SYSTEM ===
-  
+
   isMaster() {
     const masterStatus = localStorage.getItem("doxiny-master-status");
     return masterStatus === "true";
   }
-  
+
   setMasterStatus(isMaster) {
     localStorage.setItem("doxiny-master-status", isMaster.toString());
   }
-  
+
+  getCompletionCount() {
+    const count = localStorage.getItem("doxiny-completion-count");
+    return count ? parseInt(count, 10) : 0;
+  }
+
+  incrementCompletionCount() {
+    const currentCount = this.getCompletionCount();
+    localStorage.setItem(
+      "doxiny-completion-count",
+      (currentCount + 1).toString(),
+    );
+  }
+
+  getCompletionDisplay() {
+    const count = this.getCompletionCount();
+    if (count <= 1) return "";
+    if (count <= 9) return count.toString();
+    return "∞";
+  }
+
   isAllLevelsCompleted() {
     // Check if player has unlocked all 6 levels (meaning they completed level 5 successfully)
     const maxLevel = 6;
-    return this.unlockedLevels.length >= maxLevel && this.unlockedLevels.includes(maxLevel);
+    return (
+      this.unlockedLevels.length >= maxLevel &&
+      this.unlockedLevels.includes(maxLevel)
+    );
   }
 
   checkAndAwardMasterStatus() {
-    if (!this.isMaster() && this.isAllLevelsCompleted()) {
+    if (this.isAllLevelsCompleted()) {
+      const alreadyMaster = this.isMaster();
+
       this.setMasterStatus(true);
-      return true; // Newly achieved master status
+      // Increment completion counter
+      this.incrementCompletionCount();
+
+      // Reset levels back to level 1 for next playthrough
+      this.unlockedLevels = [1];
+      this.saveUnlockedLevels();
+
+      return !alreadyMaster; // Return true if master status was newly awarded
     }
     return false; // Already was master or hasn't completed all levels
   }
@@ -597,7 +633,7 @@ function createGameUI() {
       
       <!-- Game Mode & Language Controls -->
       <div class="flex gap-2 justify-center sm:justify-end items-center">
-        ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold" title="${translate('masterStatus.title')}">👑</span>` : ''}
+        ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold relative" title="${translate('masterStatus.title')}">👑${gameManager.gameModeManager.getCompletionDisplay() ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 0.6rem; min-width: 1rem; min-height: 1rem;">${gameManager.gameModeManager.getCompletionDisplay()}</span>` : ''}</span>` : ''}
         <!-- Game Mode Dropdown -->
         <div class="relative">
           <button id="game-mode-dropdown-btn" class="bg-gray-700/80 hover:bg-gray-600/80 border border-white/20 rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
@@ -757,8 +793,8 @@ function createGameUI() {
             const previews = getOperationPreviews(gameState.current);
             const isBlocked = gameState.moves >= moveLimit;
             const buttonClass = isBlocked
-              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-              : "bg-[#ef4444] hover:bg-[#dc2626] text-white transition-transform active:scale-95";
+              ? "bg-gray-600 text-gray-400 cursor-not-allowed border border-gray-500/50 shadow-inner"
+              : "bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-400 hover:via-red-500 hover:to-red-600 text-white transition-all duration-200 active:scale-95 border border-red-400/50 hover:border-red-300/70 shadow-lg hover:shadow-red-500/30 hover:shadow-xl relative before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-transparent before:rounded-xl before:pointer-events-none";
             const previewText = isBlocked
               ? translate("blocked")
               : previews[op === "sumDigits" ? "sum" : op];
