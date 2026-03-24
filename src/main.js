@@ -860,7 +860,7 @@ function createGameUI() {
           <!-- Main action buttons -->
           <div class="flex gap-2 justify-between">
             <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
-            ${`<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap next-exercise-btn" id="next-exercise-btn">${translate("nextLevel")}</button>`}
+            ${`<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")}</button>`}
           </div>
           <!-- Share buttons row -->
           <div class="flex gap-2 justify-around">
@@ -1863,6 +1863,11 @@ function setupGlobalEventListeners() {
       if (nextBtn && nextBtn.disabled) {
         return; // Prevent action if button is disabled
       }
+      cleanupSuccessAnimations();
+      document.getElementById("success-modal").classList.add("hidden");
+      scrollToTop();
+      handleNextExercise();
+    } else if (e.target.closest("#retry-exercise-btn")) {
       cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
       scrollToTop();
