@@ -263,19 +263,19 @@ class GameManager {
       console.log(`🎯 New level available: ${nextDifficulty}`);
 
       return {
-        changed: true,
+        isAvailable: true,
         oldDifficulty,
         nextDifficulty: nextDifficulty,
         direction: "increased",
       };
     }
 
-    return { changed: false };
+    return { isAvailable: false };
   }
 
   moveToNextLevel() {
     const levelChange = this.getNextLevelInfo();
-    if (levelChange.changed) {
+    if (levelChange.isAvailable) {
       this.currentDifficulty = levelChange.nextDifficulty;
       console.log(`🎯 Advanced to level ${this.currentDifficulty}!`);
     } else {
@@ -1171,7 +1171,9 @@ function showSuccessModal() {
     // Process exercise completion with game manager
     const completionResult = gameManager.onExerciseComplete(gameState.moves);
     const exercise = gameManager.currentExercise;
-    const efficiency = Math.round(completionResult.efficiency * 100);
+    const actualEfficiency = completionResult.efficiency;
+    const efficiency = Math.round(actualEfficiency * 100);
+    const requiredEfficiency = gameManager.gameModeManager.getEfficiencyRequirement(gameManager.currentDifficulty);
 
     // Update modal content
     finalMoves.textContent = gameState.moves;
@@ -1198,14 +1200,20 @@ function showSuccessModal() {
       }, 2000); // Show after level unlock notification
     }
 
+    const efficiencyNotMetMessage = t("gameModeMessages.efficiencyNotMet", {
+      required: Math.round(requiredEfficiency * 100),
+      achieved: efficiency
+    });
+
     // Check for level progression
     if (difficultyChangeMessage && difficultyChangeText) {
       const levelChange = completionResult.levelChange;
-      if (levelChange.changed) {
-        const levelText = translate("levelProgression.advancedToLevel").replace(
-          "{level}",
-          levelChange.nextDifficulty,
-        );
+      if (levelChange.isAvailable) {
+        let levelText = t("levelProgression.advancedToLevel", { level: levelChange.nextDifficulty });
+        if (actualEfficiency < requiredEfficiency) {
+          levelText = efficiencyNotMetMessage;
+        }
+
         difficultyChangeText.textContent = levelText;
         difficultyChangeMessage.classList.remove("hidden");
       } else if (gameManager.currentDifficulty === 6) {
@@ -1222,10 +1230,7 @@ function showSuccessModal() {
 
     // Handle Next Exercise button state in Normal mode
     const nextExerciseBtn = document.getElementById("next-exercise-btn");
-    if (nextExerciseBtn && gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.NORMAL) {
-      const requiredEfficiency = gameManager.gameModeManager.getEfficiencyRequirement(gameManager.currentDifficulty);
-      const actualEfficiency = completionResult.efficiency;
-      
+    if (nextExerciseBtn && gameManager.gameModeManager.isNormal()) {
       if (actualEfficiency < requiredEfficiency) {
         // Disable button and change appearance
         nextExerciseBtn.disabled = true;
@@ -1237,10 +1242,7 @@ function showSuccessModal() {
         nextExerciseBtn.classList.add(
           "bg-gray-500", "cursor-not-allowed", "opacity-50"
         );
-        nextExerciseBtn.title = translate("gameModeMessages.efficiencyNotMet", { 
-          required: Math.round(requiredEfficiency * 100),
-          achieved: Math.round(actualEfficiency * 100)
-        });
+        nextExerciseBtn.title = efficiencyNotMetMessage;
       } else {
         // Ensure button is enabled (in case it was previously disabled)
         nextExerciseBtn.disabled = false;
