@@ -1325,6 +1325,40 @@ function showSuccessModal() {
 
     modal.classList.remove("hidden");
 
+    // Handle Next Exercise button state in Normal mode
+    const nextExerciseBtn = document.getElementById("next-exercise-btn");
+    if (nextExerciseBtn && gameManager.gameModeManager.getGameMode() === gameManager.gameModeManager.modes.NORMAL) {
+      const requiredEfficiency = gameManager.gameModeManager.getEfficiencyRequirement(gameManager.currentDifficulty);
+      const actualEfficiency = completionResult.efficiency;
+      
+      if (actualEfficiency < requiredEfficiency) {
+        // Disable button and change appearance
+        nextExerciseBtn.disabled = true;
+        nextExerciseBtn.classList.remove(
+          "bg-gradient-to-r", "from-purple-600", "to-purple-700",
+          "hover:from-purple-700", "hover:to-purple-800",
+          "transform", "hover:-translate-y-1", "shadow-lg", "hover:shadow-purple-500/30"
+        );
+        nextExerciseBtn.classList.add(
+          "bg-gray-500", "cursor-not-allowed", "opacity-50"
+        );
+        nextExerciseBtn.title = translate("gameModeMessages.efficiencyNotMet", { 
+          required: Math.round(requiredEfficiency * 100),
+          achieved: Math.round(actualEfficiency * 100)
+        });
+      } else {
+        // Ensure button is enabled (in case it was previously disabled)
+        nextExerciseBtn.disabled = false;
+        nextExerciseBtn.classList.remove("bg-gray-500", "cursor-not-allowed", "opacity-50");
+        nextExerciseBtn.classList.add(
+          "bg-gradient-to-r", "from-purple-600", "to-purple-700",
+          "hover:from-purple-700", "hover:to-purple-800",
+          "transform", "hover:-translate-y-1", "shadow-lg", "hover:shadow-purple-500/30"
+        );
+        nextExerciseBtn.title = "";
+      }
+    }
+
     // Auto-expand and glow history when success modal appears
     const historyContainer = document.getElementById("history-container");
     if (historyContainer) {
@@ -1964,6 +1998,10 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#info-btn")) {
       showInfoModal();
     } else if (e.target.closest("#next-exercise-btn")) {
+      const nextBtn = document.getElementById("next-exercise-btn");
+      if (nextBtn && nextBtn.disabled) {
+        return; // Prevent action if button is disabled
+      }
       cleanupSuccessAnimations();
       document.getElementById("success-modal").classList.add("hidden");
       scrollToTop();
