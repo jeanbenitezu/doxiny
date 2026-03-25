@@ -137,7 +137,7 @@ The mastery system is implemented in the `GameModeManager` class with the follow
 - `checkAndAwardMasterStatus()` - Handles mastery achievement and completion counter
 - `isMaster()` - Checks if player has achieved master status
 - `unlockLevel()` - Manages level progression
-- `getEfficiencyRequirement()` - Returns efficiency thresholds per level
+- `getEfficiencyRequirement()` - Returns efficiency thresholds per level (80% for all levels)
 
 **Persistent Storage:**
 - `\"doxiny-master-status\"`: `\"true\"` | `null`

@@ -115,8 +115,8 @@ class GameModeManager {
   }
 
   getEfficiencyRequirement(level) {
-    // 80% for levels 1-3, 90% for levels 4+ (Hard and above)
-    return level >= 4 ? 0.9 : 0.8;
+    // 80% for all levels
+    return 0.8;
   }
 
   resetProgression() {

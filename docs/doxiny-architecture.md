@@ -137,7 +137,7 @@ class GameModeManager {
   checkAndAwardMasterStatus(): boolean // Achievement detection
   
   // Progression requirements
-  getEfficiencyRequirement(level): 0.80 (levels 1-3) | 0.90 (levels 4-6)
+  getEfficiencyRequirement(level): 0.80
   canCreateCustomExercases(): requires FREEPLAY + master status
 }
 
