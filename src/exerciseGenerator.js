@@ -419,7 +419,7 @@ function sumDigits(n) {
 /**
  * Find shortest path from any start number to target using enhanced BFS with strategic approaches
  */
-export function findShortestPath(start, target, maxMoves = DEFAULT_MAX_MOVES) {
+function findShortestPath(start, target, maxMoves = DEFAULT_MAX_MOVES) {
   if (start === target) return [];
 
   // Quick pattern-based checks for direct paths
