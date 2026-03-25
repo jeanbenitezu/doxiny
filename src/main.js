@@ -1424,6 +1424,56 @@ function cleanupSuccessAnimations() {
 }
 
 /**
+ * Create auto-solve function for debugging purposes
+ * Returns a function that solves the current exercise step by step with delays
+ */
+function createAutoSolveFunction() {
+  return async function(delayMs = 1000, solutionPath = null) {
+    // Use provided solution path or get from current exercise
+    const path = solutionPath || gameManager.currentExercise?.solutionPath;
+    
+    if (!path || path.length === 0) {
+      console.warn("❌ No solution path available. Generate a new exercise first.");
+      return false;
+    }
+
+    console.log(`🤖 Auto-solving exercise: 1 → ${gameManager.currentExercise.goal}`);
+    console.log(`📋 Solution has ${path.length} steps with ${delayMs}ms delay between steps`);
+    
+    let stepCount = 0;
+    
+    for (const step of path) {
+      stepCount++;
+      
+      // Check if game is already complete
+      if (gameState.isComplete) {
+        console.log("🎉 Exercise completed!");
+        break;
+      }
+      
+      // Log the step being executed
+      console.log(`🔄 Step ${stepCount}/${path.length}: ${step.operation.toUpperCase()} (${step.from} → ${step.to})`);
+      
+      // Simulate button click
+      try {
+        handleOperationClick(step.operation);
+      } catch (error) {
+        console.error(`❌ Error executing step ${stepCount}:`, error);
+        return false;
+      }
+      
+      // Wait for the specified delay before next step (unless it's the last step)
+      if (stepCount < path.length && !gameState.isComplete) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+    
+    console.log(`${gameState.isComplete ? '🎉' : '⚠️'} Auto-solve completed. Final result: ${gameState.current}`);
+    return gameState.isComplete;
+  };
+}
+
+/**
  * Handle operation button clicks
  */
 function handleOperationClick(operation) {
@@ -2094,6 +2144,7 @@ function init() {
       gameState: () => gameState,
       operations: operations,
       generateExercise: generateExercise,
+      autoSolve: (delayMs = 1000) => createAutoSolveFunction()(delayMs),
     };
     
     console.log("🔧 Dev tools available: window.doxinyDev");
