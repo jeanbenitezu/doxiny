@@ -895,7 +895,7 @@ function createGameUI() {
           <div class="flex gap-2 justify-between">
             <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
             ${gameManager.gameModeManager.isNormal() ? 
-              (gameManager.gameModeManager.isMaster() ? 
+              (!gameManager.getNextLevelInfo().isAvailable ? 
                 `<button class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-teal-500/30" id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")}</button>` :
                 `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")}</button>`
               ) : 
