@@ -189,21 +189,19 @@ class GameModeManager {
 class GameManager {
   constructor() {
     this.gameModeManager = new GameModeManager();
-    
+
     // In Normal mode, start at highest unlocked level
     if (this.gameModeManager.isNormal()) {
       this.currentDifficulty = this.gameModeManager.getHighestUnlockedLevel();
     } else {
       this.currentDifficulty = 1; // Default for Free Play mode
     }
-    
+
     this.currentExercise = null;
     this.isCustomExercise = false;
     this.customExerciseLevel = null;
     this.generateNewExercise();
   }
-
-
 
   generateNewExercise() {
     this.currentExercise = generateExercise(this.currentDifficulty);
@@ -224,7 +222,9 @@ class GameManager {
     let levelUnlocked = null;
     let masterAchieved = false;
     if (this.gameModeManager.isNormal()) {
-      const requiredEfficiency = this.gameModeManager.getEfficiencyRequirement(this.currentDifficulty);
+      const requiredEfficiency = this.gameModeManager.getEfficiencyRequirement(
+        this.currentDifficulty,
+      );
       if (efficiency >= requiredEfficiency) {
         // Check for unlocking next level (if not at max level)
         if (this.currentDifficulty < 6) {
@@ -322,7 +322,7 @@ class GameManager {
         console.log(`Level ${newDifficulty} is locked in Normal Game mode`);
         return false;
       }
-      
+
       this.currentDifficulty = newDifficulty;
       this.generateNewExercise();
       return true;
@@ -386,13 +386,16 @@ function updateMoveLimit() {
 // Get available difficulty levels for UI
 function getAvailableLevels() {
   const baseLevels = getDifficultyLevels().slice(0, 6); // Show 6 regular levels
-  
+
   // Only show custom level if in Free Play mode and player has mastery to create custom exercises
-  if (gameManager.gameModeManager.isFreePlay() && gameManager.gameModeManager.isMaster()) {
+  if (
+    gameManager.gameModeManager.isFreePlay() &&
+    gameManager.gameModeManager.isMaster()
+  ) {
     const customLevel = { level: "custom", nameKey: "custom" };
     return [...baseLevels, customLevel];
   }
-  
+
   return baseLevels;
 }
 
@@ -405,12 +408,12 @@ function isLevelLocked(level) {
  */
 function renderLevelSelectorUI() {
   const availableLevels = getAvailableLevels();
-  
+
   const levelButtons = availableLevels
     .map((lvl) => {
       const isCustom = lvl.level === "custom";
       const isLocked = !isCustom && isLevelLocked(lvl.level);
-      
+
       // For custom exercises, highlight the detected level
       const isCustomActive =
         gameManager.isCustomExercise &&
@@ -430,7 +433,8 @@ function renderLevelSelectorUI() {
           : "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500";
       } else if (isLocked) {
         // Locked levels
-        buttonClass = "bg-gray-800/50 border border-gray-600/20 text-gray-500 cursor-not-allowed";
+        buttonClass =
+          "bg-gray-800/50 border border-gray-600/20 text-gray-500 cursor-not-allowed";
       } else {
         // Regular level buttons
         buttonClass = isActive
@@ -438,12 +442,18 @@ function renderLevelSelectorUI() {
           : "bg-[#2a2f3a] border border-white/10 opacity-60";
       }
 
-      const title = isLocked ? translate('gameModeMessages.levelLocked', { efficiency: gameManager.gameModeManager.getEfficiencyRequirement(lvl.level) * 100 }) : '';
+      const title = isLocked
+        ? translate("gameModeMessages.levelLocked", {
+            efficiency:
+              gameManager.gameModeManager.getEfficiencyRequirement(lvl.level) *
+              100,
+          })
+        : "";
 
       return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
              data-level="${lvl.level}"
-             ${isLocked ? 'disabled' : ''}
-             ${title ? `title="${title}"` : ''}>
+             ${isLocked ? "disabled" : ""}
+             ${title ? `title="${title}"` : ""}>
           <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem); font-size: clamp(0.7rem, 2svh, 1rem);">
             ${isCustom ? "🎯" : isLocked ? "🔒" : lvl.level}
           </span>
@@ -468,20 +478,22 @@ function renderLevelSelectorUI() {
  * Update just the level selector UI without full page re-render
  */
 function updateLevelSelectorUI() {
-  const levelSelector = document.querySelector('[data-purpose="level-selector"]');
+  const levelSelector = document.querySelector(
+    '[data-purpose="level-selector"]',
+  );
   if (levelSelector) {
     // Get the new HTML from renderLevelSelectorUI and extract just the inner content
     const newLevelSelectorHTML = renderLevelSelectorUI();
-    
+
     // Create a temporary element to parse the HTML
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = newLevelSelectorHTML;
-    
+
     // Extract the nav element and replace the existing one
     const newNav = tempDiv.querySelector('nav[data-purpose="level-selector"]');
     if (newNav) {
       levelSelector.replaceWith(newNav);
-      console.log('🎮 Level selector UI updated');
+      console.log("🎮 Level selector UI updated");
     }
   }
 }
@@ -493,31 +505,30 @@ function updateLevelSelectorUI() {
  */
 function showMasterAchievementModal() {
   const modal = document.createElement("div");
-  modal.className = "fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fade-in";
+  modal.className =
+    "fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fade-in";
   modal.addEventListener("click", (e) => {
     if (e.target === modal) hideMasterAchievementModal();
   });
-  
+
   modal.innerHTML = `
     <div class="bg-gradient-to-br from-yellow-400 via-gold-500 to-yellow-600 p-6 rounded-2xl max-w-sm mx-4 text-center shadow-2xl shadow-gold-500/50 animate-bounce-in">
       <div class="text-6xl mb-4 animate-spin-once">👑</div>
-      <h2 class="text-2xl font-bold text-white mb-2">${translate('masterAchievement.title')}</h2>
-      <p class="text-white/90 mb-4">${translate('masterAchievement.message')}</p>
+      <h2 class="text-2xl font-bold text-white mb-2">${translate("masterAchievement.title")}</h2>
+      <p class="text-white/90 mb-4">${translate("masterAchievement.message")}</p>
       <button id="master-achievement-continue-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all w-full">
-        ${translate('common.continue')}
+        ${translate("common.continue")}
       </button>
     </div>
   `;
-  
+
   document.body.appendChild(modal);
 }
 
 function hideMasterAchievementModal() {
-  const modal = document.querySelector('.fixed.inset-0.bg-black\\/80');
+  const modal = document.querySelector(".fixed.inset-0.bg-black\\/80");
   if (modal) modal.remove();
 }
-
-
 
 // === END MASTERY SYSTEM UI FUNCTIONS ===
 
@@ -682,12 +693,12 @@ function createGameUI() {
       
       <!-- Game Mode & Language Controls -->
       <div class="flex gap-2 justify-center sm:justify-end items-center">
-        ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold relative" title="${translate('masterStatus.title')}">👑${gameManager.gameModeManager.getCompletionDisplay() ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 0.6rem; min-width: 1rem; min-height: 1rem;">${gameManager.gameModeManager.getCompletionDisplay()}</span>` : ''}</span>` : ''}
+        ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold relative" title="${translate("masterStatus.title")}">👑${gameManager.gameModeManager.getCompletionDisplay() ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 0.6rem; min-width: 1rem; min-height: 1rem;">${gameManager.gameModeManager.getCompletionDisplay()}</span>` : ""}</span>` : ""}
         <!-- Game Mode Dropdown -->
         <div class="relative">
           <button id="game-mode-dropdown-btn" class="mode-indicator ${gameManager.gameModeManager.getGameMode()} btn-mode-${gameManager.gameModeManager.getGameMode()} hover:brightness-110 border border-white/20 rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
                   style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem); height: clamp(1.5rem, 3vh, 2rem); height: clamp(1.5rem, 3svh, 2rem);">
-            <span id="current-mode-label">${gameManager.gameModeManager.getGameMode() === 'normal' ? '🎯' : '🔓'}</span>
+            <span id="current-mode-label">${gameManager.gameModeManager.getGameMode() === "normal" ? "🎯" : "🔓"}</span>
             <span id="current-mode-text">${translate(`gameModes.${gameManager.gameModeManager.getGameMode()}`)}</span>
             <span>▼</span>
           </button>
@@ -695,23 +706,24 @@ function createGameUI() {
             <button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="normal">
               <span>🎯</span>
               <div>
-                <div class="font-semibold">${translate('gameModes.normal')}</div>
-                <div class="text-xs text-gray-400">${translate('gameModeDescriptions.normal')}</div>
+                <div class="font-semibold">${translate("gameModes.normal")}</div>
+                <div class="text-xs text-gray-400">${translate("gameModeDescriptions.normal")}</div>
               </div>
             </button>
-            ${gameManager.gameModeManager.isMaster() 
-              ? `<button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="freeplay">
+            ${
+              gameManager.gameModeManager.isMaster()
+                ? `<button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="freeplay">
                   <span>🔓</span>
                   <div>
-                    <div class="font-semibold">${translate('gameModes.freeplay')}</div>
-                    <div class="text-xs text-gray-400">${translate('gameModeDescriptions.freeplay')}</div>
+                    <div class="font-semibold">${translate("gameModes.freeplay")}</div>
+                    <div class="text-xs text-gray-400">${translate("gameModeDescriptions.freeplay")}</div>
                   </div>
                 </button>`
-              : `<button class="game-mode-option w-full px-3 py-2 text-left cursor-not-allowed opacity-50 flex items-center gap-2" data-mode="freeplay" disabled>
+                : `<button class="game-mode-option w-full px-3 py-2 text-left cursor-not-allowed opacity-50 flex items-center gap-2" data-mode="freeplay" disabled>
                   <span>🔒</span>
                   <div>
-                    <div class="font-semibold text-gray-400">${translate('gameModes.freeplay')}</div>
-                    <div class="text-xs text-gray-500">${translate('gameModeDescriptions.freeplayLocked')}</div>
+                    <div class="font-semibold text-gray-400">${translate("gameModes.freeplay")}</div>
+                    <div class="text-xs text-gray-500">${translate("gameModeDescriptions.freeplayLocked")}</div>
                   </div>
                 </button>`
             }
@@ -893,22 +905,26 @@ function createGameUI() {
           </div>
         </div>
         
-        ${gameManager.gameModeManager.isNormal() ? `
+        ${
+          gameManager.gameModeManager.isNormal()
+            ? `
         <div id="difficulty-change-message" class="text-center text-yellow-300 text-sm mb-2 hidden">
           📈 <span id="difficulty-change-text"></span>
         </div>
-        ` : ''}
+        `
+            : ""
+        }
         <!-- Action buttons row -->
         <div class="flex flex-col gap-3 justify-center">
           <!-- Main action buttons -->
           <div class="flex gap-2 justify-between">
             <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
-            ${gameManager.gameModeManager.isNormal() ? 
-              (!gameManager.getNextLevelInfo().isAvailable ? 
-                `<button class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-teal-500/30" id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")}</button>` :
-                `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")}</button>`
-              ) : 
-              `<button class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-indigo-500/30" id="try-normal-btn">${translate("gameModeMessages.tryNormalMode")}</button>`
+            ${
+              gameManager.gameModeManager.isNormal()
+                ? !gameManager.getNextLevelInfo().isAvailable
+                  ? `<button class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-teal-500/30" id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")}</button>`
+                  : `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")}</button>`
+                : `<button class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-indigo-500/30" id="try-normal-btn">${translate("gameModeMessages.tryNormalMode")}</button>`
             }
           </div>
           <!-- Share buttons row -->
@@ -1188,7 +1204,10 @@ function showSuccessModal() {
     const exercise = gameManager.currentExercise;
     const actualEfficiency = completionResult.efficiency;
     const efficiency = Math.round(actualEfficiency * 100);
-    const requiredEfficiency = gameManager.gameModeManager.getEfficiencyRequirement(gameManager.currentDifficulty);
+    const requiredEfficiency =
+      gameManager.gameModeManager.getEfficiencyRequirement(
+        gameManager.currentDifficulty,
+      );
 
     // Update modal content
     finalMoves.textContent = gameState.moves;
@@ -1216,14 +1235,16 @@ function showSuccessModal() {
     }
 
     const efficiencyNotMetMessage = t("gameModeMessages.efficiencyNotMet", {
-      required: Math.round(requiredEfficiency * 100)
+      required: Math.round(requiredEfficiency * 100),
     });
 
     // Check for level progression
     if (difficultyChangeMessage && difficultyChangeText) {
       const levelChange = completionResult.levelChange;
       if (levelChange.isAvailable) {
-        let levelText = t("levelProgression.advancedToLevel", { level: levelChange.nextDifficulty });
+        let levelText = t("levelProgression.advancedToLevel", {
+          level: levelChange.nextDifficulty,
+        });
         if (actualEfficiency < requiredEfficiency) {
           levelText = efficiencyNotMetMessage;
         }
@@ -1249,22 +1270,40 @@ function showSuccessModal() {
         // Disable button and change appearance
         nextExerciseBtn.disabled = true;
         nextExerciseBtn.classList.remove(
-          "bg-gradient-to-r", "from-purple-600", "to-purple-700",
-          "hover:from-purple-700", "hover:to-purple-800",
-          "transform", "hover:-translate-y-1", "shadow-lg", "hover:shadow-purple-500/30"
+          "bg-gradient-to-r",
+          "from-purple-600",
+          "to-purple-700",
+          "hover:from-purple-700",
+          "hover:to-purple-800",
+          "transform",
+          "hover:-translate-y-1",
+          "shadow-lg",
+          "hover:shadow-purple-500/30",
         );
         nextExerciseBtn.classList.add(
-          "bg-gray-500", "cursor-not-allowed", "opacity-50"
+          "bg-gray-500",
+          "cursor-not-allowed",
+          "opacity-50",
         );
         nextExerciseBtn.title = efficiencyNotMetMessage;
       } else {
         // Ensure button is enabled (in case it was previously disabled)
         nextExerciseBtn.disabled = false;
-        nextExerciseBtn.classList.remove("bg-gray-500", "cursor-not-allowed", "opacity-50");
+        nextExerciseBtn.classList.remove(
+          "bg-gray-500",
+          "cursor-not-allowed",
+          "opacity-50",
+        );
         nextExerciseBtn.classList.add(
-          "bg-gradient-to-r", "from-purple-600", "to-purple-700",
-          "hover:from-purple-700", "hover:to-purple-800",
-          "transform", "hover:-translate-y-1", "shadow-lg", "hover:shadow-purple-500/30"
+          "bg-gradient-to-r",
+          "from-purple-600",
+          "to-purple-700",
+          "hover:from-purple-700",
+          "hover:to-purple-800",
+          "transform",
+          "hover:-translate-y-1",
+          "shadow-lg",
+          "hover:shadow-purple-500/30",
         );
         nextExerciseBtn.title = "";
       }
@@ -1323,7 +1362,7 @@ function showSuccessModal() {
 
     // Create confetti explosion
     createConfettiExplosion();
-    
+
     // Reduce number display height when success modal is shown
     const numberDisplay = document.getElementById("number-display");
     if (numberDisplay) {
@@ -1414,7 +1453,7 @@ function cleanupSuccessAnimations() {
   if (emoji) {
     emoji.style.animation = "";
   }
-  
+
   // Restore number display height when success modal is hidden
   const numberDisplay = document.getElementById("number-display");
   if (numberDisplay) {
@@ -1428,32 +1467,40 @@ function cleanupSuccessAnimations() {
  * Returns a function that solves the current exercise step by step with delays
  */
 function createAutoSolveFunction() {
-  return async function(delayMs = 1000, solutionPath = null) {
+  return async function (delayMs = 1000, solutionPath = null) {
     // Use provided solution path or get from current exercise
     const path = solutionPath || gameManager.currentExercise?.solutionPath;
-    
+
     if (!path || path.length === 0) {
-      console.warn("❌ No solution path available. Generate a new exercise first.");
+      console.warn(
+        "❌ No solution path available. Generate a new exercise first.",
+      );
       return false;
     }
 
-    console.log(`🤖 Auto-solving exercise: 1 → ${gameManager.currentExercise.goal}`);
-    console.log(`📋 Solution has ${path.length} steps with ${delayMs}ms delay between steps`);
-    
+    console.log(
+      `🤖 Auto-solving exercise: 1 → ${gameManager.currentExercise.goal}`,
+    );
+    console.log(
+      `📋 Solution has ${path.length} steps with ${delayMs}ms delay between steps`,
+    );
+
     let stepCount = 0;
-    
+
     for (const step of path) {
       stepCount++;
-      
+
       // Check if game is already complete
       if (gameState.isComplete) {
         console.log("🎉 Exercise completed!");
         break;
       }
-      
+
       // Log the step being executed
-      console.log(`🔄 Step ${stepCount}/${path.length}: ${step.operation.toUpperCase()} (${step.from} → ${step.to})`);
-      
+      console.log(
+        `🔄 Step ${stepCount}/${path.length}: ${step.operation.toUpperCase()} (${step.from} → ${step.to})`,
+      );
+
       // Simulate button click
       try {
         handleOperationClick(step.operation);
@@ -1461,14 +1508,16 @@ function createAutoSolveFunction() {
         console.error(`❌ Error executing step ${stepCount}:`, error);
         return false;
       }
-      
+
       // Wait for the specified delay before next step (unless it's the last step)
       if (stepCount < path.length && !gameState.isComplete) {
-        await new Promise(resolve => setTimeout(resolve, delayMs));
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
     }
-    
-    console.log(`${gameState.isComplete ? '🎉' : '⚠️'} Auto-solve completed. Final result: ${gameState.current}`);
+
+    console.log(
+      `${gameState.isComplete ? "🎉" : "⚠️"} Auto-solve completed. Final result: ${gameState.current}`,
+    );
     return gameState.isComplete;
   };
 }
@@ -2022,12 +2071,12 @@ function setupGlobalEventListeners() {
       toggleGameModeDropdown();
     } else if (e.target.closest(".game-mode-option")) {
       const modeBtn = e.target.closest(".game-mode-option");
-      
+
       // Check if button is disabled
       if (modeBtn.disabled) {
         return; // Prevent action if button is disabled
       }
-      
+
       const mode = modeBtn.dataset.mode;
       handleGameModeChange(mode);
     } else if (e.target.closest(".level-btn")) {
@@ -2057,10 +2106,13 @@ function setupGlobalEventListeners() {
     }
 
     // Close game mode dropdown if clicking outside
-    if (!e.target.closest('#game-mode-dropdown-btn') && !e.target.closest('#game-mode-dropdown')) {
-      const dropdown = document.getElementById('game-mode-dropdown');
-      if (dropdown && !dropdown.classList.contains('hidden')) {
-        dropdown.classList.add('hidden');
+    if (
+      !e.target.closest("#game-mode-dropdown-btn") &&
+      !e.target.closest("#game-mode-dropdown")
+    ) {
+      const dropdown = document.getElementById("game-mode-dropdown");
+      if (dropdown && !dropdown.classList.contains("hidden")) {
+        dropdown.classList.add("hidden");
       }
     }
   });
@@ -2146,7 +2198,7 @@ function init() {
       generateExercise: generateExercise,
       autoSolve: (delayMs = 1000) => createAutoSolveFunction()(delayMs),
     };
-    
+
     console.log("🔧 Dev tools available: window.doxinyDev");
   }
 
@@ -2161,8 +2213,8 @@ function init() {
  * Toggle game mode dropdown visibility
  */
 function toggleGameModeDropdown() {
-  const dropdown = document.getElementById('game-mode-dropdown');
-  dropdown.classList.toggle('hidden');
+  const dropdown = document.getElementById("game-mode-dropdown");
+  dropdown.classList.toggle("hidden");
 }
 
 /**
@@ -2170,10 +2222,10 @@ function toggleGameModeDropdown() {
  */
 function applyGameModeBackground(mode) {
   const body = document.body;
-  
+
   // Remove existing mode classes
-  body.classList.remove('game-mode-normal', 'game-mode-freeplay');
-  
+  body.classList.remove("game-mode-normal", "game-mode-freeplay");
+
   // Add new mode class
   body.classList.add(`game-mode-${mode}`);
 }
@@ -2182,22 +2234,28 @@ function applyGameModeBackground(mode) {
  * Update mode indicator styling
  */
 function updateModeIndicator(mode) {
-  const modeBtn = document.getElementById('game-mode-dropdown-btn');
-  const modeLabel = document.getElementById('current-mode-label');
-  const modeText = document.getElementById('current-mode-text');
-  
+  const modeBtn = document.getElementById("game-mode-dropdown-btn");
+  const modeLabel = document.getElementById("current-mode-label");
+  const modeText = document.getElementById("current-mode-text");
+
   if (modeBtn) {
     // Remove existing mode classes
-    modeBtn.classList.remove('btn-mode-normal', 'btn-mode-freeplay', 'mode-indicator', 'normal', 'freeplay');
-    
+    modeBtn.classList.remove(
+      "btn-mode-normal",
+      "btn-mode-freeplay",
+      "mode-indicator",
+      "normal",
+      "freeplay",
+    );
+
     // Add new mode classes
-    modeBtn.classList.add('mode-indicator', mode, `btn-mode-${mode}`);
+    modeBtn.classList.add("mode-indicator", mode, `btn-mode-${mode}`);
   }
-  
+
   if (modeLabel) {
-    modeLabel.textContent = mode === 'normal' ? '🎯' : '🔓';
+    modeLabel.textContent = mode === "normal" ? "🎯" : "🔓";
   }
-  
+
   if (modeText) {
     modeText.textContent = translate(`gameModes.${mode}`);
   }
@@ -2207,56 +2265,61 @@ function updateModeIndicator(mode) {
  * Handle game mode change with enhanced animations
  */
 function handleGameModeChange(mode) {
-  document.getElementById('game-mode-dropdown').classList.add('hidden');
+  document.getElementById("game-mode-dropdown").classList.add("hidden");
 
   const currentMode = gameManager.gameModeManager.getGameMode();
   if (mode === currentMode) return;
-  
+
   // Change the mode
   gameManager.gameModeManager.setGameMode(mode);
-  
+
   // Apply new background
   applyGameModeBackground(mode);
-  
+
   // Update mode indicator
   updateModeIndicator(mode);
 
-  const newDifficulty = mode === 'normal' ? gameManager.gameModeManager.getHighestUnlockedLevel() : gameManager.currentDifficulty;
-  console.log(`🎮 Game mode changed to ${mode}. Setting difficulty to ${newDifficulty}.`);
-  
+  const newDifficulty =
+    mode === "normal"
+      ? gameManager.gameModeManager.getHighestUnlockedLevel()
+      : gameManager.currentDifficulty;
+  console.log(
+    `🎮 Game mode changed to ${mode}. Setting difficulty to ${newDifficulty}.`,
+  );
+
   // Slight delay to let background transition start
   setTimeout(() => {
     handleDifficultySelect(newDifficulty);
   }, 100);
 }
 
-
 /**
  * Show level unlock notification with celebration
  */
 function showLevelUnlockNotification(level) {
-  const message = t('gameModeMessages.levelUnlocked', { level });
-  
-  // Create special celebration notification 
-  const notification = document.createElement('div');
-  notification.className = 'notification fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-4 rounded-xl shadow-2xl z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center';
-  notification.style.minWidth = '280px';
-  
+  const message = t("gameModeMessages.levelUnlocked", { level });
+
+  // Create special celebration notification
+  const notification = document.createElement("div");
+  notification.className =
+    "notification fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-4 rounded-xl shadow-2xl z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center";
+  notification.style.minWidth = "280px";
+
   notification.innerHTML = `
     <div class="text-2xl mb-2">🎉</div>
     <div class="font-bold text-lg mb-1">${message}</div>
-    <div class="text-sm opacity-90">${translate(`difficultyLevels.${getDifficultyLevels()[level-1]?.nameKey}`)}</div>
+    <div class="text-sm opacity-90">${translate(`difficultyLevels.${getDifficultyLevels()[level - 1]?.nameKey}`)}</div>
   `;
-  
+
   document.body.appendChild(notification);
-  
+
   // Add celebration animation
-  notification.style.animation = 'celebrateBounce 0.6s ease-out';
-  
+  notification.style.animation = "celebrateBounce 0.6s ease-out";
+
   // Remove after 4 seconds
   setTimeout(() => {
-    notification.style.opacity = '0';
-    notification.style.transform = 'scale(0.8) translate(-50%, -50%)';
+    notification.style.opacity = "0";
+    notification.style.transform = "scale(0.8) translate(-50%, -50%)";
     setTimeout(() => {
       if (notification.parentNode) {
         notification.parentNode.removeChild(notification);

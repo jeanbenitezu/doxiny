@@ -19,18 +19,14 @@ body {
 /* === GAME MODE BACKGROUNDS === */
 /* Normal Mode: Focused, goal-oriented gradient with subtle animation */
 .game-mode-normal {
-  background: linear-gradient(
-    135deg,
-    #1a1f26 0%,
-    #2d3748 50%,
-    #1a202c 100%
-  );
+  background: linear-gradient(135deg, #1a1f26 0%, #2d3748 50%, #1a202c 100%);
   background-size: 200% 200%;
   animation: normalModeGradient 6s ease-in-out infinite;
 }
 
 @keyframes normalModeGradient {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -40,18 +36,14 @@ body {
 
 /* Free Play Mode: Creative, open-ended gradient with gentle animation */
 .game-mode-freeplay {
-  background: linear-gradient(
-    135deg,
-    #1a1f26 0%,
-    #2d4a3d 50%,
-    #1e293b 100%
-  );
+  background: linear-gradient(135deg, #1a1f26 0%, #2d4a3d 50%, #1e293b 100%);
   background-size: 200% 200%;
   animation: freeplayModeGradient 8s ease-in-out infinite;
 }
 
 @keyframes freeplayModeGradient {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -86,10 +78,18 @@ body {
 }
 
 @keyframes rainbow-celebration {
-  0%, 66.67%, 100% {
-    background: linear-gradient(45deg, 
-      #ff0000, #ff7700, #ffff00, #00ff00, 
-      #0099ff, #6633ff, #ff00ff
+  0%,
+  66.67%,
+  100% {
+    background: linear-gradient(
+      45deg,
+      #ff0000,
+      #ff7700,
+      #ffff00,
+      #00ff00,
+      #0099ff,
+      #6633ff,
+      #ff00ff
     );
     background-size: 400% 400%;
     background-position: 0% 50%;
@@ -163,7 +163,18 @@ body {
 
 .confetti-star {
   background: #9b59b6;
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
 }
 
 .confetti-heart {
@@ -176,7 +187,7 @@ body {
 
 .confetti-heart:before,
 .confetti-heart:after {
-  content: '';
+  content: "";
   width: 8px;
   height: 6px;
   position: absolute;
@@ -304,7 +315,8 @@ h3 {
 }
 
 @keyframes hintBlink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -371,7 +383,7 @@ button:active:not(:disabled) {
 }
 
 .mode-indicator::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -453,7 +465,8 @@ button:active:not(:disabled) {
 }
 
 @keyframes lockPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
   }
   50% {
@@ -489,7 +502,9 @@ button:active:not(:disabled) {
 }
 
 .shadow-gold-500\/50 {
-  box-shadow: 0 20px 25px -5px rgba(217, 119, 6, 0.5), 0 10px 10px -5px rgba(217, 119, 6, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(217, 119, 6, 0.5),
+    0 10px 10px -5px rgba(217, 119, 6, 0.04);
 }
 
 /* Master indicator */
@@ -568,5 +583,7 @@ button:active:not(:disabled) {
 }
 
 .hover\\:shadow-gold-500\\30:hover {
-  box-shadow: 0 20px 25px -5px rgba(217, 119, 6, 0.3), 0 10px 10px -5px rgba(217, 119, 6, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(217, 119, 6, 0.3),
+    0 10px 10px -5px rgba(217, 119, 6, 0.04);
 }
