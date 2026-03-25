@@ -60,6 +60,10 @@ export const translations = {
       en: "All levels available, create custom exercises",
       es: "Todos los niveles disponibles, crea ejercicios personalizados",
     },
+    freeplayLocked: {
+      en: "Requires Master status to unlock",
+      es: "Requiere estatus de Maestro para desbloquear",
+    },
   },
 
   gameModeMessages: {

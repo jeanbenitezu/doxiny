@@ -699,13 +699,22 @@ function createGameUI() {
                 <div class="text-xs text-gray-400">${translate('gameModeDescriptions.normal')}</div>
               </div>
             </button>
-            <button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="freeplay">
-              <span>🔓</span>
-              <div>
-                <div class="font-semibold">${translate('gameModes.freeplay')}</div>
-                <div class="text-xs text-gray-400">${translate('gameModeDescriptions.freeplay')}</div>
-              </div>
-            </button>
+            ${gameManager.gameModeManager.isMaster() 
+              ? `<button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="freeplay">
+                  <span>🔓</span>
+                  <div>
+                    <div class="font-semibold">${translate('gameModes.freeplay')}</div>
+                    <div class="text-xs text-gray-400">${translate('gameModeDescriptions.freeplay')}</div>
+                  </div>
+                </button>`
+              : `<button class="game-mode-option w-full px-3 py-2 text-left cursor-not-allowed opacity-50 flex items-center gap-2" data-mode="freeplay" disabled>
+                  <span>🔒</span>
+                  <div>
+                    <div class="font-semibold text-gray-400">${translate('gameModes.freeplay')}</div>
+                    <div class="text-xs text-gray-500">${translate('gameModeDescriptions.freeplayLocked')}</div>
+                  </div>
+                </button>`
+            }
           </div>
         </div>
         
@@ -1963,6 +1972,12 @@ function setupGlobalEventListeners() {
       toggleGameModeDropdown();
     } else if (e.target.closest(".game-mode-option")) {
       const modeBtn = e.target.closest(".game-mode-option");
+      
+      // Check if button is disabled
+      if (modeBtn.disabled) {
+        return; // Prevent action if button is disabled
+      }
+      
       const mode = modeBtn.dataset.mode;
       handleGameModeChange(mode);
     } else if (e.target.closest(".level-btn")) {
@@ -1986,6 +2001,9 @@ function setupGlobalEventListeners() {
       scrollToTop();
     } else if (e.target.closest("#master-achievement-continue-btn")) {
       hideMasterAchievementModal();
+      // Refresh UI to show newly available Free Play mode
+      app.innerHTML = createGameUI();
+      updateDisplay();
     }
 
     // Close game mode dropdown if clicking outside
