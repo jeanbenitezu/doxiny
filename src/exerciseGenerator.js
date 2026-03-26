@@ -125,18 +125,53 @@ export function getAllSolutions(goal, maxMoves = DEFAULT_MAX_MOVES) {
 
 /**
  * Validate that an exercise is actually solvable with enhanced strategies
+ * @param {number} goal - The target number to reach
+ * @param {boolean} lazy - If true, returns first valid solution found; if false, finds all solutions and returns the best one
+ * @param {number} maxMoves - Maximum moves allowed for pathfinding
+ * @returns {Object} Solution object with solvable, minMoves, solutionPath, and algorithm properties
  */
-export function validateExercise(goal, maxMoves = DEFAULT_MAX_MOVES) {
-  const solutions = getAllSolutions(goal, maxMoves);
+export function validateExercise(goal, lazy = true, maxMoves = DEFAULT_MAX_MOVES) {
+  if (lazy) {
+    // Lazy mode: return first valid solution found, prioritizing the same order as strategic method execution
+    
+    // Try quick pattern-based checks first
+    const quickResults = checkQuickPatterns(goal);
+    for (const result of quickResults) {
+      if (result.solvable) {
+        return result;
+      }
+    }
 
-  if (solutions.length > 0) {
-    // Return the solution with the fewest moves
-    return solutions.reduce((best, current) =>
-      current.minMoves < best.minMoves ? current : best,
-    );
+    // Try enhanced BFS with bidirectional search and strategic analysis
+    const forwardResults = enhancedBFS(1, goal, maxMoves);
+    for (const result of forwardResults) {
+      if (result.solvable) {
+        return result;
+      }
+    }
+
+    // Try strategic approaches for all numbers, not just odd ones
+    const strategicResults = tryStrategicApproaches(goal, maxMoves + 5);
+    for (const result of strategicResults) {
+      if (result.solvable) {
+        return result;
+      }
+    }
+
+    return { solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" };
+  } else {
+    // Non-lazy mode: get all solutions and return the best one
+    const solutions = getAllSolutions(goal, maxMoves);
+
+    if (solutions.length > 0) {
+      // Return the solution with the fewest moves
+      return solutions.reduce((best, current) =>
+        current.minMoves < best.minMoves ? current : best,
+      );
+    }
+
+    return { solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" };
   }
-
-  return { solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" };
 }
 
 /**
@@ -166,7 +201,7 @@ function checkQuickPatterns(goal) {
 /**
  * Enhanced BFS with better pruning and early termination
  */
-function enhancedBFS(start, goal, maxMoves) {
+function enhancedBFS(start, goal, maxMoves, lazy = true) {
   const queue = [{ current: start, steps: 0, path: [] }];
   const visited = new Map([[start, 0]]); // Track minimum steps to reach each number
 
@@ -175,7 +210,9 @@ function enhancedBFS(start, goal, maxMoves) {
     const { current, steps, path } = queue.shift();
 
     if (current === goal) {
-      solutions.push({ solvable: true, minMoves: steps, solutionPath: path, algorithm: "enhancedBFS" });
+      const solution = { solvable: true, minMoves: steps, solutionPath: path, algorithm: "enhancedBFS" };
+      solutions.push(solution);
+      if (lazy) return [solution]; // Return first solution found in lazy mode
     }
 
     if (steps >= maxMoves) continue;
@@ -205,7 +242,7 @@ function enhancedBFS(start, goal, maxMoves) {
 /**
  * Strategic approaches for hard-to-reach numbers
  */
-function tryStrategicApproaches(goal, maxMoves) {
+function tryStrategicApproaches(goal, maxMoves, lazy = true) {
   const solutions = [];
   // Strategy 1: Try numbers that can be transformed into the goal
   const reverseTargets = findReverseTargets(goal);
@@ -214,14 +251,17 @@ function tryStrategicApproaches(goal, maxMoves) {
       1,
       target.number,
       maxMoves - target.stepsToGoal,
+      lazy
     );
     if (pathToTarget.solvable) {
-      solutions.push({
+      const solution = {
         solvable: true,
         minMoves: pathToTarget.minMoves + target.stepsToGoal,
         solutionPath: [...pathToTarget.solutionPath, ...target.path],
         algorithm: "strategicReverseTarget",
-      });
+      };
+      solutions.push(solution);
+      if (lazy) return [solution]; // Return first solution found in lazy mode
     }
   }
 
@@ -233,14 +273,17 @@ function tryStrategicApproaches(goal, maxMoves) {
         1,
         variant.number,
         maxMoves - variant.stepsToGoal,
+        lazy
       );
       if (pathToVariant.solvable) {
-        solutions.push({
+        const solution = {
           solvable: true,
           minMoves: pathToVariant.minMoves + variant.stepsToGoal,
           solutionPath: [...pathToVariant.solutionPath, ...variant.path],
           algorithm: "digitManipulation",
-        });
+        };
+        solutions.push(solution);
+        if (lazy) return [solution]; // Return first solution found in lazy mode
       }
     }
   }
@@ -252,14 +295,17 @@ function tryStrategicApproaches(goal, maxMoves) {
       1,
       variant.number,
       maxMoves - variant.stepsToGoal,
+      lazy
     );
     if (pathToVariant.solvable) {
-      solutions.push({
+      const solution = {
         solvable: true,
         minMoves: pathToVariant.minMoves + variant.stepsToGoal,
         solutionPath: [...pathToVariant.solutionPath, ...variant.path],
         algorithm: "factorization",
-      });
+      };
+      solutions.push(solution);
+      if (lazy) return [solution]; // Return first solution found in lazy mode
     }
   }
 
