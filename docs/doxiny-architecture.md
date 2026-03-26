@@ -1,5 +1,5 @@
 # Doxiny - Architecture & Code Structure
-*Last Updated: March 24, 2026 - Added modular UI component system and fixed game mode state synchronization*
+*Last Updated: January 2025 - Added configurable hint system and global configuration management patterns*
 
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
@@ -15,6 +15,8 @@
 - **`src/game.js`** - Game state management, move history, state transitions
 - **`src/operations.js`** - Pure functions for 4 number operations (REVERSE, SUM, APPEND, DOUBLE)
 - **`src/exerciseGenerator.js`** - BFS-based exercise generation and solvability validation
+- **`src/gameHelpers.js`** - Configurable hint system and progress calculation utilities
+- **`src/config.js`** - Global configuration management with preset system
 - **`src/sharing.js`** - Progressive enhancement sharing system with Web Share API
 - **`src/i18n.js`** - Bilingual support system (EN/ES) with sharing messages and master status translations
 - **`src/style.css`** - Custom styles, animated game mode backgrounds, mode transitions, responsive design, gold accent system for masters
@@ -24,6 +26,48 @@
 - **`package.json`** - Dependencies, scripts
 
 ## Architecture Patterns
+
+### Helper System Features
+- **3-Level Hint Guidance**: Strategic (general direction), Tactical (specific guidance), Direct (exact move)
+- **Configurable Hint Types**: Individual control via doxinyConfig (enableStrategicHints, enableTacticalHints, enableDirectHints)
+- **Dynamic Progress Tracking**: Real-time progress calculation for UI feedback
+- **Pathfinding Integration**: Uses BFS to find optimal paths for accurate hints and progress
+- **Preset Configurations**: Beginner (all hints), Expert (strategic only), and custom configurations
+- **Fallback System**: Graceful degradation when pathfinding fails
+- **Localization Support**: All hint messages use i18n translation system
+
+**File Restructuring (January 2025)**:
+- **Function Migration**: `calculateProgressToTarget` moved to gameHelpers.js from exerciseGenerator.js
+- **Clean Dependencies**: gameHelpers.js imports its own dependencies (i18n, operations, config)
+- **Backward Compatibility**: exerciseGenerator.js imports and re-exports both functions
+- **Better Naming**: File name reflects broader scope of game assistance functions
+
+### Global Configuration System
+```javascript
+// DoxinyConfig class - Centralized configuration management
+class DoxinyConfig {
+  config = {
+    // Hint system configuration - individual enable/disable control
+    enableStrategicHints: true,    // General direction and analysis
+    enableTacticalHints: true,     // Specific operation suggestions  
+    enableDirectHints: true,       // Exact button recommendations
+    
+    // BFS Algorithm configuration
+    maxSearchDepth: 25,
+    timeoutMs: 5000,
+    searchStrategy: 'comprehensive'
+  }
+  
+  // Preset system for common scenarios
+  setPreset(name) {
+    const presets = {
+      beginner: { enableStrategicHints: true, enableTacticalHints: true, enableDirectHints: true },
+      expert: { enableStrategicHints: true, enableTacticalHints: false, enableDirectHints: false }
+    };
+    Object.assign(this.config, presets[name] || {});
+  }
+}
+```
 
 ### Animated Game Mode Background System
 ```css

@@ -315,17 +315,21 @@ export function generateHints(
     return generateFallbackHints(currentNumber, targetNumber, hintsUsed);
   }
 
+  const config = doxinyConfig.get();
   const hints = [];
 
-  // Always generate all 3 hint levels for current number
-  // Hint 1: Strategic guidance (general direction)
-  hints.push(generateStrategicHint(currentNumber, targetNumber, optimalPath));
+  // Generate hints based on configuration
+  if (config.enableStrategicHints) {
+    hints.push(generateStrategicHint(currentNumber, targetNumber, optimalPath));
+  }
 
-  // Hint 2: Tactical guidance (specific numbers or operations)
-  hints.push(generateTacticalHint(currentNumber, targetNumber, optimalPath));
+  if (config.enableTacticalHints) {
+    hints.push(generateTacticalHint(currentNumber, targetNumber, optimalPath));
+  }
 
-  // Hint 3: Direct guidance (exact next move)
-  hints.push(generateDirectHint(currentNumber, targetNumber, optimalPath));
+  if (config.enableDirectHints) {
+    hints.push(generateDirectHint(currentNumber, targetNumber, optimalPath));
+  }
 
   return hints;
 }
@@ -482,60 +486,67 @@ function generateDirectHint(current, target, path) {
  * Generate fallback hints when optimal path is not available
  */
 function generateFallbackHints(current, target, hintsUsed) {
+  const config = doxinyConfig.get();
   const hints = [];
 
-  // Always generate all 3 levels for current number
+  // Generate fallback hints based on configuration
 
   // Level 1: Strategic hint
-  if (target > current * 2) {
-    hints.push({
-      level: 1,
-      type: "strategic",
-      message: t("hints.strategic.targetMuchLarger", { target, current }),
-      confidence: "medium",
-    });
-  } else if (target < current) {
-    hints.push({
-      level: 1,
-      type: "strategic",
-      message: t("hints.strategic.targetSmaller", { target, current }),
-      confidence: "medium",
-    });
-  } else {
-    hints.push({
-      level: 1,
-      type: "strategic",
-      message: t("hints.strategic.targetClose", { target, current }),
-      confidence: "medium",
-    });
+  if (config.enableStrategicHints) {
+    if (target > current * 2) {
+      hints.push({
+        level: 1,
+        type: "strategic",
+        message: t("hints.strategic.targetMuchLarger", { target, current }),
+        confidence: "medium",
+      });
+    } else if (target < current) {
+      hints.push({
+        level: 1,
+        type: "strategic",
+        message: t("hints.strategic.targetSmaller", { target, current }),
+        confidence: "medium",
+      });
+    } else {
+      hints.push({
+        level: 1,
+        type: "strategic",
+        message: t("hints.strategic.targetClose", { target, current }),
+        confidence: "medium",
+      });
+    }
   }
 
   // Level 2: Tactical hint
-  const currentStr = current.toString();
+  if (config.enableTacticalHints) {
+    const currentStr = current.toString();
 
-  if (currentStr.length > 1) {
-    hints.push({
-      level: 2,
-      type: "tactical",
-      message: t("hints.tactical.multiDigitOps", { count: currentStr.length }),
-      confidence: "medium",
-    });
-  } else {
-    hints.push({
-      level: 2,
-      type: "tactical",
-      message: t("hints.tactical.singleDigitOps", { current }),
-      confidence: "medium",
-    });
+    if (currentStr.length > 1) {
+      hints.push({
+        level: 2,
+        type: "tactical",
+        message: t("hints.tactical.multiDigitOps", { count: currentStr.length }),
+        confidence: "medium",
+      });
+    } else {
+      hints.push({
+        level: 2,
+        type: "tactical",
+        message: t("hints.tactical.singleDigitOps", { current }),
+        confidence: "medium",
+      });
+    }
   }
 
   // Level 3: Direct hint
-  hints.push({
-    level: 3,
-    type: "direct",
-    message: t("hints.direct.challenging", { target }),
-    confidence: "low",
-  });
+  if (config.enableDirectHints) {
+    hints.push({
+      level: 3,
+      type: "direct",
+      message: t("hints.direct.challenging", { target }),
+      confidence: "low",
+    });
+  }
 
   return hints;
 }

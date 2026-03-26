@@ -25,6 +25,11 @@ class DoxinyConfig {
       debugMode: false, // Enable detailed logging
       benchmarkMode: false, // Track performance metrics
       validateOptimality: true, // Ensure optimal solutions when possible
+
+      // Hint System Configuration
+      enableStrategicHints: true, // Level 1: General strategic guidance
+      enableTacticalHints: true, // Level 2: Specific operational hints
+      enableDirectHints: true, // Level 3: Exact next move guidance
     };
   }
 
@@ -121,6 +126,23 @@ class DoxinyConfig {
       maxIterations: 50000,
       lazySearch: false, // Thorough analysis, find all solutions
       debugMode: true,
+    },
+    
+    // Beginner-friendly (all hint types enabled) 
+    beginner: {
+      enableStrategicHints: true,
+      enableTacticalHints: true,
+      enableDirectHints: true,
+      lazySearch: true,
+    },
+    
+    // Expert mode (minimal hints)
+    expert: {
+      enableStrategicHints: true,
+      enableTacticalHints: false, 
+      enableDirectHints: false,
+      bfsUpperBoundLimit: 500000,
+      lazySearch: false,
     },
   };
 

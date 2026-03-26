@@ -1,7 +1,69 @@
 # Doxiny - Development Patterns & Best Practices
-*Last Updated: March 24, 2026 - Added modal space management pattern and simplified animations*
+*Last Updated: January 2025 - Added configurable hint system and global configuration management patterns*
 
 ## Code Organization Principles
+
+### Global Configuration Management
+**Added January 2025**: Centralized configuration system with runtime hint control and preset management.
+
+```javascript
+// DoxinyConfig class singleton pattern
+class DoxinyConfig {
+  constructor() {
+    this.config = {
+      // Hint system configuration - individual control over hint types
+      enableStrategicHints: true,    // General direction and analysis
+      enableTacticalHints: true,     // Specific operation suggestions
+      enableDirectHints: true,       // Exact button recommendations
+      
+      // BFS Algorithm configuration
+      maxSearchDepth: 25,
+      timeoutMs: 5000,
+      searchStrategy: 'comprehensive'
+    };
+  }
+  
+  // Preset system for common configurations
+  setPreset(presetName) {
+    const presets = {
+      beginner: {    // All guidance enabled for learning
+        enableStrategicHints: true,
+        enableTacticalHints: true,
+        enableDirectHints: true,
+        maxSearchDepth: 15
+      },
+      expert: {      // Strategic insights only, no hand-holding
+        enableStrategicHints: true,
+        enableTacticalHints: false,
+        enableDirectHints: false,
+        maxSearchDepth: 25
+      }
+    };
+    
+    Object.assign(this.config, presets[presetName] || {});
+  }
+}
+
+// Usage throughout application
+import { doxinyConfig } from './config.js';
+
+function generateHints(currentNumber, targetNumber, movesMade, hintsUsed) {
+  const hintTypes = [];
+  
+  // Configurable hint inclusion
+  if (doxinyConfig.get('enableStrategicHints')) {
+    hintTypes.push(...generateStrategicHints(currentNumber, targetNumber, movesMade));
+  }
+  if (doxinyConfig.get('enableTacticalHints')) {
+    hintTypes.push(...generateTacticalHints(currentNumber, targetNumber, movesMade));
+  }
+  if (doxinyConfig.get('enableDirectHints')) {
+    hintTypes.push(...generateDirectHints(currentNumber, targetNumber, movesMade));
+  }
+  
+  return hintTypes;
+}
+```
 
 ### Pure Function Operations
 All game operations are implemented as pure functions:
