@@ -5,33 +5,7 @@
 
 import { operations } from "./operations.js";
 import { t } from "./i18n.js";
-
-/**
- * Default maximum moves limit for BFS pathfinding algorithms
- * This prevents infinite loops and excessive computation time
- * while allowing reasonable solution depths for most puzzles
- */
-const DEFAULT_MAX_MOVES = 30;
-
-/**
- * BFS upper bound limit for intermediate number exploration
- * 
- * This critical value (200,000) represents the optimal balance between:
- * - CORRECTNESS: High enough to allow goal 73's optimal 10-move solution
- *   (requires intermediate state 888,841 during BFS exploration)
- * - PERFORMANCE: Low enough to prevent exponential search space explosion
- * 
- * BENCHMARK ANALYSIS:
- * - 100,000: Blocks optimal solutions (goal 73 = 11 moves instead of 10)
- * - 200,000: ✅ OPTIMAL - Enables all optimizations with excellent performance
- * - 1,000,000: Causes 22,394% performance degradation (19+ seconds vs 0.7 seconds)
- * 
- * MINIMUM REQUIREMENT: 888,841 (largest intermediate state in known optimal paths)
- * CHOSEN VALUE: 200,000 (safe margin + 95% faster than naive 1M approach)
- * 
- * ⚠️ DO NOT CHANGE without extensive benchmark testing across difficulty levels!
- */
-const BFS_UPPER_BOUND_LIMIT = 200000;
+import { doxinyConfig } from "./config.js";
 
 /**
  * Simple difficulty configuration with i18n keys
@@ -126,18 +100,21 @@ function generateSimpleExercise(difficulty) {
   };
 }
 
-export function getAllSolutions(goal, maxMoves = DEFAULT_MAX_MOVES) {
+export function getAllSolutions(goal, maxMoves = null) {
+  const config = doxinyConfig.get();
+  const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
+  
   const solutions = []
   // Quick pattern-based checks first
   const quickResult = checkQuickPatterns(goal);
   solutions.push(quickResult);
 
   // Enhanced BFS with bidirectional search and strategic analysis
-  const forwardResult = enhancedBFS(1, goal, maxMoves);
+  const forwardResult = enhancedBFS(1, goal, actualMaxMoves);
   solutions.push(forwardResult);
 
   // Try strategic approaches for all numbers, not just odd ones
-  const strategicResult = tryStrategicApproaches(goal, maxMoves + 5);
+  const strategicResult = tryStrategicApproaches(goal, actualMaxMoves + 5);
   solutions.push(strategicResult);
 
   return solutions.flat(Infinity).filter(s => s.solvable);
@@ -146,11 +123,14 @@ export function getAllSolutions(goal, maxMoves = DEFAULT_MAX_MOVES) {
 /**
  * Validate that an exercise is actually solvable with enhanced strategies
  * @param {number} goal - The target number to reach
- * @param {boolean} lazy - If true, returns first valid solution found; if false, finds all solutions and returns the best one
- * @param {number} maxMoves - Maximum moves allowed for pathfinding
+ * @param {number} maxMoves - Optional maximum moves allowed for pathfinding (uses config default if not provided)
  * @returns {Object} Solution object with solvable, minMoves, solutionPath, and algorithm properties
  */
-export function validateExercise(goal, lazy = true, maxMoves = DEFAULT_MAX_MOVES) {
+export function validateExercise(goal, maxMoves = null) {
+  const config = doxinyConfig.get();
+  const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
+  const lazy = config.lazySearch;
+  
   if (lazy) {
     // Lazy mode: return first valid solution found, prioritizing the same order as strategic method execution
     
@@ -163,7 +143,7 @@ export function validateExercise(goal, lazy = true, maxMoves = DEFAULT_MAX_MOVES
     }
 
     // Try enhanced BFS with bidirectional search and strategic analysis
-    const forwardResults = enhancedBFS(1, goal, maxMoves);
+    const forwardResults = enhancedBFS(1, goal, actualMaxMoves);
     for (const result of forwardResults) {
       if (result.solvable) {
         return result;
@@ -171,7 +151,7 @@ export function validateExercise(goal, lazy = true, maxMoves = DEFAULT_MAX_MOVES
     }
 
     // Try strategic approaches for all numbers, not just odd ones
-    const strategicResults = tryStrategicApproaches(goal, maxMoves + 5);
+    const strategicResults = tryStrategicApproaches(goal, actualMaxMoves + 5);
     for (const result of strategicResults) {
       if (result.solvable) {
         return result;
@@ -181,7 +161,7 @@ export function validateExercise(goal, lazy = true, maxMoves = DEFAULT_MAX_MOVES
     return { solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" };
   } else {
     // Non-lazy mode: get all solutions and return the best one
-    const solutions = getAllSolutions(goal, maxMoves);
+    const solutions = getAllSolutions(goal, actualMaxMoves);
 
     if (solutions.length > 0) {
       // Return the solution with the fewest moves
@@ -221,7 +201,12 @@ function checkQuickPatterns(goal) {
 /**
  * Enhanced BFS with optimal solution finding, better pruning and early termination
  */
-function enhancedBFS(start, goal, maxMoves, lazy = true) {
+function enhancedBFS(start, goal, maxMoves = null) {
+  const config = doxinyConfig.get();
+  const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
+  const upperBoundLimit = config.bfsUpperBoundLimit;
+  const lazy = config.lazySearch;
+  
   const queue = [{ current: start, steps: 0, path: [] }];
   const visited = new Map([[start, 0]]); // Track minimum steps to reach each number
 
@@ -235,12 +220,12 @@ function enhancedBFS(start, goal, maxMoves, lazy = true) {
       if (lazy) return [solution]; // Return first solution found in lazy mode
     }
 
-    if (steps >= maxMoves) continue;
+    if (steps >= actualMaxMoves) continue;
 
     for (const [opName, opFunc] of Object.entries(operations)) {
       const next = opFunc(current);
 
-      if (next > 0 && next <= BFS_UPPER_BOUND_LIMIT) {
+      if (next > 0 && next <= upperBoundLimit) {
         const existingSteps = visited.get(next);
         if (!existingSteps || steps + 1 < existingSteps) {
           visited.set(next, steps + 1);
@@ -262,7 +247,11 @@ function enhancedBFS(start, goal, maxMoves, lazy = true) {
 /**
  * Strategic approaches for hard-to-reach numbers
  */
-function tryStrategicApproaches(goal, maxMoves, lazy = true) {
+function tryStrategicApproaches(goal, maxMoves = null) {
+  const config = doxinyConfig.get();
+  const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
+  const lazy = config.lazySearch;
+  
   const solutions = [];
   // Strategy 1: Try numbers that can be transformed into the goal
   const reverseTargets = findReverseTargets(goal);
@@ -270,8 +259,7 @@ function tryStrategicApproaches(goal, maxMoves, lazy = true) {
     const pathToTarget = enhancedBFS(
       1,
       target.number,
-      maxMoves - target.stepsToGoal,
-      lazy
+      actualMaxMoves - target.stepsToGoal
     );
     if (pathToTarget.solvable) {
       const solution = {
@@ -292,8 +280,7 @@ function tryStrategicApproaches(goal, maxMoves, lazy = true) {
       const pathToVariant = enhancedBFS(
         1,
         variant.number,
-        maxMoves - variant.stepsToGoal,
-        lazy
+        actualMaxMoves - variant.stepsToGoal
       );
       if (pathToVariant.solvable) {
         const solution = {
@@ -314,8 +301,7 @@ function tryStrategicApproaches(goal, maxMoves, lazy = true) {
     const pathToVariant = enhancedBFS(
       1,
       variant.number,
-      maxMoves - variant.stepsToGoal,
-      lazy
+      actualMaxMoves - variant.stepsToGoal
     );
     if (pathToVariant.solvable) {
       const solution = {
@@ -497,7 +483,9 @@ function sumDigits(n) {
 /**
  * Find shortest path from any start number to target using enhanced BFS with strategic approaches
  */
-function findShortestPath(start, target, maxMoves = DEFAULT_MAX_MOVES) {
+function findShortestPath(start, target) {
+  const config = doxinyConfig.get();
+  const maxMoves = config.defaultMaxMoves;
   const paths = [];
   if (start === target) return [];
 
@@ -555,14 +543,18 @@ function findQuickPath(start, target) {
 /**
  * Enhanced BFS with better pruning and tracking
  */
-function enhancedPathBFS(start, target, maxMoves) {
+function enhancedPathBFS(start, target, maxMoves = null) {
+  const config = doxinyConfig.get();
+  const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
+  const upperBoundLimit = config.bfsUpperBoundLimit;
+  
   const queue = [{ current: start, moves: 0, path: [] }];
   const visited = new Map([[start, 0]]); // Track minimum moves to reach each number
 
   while (queue.length > 0) {
     const { current, moves, path } = queue.shift();
 
-    if (moves >= maxMoves) continue;
+    if (moves >= actualMaxMoves) continue;
 
     for (const [opName, opFunc] of Object.entries(operations)) {
       const next = opFunc(current);
@@ -571,7 +563,7 @@ function enhancedPathBFS(start, target, maxMoves) {
         return [...path, { operation: opName, from: current, to: next }];
       }
 
-      if (next > 0 && next <= BFS_UPPER_BOUND_LIMIT) {
+      if (next > 0 && next <= upperBoundLimit) {
         const existingMoves = visited.get(next);
         if (!existingMoves || moves + 1 < existingMoves) {
           visited.set(next, moves + 1);

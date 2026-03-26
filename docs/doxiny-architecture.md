@@ -113,7 +113,7 @@ const reverse = (num) => parseInt(num.toString().split('').reverse().join('')) |
 ### Enhanced BFS Exercise Validation
 ```javascript
 // Multi-stage validation with strategic approaches
-function validateExercise(goal, maxMoves = DEFAULT_MAX_MOVES) {
+function validateExercise(goal, maxMoves) {
   // Dynamic move calculation: Math.min(25, Math.max(15, Math.floor(Math.log10(goal)) * 8))
   // 1. Quick patterns (powers of 2, single digits)
   // 2. Enhanced BFS with better pruning (Map-based visited tracking)

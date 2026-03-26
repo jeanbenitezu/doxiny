@@ -7,17 +7,7 @@
  * Best of both worlds: Maximum reliability + Intelligent insights
  */
 
-/**
- * BFS upper bound limit for intermediate number exploration
- * 
- * This critical value (200,000) represents the optimal balance between:
- * - CORRECTNESS: High enough to allow goal 73's optimal 10-move solution
- * - PERFORMANCE: Low enough to prevent exponential search space explosion
- * 
- * See exerciseGenerator.js for full benchmark analysis documentation.
- * ⚠️ DO NOT CHANGE without extensive benchmark testing!
- */
-const BFS_UPPER_BOUND_LIMIT = 200000;
+import { doxinyConfig } from './config.js';
 
 class UltimateOptimizedDoxinyGenerator {
   constructor() {
@@ -213,7 +203,11 @@ class UltimateOptimizedDoxinyGenerator {
   /**
    * ADOPTED: User's enhanced BFS - THE WINNING CORE ALGORITHM
    */
-  enhancedBFS(start, goal, maxMoves) {
+  enhancedBFS(start, goal, maxMoves = null) {
+    const config = doxinyConfig.get();
+    const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
+    const upperBoundLimit = config.bfsUpperBoundLimit;
+    
     if (start === goal) {
       return { solvable: true, minMoves: 0, solutionPath: [] };
     }
@@ -223,7 +217,7 @@ class UltimateOptimizedDoxinyGenerator {
 
     // ADOPTED: User's generous iteration limits for reliability
     let iterations = 0;
-    const maxIterations = 15000;
+    const maxIterations = config.maxIterations || 15000;
 
     while (queue.length > 0 && iterations < maxIterations) {
       iterations++;
@@ -233,13 +227,13 @@ class UltimateOptimizedDoxinyGenerator {
         return { solvable: true, minMoves: steps, solutionPath: path };
       }
 
-      if (steps >= maxMoves) continue;
+      if (steps >= actualMaxMoves) continue;
 
       // ADOPTED: User's thorough operation exploration
       for (const [opName, opFunc] of Object.entries(this.operations)) {
         const next = opFunc(current);
 
-        if (next > 0 && next <= BFS_UPPER_BOUND_LIMIT) {
+        if (next > 0 && next <= upperBoundLimit) {
           const existingSteps = visited.get(next);
           if (!existingSteps || steps + 1 < existingSteps) {
             visited.set(next, steps + 1);
@@ -259,12 +253,15 @@ class UltimateOptimizedDoxinyGenerator {
   /**
    * ADOPTED: User's strategic approaches - THE BREAKTHROUGH TECHNIQUE
    */
-  tryStrategicApproaches(goal, maxMoves) {
+  tryStrategicApproaches(goal, maxMoves = null) {
+    const config = doxinyConfig.get();
+    const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
+    
     const reverseTargets = this.findReverseTargets(goal);
 
     // ADOPTED: User's comprehensive reverse targeting approach
     for (const target of reverseTargets) {
-      const remainingMoves = maxMoves - target.stepsToGoal;
+      const remainingMoves = actualMaxMoves - target.stepsToGoal;
       if (remainingMoves > 0) {
         const pathToTarget = this.enhancedBFS(1, target.number, remainingMoves);
         if (pathToTarget.solvable) {
@@ -285,7 +282,10 @@ class UltimateOptimizedDoxinyGenerator {
   /**
    * CORE METHOD: User's winning algorithm with 98% success rate
    */
-  validateExercise(goal, maxMoves = 30) {
+  validateExercise(goal, maxMoves = null) {
+    const config = doxinyConfig.get();
+    const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
+    
     if (goal < 1 || goal > 10000) {
       return {
         solvable: false,
@@ -317,7 +317,7 @@ class UltimateOptimizedDoxinyGenerator {
     }
 
     // STAGE 2: User's enhanced BFS (core algorithm)
-    const forwardResult = this.enhancedBFS(1, goal, maxMoves);
+    const forwardResult = this.enhancedBFS(1, goal, actualMaxMoves);
     if (forwardResult.solvable) {
       const result = {
         solvable: true,
@@ -329,7 +329,7 @@ class UltimateOptimizedDoxinyGenerator {
     }
 
     // STAGE 3: User's strategic approaches (the breakthrough)
-    const strategicResult = this.tryStrategicApproaches(goal, maxMoves + 5);
+    const strategicResult = this.tryStrategicApproaches(goal, actualMaxMoves + 5);
     if (strategicResult.solvable) {
       const result = {
         solvable: true,
@@ -699,7 +699,7 @@ const optimizedGenerator = new UltimateOptimizedDoxinyGenerator();
 /**
  * EXPORT: Validate exercise (User's winning 98% success rate algorithm)
  */
-export function validateExercise(goal, maxMoves = 30) {
+export function validateExercise(goal, maxMoves = null) {
   return optimizedGenerator.validateExercise(goal, maxMoves);
 }
 
