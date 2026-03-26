@@ -1,5 +1,4 @@
 # Doxiny - Architecture & Code Structure
-*Last Updated: January 2025 - Added configurable hint system and global configuration management patterns*
 
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
@@ -64,7 +63,7 @@ export class PathfindingResult { /* Unified result API */ }
 - **Fallback System**: Graceful degradation when pathfinding fails
 - **Localization Support**: All hint messages use i18n translation system
 
-**File Restructuring (January 2025)**:
+**File Restructuring**:
 - **Function Migration**: `calculateProgressToTarget` moved to gameHelpers.js from exerciseGenerator.js
 - **Clean Dependencies**: gameHelpers.js imports its own dependencies (i18n, operations, config)
 - **Backward Compatibility**: exerciseGenerator.js imports and re-exports both functions
@@ -229,7 +228,6 @@ class GameModeManager {
 "doxiny-completion-count": "1" | "2" | ... | "15" // Master completions counter
 "doxiny-language": "en" | "es"
 
-// Updated March 24, 2026: Added completion counter for prestige system
 // Levels auto-reset to [1] upon each mastery achievement
 ```
 
@@ -237,11 +235,11 @@ class GameModeManager {
 - Each UI section has dedicated update functions
 - State changes trigger specific UI updates  
 - Animation states managed via CSS classes
-- **Modular Component System (Added March 24, 2026)**:
+- **Modular Component System:
   - `renderLevelSelectorUI()` - Generates level selector HTML with current state
   - `updateLevelSelectorUI()` - Updates just the level selector without full page re-render
   - **Benefits**: Improved performance, immediate visual feedback, better code organization
-- **State Synchronization Fixes (March 24, 2026)**:
+- **State Synchronization**:
   - Fixed game state desync when switching from Freeplay to Normal mode
   - Ensures proper exercise completion detection across mode changes
 
@@ -261,5 +259,3 @@ class GameModeManager {
 - **No runtime dependencies** - Pure vanilla JS
 - **Build tools**: Vite for bundling, development server
 - **Styling**: Tailwind CSS via CDN (no build step needed)
-
-Last Updated: March 23, 2026

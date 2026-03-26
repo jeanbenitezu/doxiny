@@ -1,5 +1,4 @@
 # Doxiny - Game Mechanics & Algorithms
-*Last Updated: March 24, 2026 - Cleaned up dead code references and corrected mastery system documentation*
 
 ## Core Game Concept
 **Goal**: Transform number 1 to a target number using exactly 4 operations in minimum moves possible.
@@ -144,7 +143,6 @@ The mastery system is implemented in the `GameModeManager` class with the follow
 - `\"doxiny-completion-count\"`: `\"1\"` | `\"2\"` | ... | `\"15\"`
 
 ### Cross-Mode Invitation System
-**Added March 24, 2026**: Bidirectional mode switching via success modal buttons
 
 - **Normal Game**: Progressive unlocking with efficiency requirements
 - **Free Play**: Unrestricted level access (masters only for custom exercises)
@@ -225,7 +223,7 @@ canCreateCustomExercases() {
 
 ## Hint System
 
-**Added March 22, 2026**: Intelligent hint system provides 3 levels of guidance per exercise.
+Intelligent hint system provides 3 levels of guidance per exercise.
 
 ### Hint Types & UI Behavior
 
@@ -284,8 +282,3 @@ function generateHints(currentNumber, targetNumber, movesMade, hintsUsed = 0) {
 - **UI feedback**: Hint button greys out when exhausted
 - **Smart progression**: When user makes move, hint progression continues (strategic→tactical→direct) but hints are regenerated for new current number
 - **Fresh context**: Each hint is always relevant to current game state
-
----
-Last Updated: March 26, 2026 (Optimized BFS upper bound: 100K→200K for 95% performance gain while maintaining Goal 73 fix)
-
-Last Updated: March 24, 2026 (Added completion counter system and level reset functionality)

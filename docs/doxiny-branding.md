@@ -1,5 +1,4 @@
 # Doxiny Branding Decisions
-*Last Updated: March 24, 2026 - Simplified background animations for performance optimization*
 
 ## Core Brand Identity
 - **Name**: Doxiny = "Do X in Y moves"
@@ -32,7 +31,7 @@
 - **Friend challenges** with specific move targets to beat
 
 ## Animated Game Mode Visual System
-**Updated March 24, 2026**: Simplified background animations for better performance
+Simplified background animations for better performance
 
 ### Mode-Specific Backgrounds
 **Design Philosophy**: Clean, performant animations that reinforce mode identity without complexity
@@ -74,7 +73,7 @@
 ## Visual Design System
 
 ### Color Palette
-- **Primary**: Doxiny Blue (#2563EB) - Updated March 21, 2026
+- **Primary**: Doxiny Blue (#2563EB)
 - **Action**: Transform Orange (#F97316) 
 - **Success**: Emerald (#10B981)
 - **Sharing**: Orange (#F97316) for victory, Blue (#3B82F6) for challenges, Indigo (#6366F1) for invitations
@@ -117,5 +116,3 @@
 - MARKETING.md: Growth strategy with UI/UX advantages
 - src/main.js: Success modal sharing system + URL parameter routing
 - docs/doxiny-branding.md: Updated with gamification messaging strategy
-
-**Last Updated**: March 21, 2026 - Modal styling consistency implemented
