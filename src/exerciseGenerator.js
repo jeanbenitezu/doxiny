@@ -77,6 +77,7 @@ function generateSimpleExercise(difficulty) {
         goal,
         optimalMoves: validation.minMoves,
         solutionPath: validation.solutionPath,
+        algorithm: validation.algorithm,
       };
     }
   }
@@ -101,26 +102,41 @@ function generateSimpleExercise(difficulty) {
     goal: fallbackGoal,
     optimalMoves: validation.minMoves,
     solutionPath: validation.solutionPath,
+    algorithm: validation.algorithm,
   };
+}
+
+export function getAllSolutions(goal, maxMoves = DEFAULT_MAX_MOVES) {
+  const solutions = []
+  // Quick pattern-based checks first
+  const quickResult = checkQuickPatterns(goal);
+  solutions.push(quickResult);
+
+  // Enhanced BFS with bidirectional search and strategic analysis
+  const forwardResult = enhancedBFS(1, goal, maxMoves);
+  solutions.push(forwardResult);
+
+  // Try strategic approaches for all numbers, not just odd ones
+  const strategicResult = tryStrategicApproaches(goal, maxMoves + 5);
+  solutions.push(strategicResult);
+
+  return solutions.flat(Infinity).filter(s => s.solvable);
 }
 
 /**
  * Validate that an exercise is actually solvable with enhanced strategies
  */
 export function validateExercise(goal, maxMoves = DEFAULT_MAX_MOVES) {
-  // Quick pattern-based checks first
-  const quickResult = checkQuickPatterns(goal);
-  if (quickResult) return quickResult;
+  const solutions = getAllSolutions(goal, maxMoves);
 
-  // Enhanced BFS with bidirectional search and strategic analysis
-  const forwardResult = enhancedBFS(1, goal, maxMoves);
-  if (forwardResult.solvable) return forwardResult;
+  if (solutions.length > 0) {
+    // Return the solution with the fewest moves
+    return solutions.reduce((best, current) =>
+      current.minMoves < best.minMoves ? current : best,
+    );
+  }
 
-  // Try strategic approaches for all numbers, not just odd ones
-  const strategicResult = tryStrategicApproaches(goal, maxMoves + 5);
-  if (strategicResult.solvable) return strategicResult;
-
-  return { solvable: false, minMoves: Infinity, solutionPath: [] };
+  return { solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" };
 }
 
 /**
@@ -130,9 +146,10 @@ function checkQuickPatterns(goal) {
   // Powers of 2 are always reachable by doubling
   if (isPowerOfTwo(goal)) {
     const steps = Math.log2(goal);
-    return {
+    return [{
       solvable: true,
       minMoves: steps,
+      algorithm: "powersOfTwo",
       solutionPath: Array(steps)
         .fill()
         .map((_, i) => ({
@@ -140,10 +157,10 @@ function checkQuickPatterns(goal) {
           from: Math.pow(2, i),
           to: Math.pow(2, i + 1),
         })),
-    };
+    }];
   }
 
-  return null;
+  return [{ solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" }];
 }
 
 /**
@@ -153,11 +170,12 @@ function enhancedBFS(start, goal, maxMoves) {
   const queue = [{ current: start, steps: 0, path: [] }];
   const visited = new Map([[start, 0]]); // Track minimum steps to reach each number
 
+  const solutions = [];
   while (queue.length > 0) {
     const { current, steps, path } = queue.shift();
 
     if (current === goal) {
-      return { solvable: true, minMoves: steps, solutionPath: path };
+      solutions.push({ solvable: true, minMoves: steps, solutionPath: path, algorithm: "enhancedBFS" });
     }
 
     if (steps >= maxMoves) continue;
@@ -179,13 +197,16 @@ function enhancedBFS(start, goal, maxMoves) {
     }
   }
 
-  return { solvable: false, minMoves: Infinity, solutionPath: [] };
+  if (solutions.length > 0) return solutions;
+
+  return [{ solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" }];
 }
 
 /**
  * Strategic approaches for hard-to-reach numbers
  */
 function tryStrategicApproaches(goal, maxMoves) {
+  const solutions = [];
   // Strategy 1: Try numbers that can be transformed into the goal
   const reverseTargets = findReverseTargets(goal);
   for (const target of reverseTargets) {
@@ -195,11 +216,12 @@ function tryStrategicApproaches(goal, maxMoves) {
       maxMoves - target.stepsToGoal,
     );
     if (pathToTarget.solvable) {
-      return {
+      solutions.push({
         solvable: true,
         minMoves: pathToTarget.minMoves + target.stepsToGoal,
         solutionPath: [...pathToTarget.solutionPath, ...target.path],
-      };
+        algorithm: "strategicReverseTarget",
+      });
     }
   }
 
@@ -213,11 +235,12 @@ function tryStrategicApproaches(goal, maxMoves) {
         maxMoves - variant.stepsToGoal,
       );
       if (pathToVariant.solvable) {
-        return {
+        solutions.push({
           solvable: true,
           minMoves: pathToVariant.minMoves + variant.stepsToGoal,
           solutionPath: [...pathToVariant.solutionPath, ...variant.path],
-        };
+          algorithm: "digitManipulation",
+        });
       }
     }
   }
@@ -231,15 +254,18 @@ function tryStrategicApproaches(goal, maxMoves) {
       maxMoves - variant.stepsToGoal,
     );
     if (pathToVariant.solvable) {
-      return {
+      solutions.push({
         solvable: true,
         minMoves: pathToVariant.minMoves + variant.stepsToGoal,
         solutionPath: [...pathToVariant.solutionPath, ...variant.path],
-      };
+        algorithm: "factorization",
+      });
     }
   }
 
-  return { solvable: false, minMoves: Infinity, solutionPath: [] };
+  if (solutions.length > 0) return solutions;
+
+  return [{ solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" }];
 }
 
 /**
@@ -406,21 +432,29 @@ function sumDigits(n) {
  * Find shortest path from any start number to target using enhanced BFS with strategic approaches
  */
 function findShortestPath(start, target, maxMoves = DEFAULT_MAX_MOVES) {
+  const paths = [];
   if (start === target) return [];
 
   // Quick pattern-based checks for direct paths
   const quickPath = findQuickPath(start, target);
-  if (quickPath.length > 0) return quickPath;
+  if (quickPath.length > 0) paths.push(quickPath);
 
   // Enhanced BFS with strategic approaches
   const directPath = enhancedPathBFS(start, target, maxMoves);
-  if (directPath.length > 0) return directPath;
+  if (directPath.length > 0) paths.push(directPath);
 
   // If direct path fails, try strategic reverse approaches
   const strategicPath = findStrategicPath(start, target, maxMoves);
-  if (strategicPath.length > 0) return strategicPath;
+  if (strategicPath.length > 0) paths.push(strategicPath);
 
-  return []; // No path found
+  // return shortest path found, or empty if none
+  if (paths.length > 0) {
+    return paths.reduce((shortest, path) =>
+      path.length < shortest.length ? path : shortest,
+    );
+  }
+
+  return [];
 }
 
 /**
@@ -941,6 +975,68 @@ export function detectCustomExerciseLevel(goal, optimalMoves) {
 
   // Final fallback to insane level (6)
   return 6;
+}
+
+/**
+ * Create auto-solve function for debugging purposes
+ * Returns a function that solves the current exercise step by step with delays using actual UI clicks
+ */
+export function createAutoSolveFunction() {
+  return async function (solutionPath, goal, delayMs = 1000, clickCallback = null) {
+    if (!solutionPath || solutionPath.length === 0) {
+      console.warn(
+        "❌ No solution path provided. Please provide a valid solution path.",
+      );
+      return false;
+    }
+
+    if (!clickCallback) {
+      console.warn(
+        "❌ No click callback provided. Cannot perform UI interactions.",
+      );
+      return false;
+    }
+
+    console.log(
+      `🤖 Auto-solving exercise: 1 → ${goal}`,
+    );
+    console.log(
+      `📋 Solution has ${solutionPath.length} steps with ${delayMs}ms delay between steps`,
+    );
+
+    let stepCount = 0;
+
+    for (const step of solutionPath) {
+      stepCount++;
+
+      // Log the step being executed
+      console.log(
+        `🔄 Step ${stepCount}/${solutionPath.length}: ${step.operation.toUpperCase()} (${step.from} → ${step.to})`,
+      );
+
+      // Perform the actual UI click
+      try {
+        const result = clickCallback(step.operation);
+        if (result === false) {
+          console.error(`❌ Click callback returned false for operation: ${step.operation}`);
+          return false;
+        }
+      } catch (error) {
+        console.error(`❌ Error executing step ${stepCount}:`, error);
+        return false;
+      }
+
+      // Wait for the specified delay before next step (unless it's the last step)
+      if (stepCount < solutionPath.length) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+
+    console.log(
+      `🎉 Auto-solve completed after ${stepCount} steps`,
+    );
+    return true;
+  };
 }
 
 /**

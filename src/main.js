@@ -8,6 +8,7 @@ import { operations } from "./operations.js";
 import {
   generateExercise,
   generateHints,
+  getAllSolutions,
   getDifficultyLevels,
   calculateProgressToTarget,
   validateExercise,
@@ -2191,6 +2192,7 @@ function init() {
   if (typeof window !== "undefined") {
     window.doxinyDev = {
       validateExercise: validateExercise,
+      getAllSolutions: getAllSolutions,
       calculateProgress: calculateProgress,
       generateHints: generateHints,
       gameManager: gameManager,
