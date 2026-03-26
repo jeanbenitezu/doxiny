@@ -3,7 +3,7 @@
  * Creates solvable exercises with appropriate difficulty scaling
  */
 
-import { operations, mathUtils } from "./operations.js";
+import { mathUtils } from "./operations.js";
 import { doxinyConfig } from "./config.js";
 import {
   findDirectPath,

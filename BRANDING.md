@@ -16,7 +16,7 @@ Mathematical beauty through minimal moves.
 ## Visual Identity
 
 ### Logo Concepts
-1. **🔢 DOXINY** - Direct numerical approach
+1. **DOXINY** - Direct numerical approach
 2. **[X→Y] DOXINY** - Mathematical transformation 
 3. **◉→→→◎ DOXINY** - Journey visualization
 

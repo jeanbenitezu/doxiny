@@ -1,4 +1,4 @@
-# 🔢 Doxiny - Do X in Y moves
+# Doxiny - Do X in Y moves
 
 > *"The elegance is in efficiency"*
 

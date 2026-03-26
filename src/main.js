@@ -687,7 +687,7 @@ function createGameUI() {
     <!-- BEGIN: MainHeader -->
     <header class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between py-1" data-purpose="app-header">
       <div class="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
-        <span class="text-base sm:text-xl" style="font-size: clamp(1rem, 2.5vh, 1.5rem); font-size: clamp(1rem, 2.5svh, 1.5rem)">🔢</span>
+        <span class="text-base sm:text-xl" style="font-size: clamp(1rem, 2.5vh, 1.5rem); font-size: clamp(1rem, 2.5svh, 1.5rem)"></span>
         <h1 class="font-bold tracking-wide uppercase" style="font-size: clamp(0.8rem, 2vh, 1.2rem); font-size: clamp(0.8rem, 2svh, 1.2rem)">Doxiny</h1>
       </div>
       

@@ -86,7 +86,7 @@ Unlike other number games that rely on speed or luck, Doxiny rewards **strategic
 
 #### "Share Your Solution"
 ```
-🔢 DOXINY Challenge
+DOXINY Challenge
 1 → 128 in 7 moves
 
 My solution:

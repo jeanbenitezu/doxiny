@@ -3,7 +3,6 @@
 ## Core Brand Identity
 - **Name**: Doxiny = "Do X in Y moves"
 - **Tagline**: "The elegance is in efficiency"
-- **Icon**: 🔢 (Input Numbers emoji)
 - **Concept**: Mathematical puzzle focused on optimal solutions
 
 ## Gamification & Sharing Strategy
