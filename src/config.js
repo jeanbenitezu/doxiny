@@ -28,7 +28,7 @@ class DoxinyConfig {
 
       // Hint System Configuration
       enableStrategicHints: true, // Level 1: General strategic guidance
-      enableTacticalHints: true, // Level 2: Specific operational hints
+      enableTacticalHints: false, // Level 2: Specific operational hints
       enableDirectHints: true, // Level 3: Exact next move guidance
     };
   }
