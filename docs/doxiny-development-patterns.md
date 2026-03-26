@@ -3,6 +3,58 @@
 
 ## Code Organization Principles
 
+### Pathfinding Unification Pattern
+**Added January 2025**: Eliminated code duplication by extracting shared pathfinding logic to dedicated module.
+
+```javascript
+// Before: Duplicate functions across files (~65 lines duplicated)
+// gameHelpers.js
+function findDirectPath(from, to) { /* identical implementation */ }
+function findReverseTargets(goal) { /* identical implementation */ }
+function enhancedPathBFS(start, target, maxMoves) { /* BFS algorithm */ }
+
+// exerciseGenerator.js  
+function findDirectPath(from, to) { /* identical implementation */ }
+function findReverseTargets(goal) { /* identical implementation */ }
+function enhancedBFS(start, goal, maxMoves) { /* 85% similar BFS */ }
+
+// After: Unified pathfinding module
+// src/pathfinding.js
+export function findDirectPath(from, to) { /* single implementation */ }
+export function findReverseTargets(goal) { /* single implementation */ }
+export function enhancedBFS(start, goal, options) {
+  // Configurable BFS supporting multiple return formats
+  const { returnFormat = "path", lazy = true } = options;
+  
+  if (returnFormat === "path") {
+    // Optimized for hint generation (early termination)
+    return [...path, { operation, from, to }];
+  } else {
+    // Comprehensive for exercise validation (metadata)
+    return [{ solvable: true, minMoves, solutionPath, algorithm }];
+  }
+}
+
+// Consumer modules use unified engine
+// gameHelpers.js
+import { enhancedBFS } from "./pathfinding.js";
+function enhancedPathBFS(start, target, maxMoves) {
+  return enhancedBFS(start, target, { maxMoves, returnFormat: "path" });
+}
+
+// exerciseGenerator.js
+import { enhancedBFS as unifiedBFS } from "./pathfinding.js";
+function enhancedBFS(start, goal, maxMoves) {
+  return unifiedBFS(start, goal, { maxMoves, returnFormat: "result" });
+}
+
+// Benefits:
+// - 65+ lines of duplicate code eliminated
+// - Consistent pathfinding between hint generation and validation
+// - Single source of truth for algorithm improvements
+// - Configurable behavior without code duplication
+```
+
 ### Global Configuration Management
 **Added January 2025**: Centralized configuration system with runtime hint control and preset management.
 

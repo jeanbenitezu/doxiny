@@ -5,7 +5,7 @@
 
 import { operations, mathUtils } from "./operations.js";
 import { doxinyConfig } from "./config.js";
-import { generateHints, calculateProgressToTarget } from "./gameHelpers.js";
+import { findDirectPath, findReverseTargets, enhancedBFS as unifiedBFS } from "./pathfinding.js";
 
 /**
  * Simple difficulty configuration with i18n keys
@@ -200,48 +200,14 @@ function checkQuickPatterns(goal) {
 
 /**
  * Enhanced BFS with optimal solution finding, better pruning and early termination
+ * Uses unified BFS engine with result return format
  */
 function enhancedBFS(start, goal, maxMoves = null) {
-  const config = doxinyConfig.get();
-  const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
-  const upperBoundLimit = config.bfsUpperBoundLimit;
-  const lazy = config.lazySearch;
-  
-  const queue = [{ current: start, steps: 0, path: [] }];
-  const visited = new Map([[start, 0]]); // Track minimum steps to reach each number
-
-  const solutions = [];
-  while (queue.length > 0) {
-    const { current, steps, path } = queue.shift();
-
-    if (current === goal) {
-      const solution = { solvable: true, minMoves: steps, solutionPath: path, algorithm: "enhancedBFS" };
-      solutions.push(solution);
-      if (lazy) return [solution]; // Return first solution found in lazy mode
-    }
-
-    if (steps >= actualMaxMoves) continue;
-
-    for (const [opName, opFunc] of Object.entries(operations)) {
-      const next = opFunc(current);
-
-      if (next > 0 && next <= upperBoundLimit) {
-        const existingSteps = visited.get(next);
-        if (!existingSteps || steps + 1 < existingSteps) {
-          visited.set(next, steps + 1);
-          queue.push({
-            current: next,
-            steps: steps + 1,
-            path: [...path, { operation: opName, from: current, to: next }],
-          });
-        }
-      }
-    }
-  }
-
-  if (solutions.length > 0) return solutions;
-
-  return [{ solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" }];
+  return unifiedBFS(start, goal, {
+    maxMoves,
+    returnFormat: "result",
+    algorithm: "enhancedBFS"
+  });
 }
 
 /**
@@ -384,86 +350,6 @@ function generateFactorVariants(goal) {
 
   return variants;
 }
-
-/**
- * Find direct operational path between two numbers
- */
-function findDirectPath(from, to) {
-  const paths = [];
-
-  // Direct operations
-  if (operations.double(from) === to) {
-    paths.push({ operation: "double", from: from, to: to });
-  }
-  if (operations.reverse(from) === to) {
-    paths.push({ operation: "reverse", from: from, to: to });
-  }
-  if (operations.append1(from) === to) {
-    paths.push({ operation: "append1", from: from, to: to });
-  }
-  if (operations.sum && operations.sum(from) === to) {
-    paths.push({ operation: "sum", from: from, to: to });
-  }
-
-  return paths;
-}
-
-/**
- * Find numbers that can reach the goal in 1-2 operations (enhanced)
- */
-function findReverseTargets(goal) {
-  const targets = [];
-
-  // Numbers that when doubled give goal
-  if (goal % 2 === 0) {
-    targets.push({
-      number: goal / 2,
-      stepsToGoal: 1,
-      path: [{ operation: "double", from: goal / 2, to: goal }],
-    });
-  }
-
-  // Numbers that when reversed give goal
-  const reversed = mathUtils.reverseNumber(goal);
-  if (reversed !== goal && reversed > 0 && reversed <= 100000) {
-    targets.push({
-      number: reversed,
-      stepsToGoal: 1,
-      path: [{ operation: "reverse", from: reversed, to: goal }],
-    });
-  }
-
-  // Numbers that when sum-digits applied give goal (expanded search)
-  const maxSearchRange = Math.min(100000, goal * 20);
-  for (let candidate = goal * 2; candidate <= maxSearchRange; candidate++) {
-    if (mathUtils.sumDigits(candidate) === goal) {
-      targets.push({
-        number: candidate,
-        stepsToGoal: 1,
-        path: [{ operation: "sum", from: candidate, to: goal }],
-      });
-
-      // Only need a few good candidates to keep performance reasonable
-      if (targets.length >= 8) break;
-    }
-  }
-
-  // Numbers that when append1 applied give goal
-  const goalStr = goal.toString();
-  if (goalStr.endsWith("1") && goalStr.length > 1) {
-    const baseNumber = parseInt(goalStr.slice(0, -1));
-    if (baseNumber > 0) {
-      targets.push({
-        number: baseNumber,
-        stepsToGoal: 1,
-        path: [{ operation: "append1", from: baseNumber, to: goal }],
-      });
-    }
-  }
-
-  return targets;
-}
-
 
 /**
  * Main function: Generate a complete exercise

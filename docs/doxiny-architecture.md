@@ -16,6 +16,7 @@
 - **`src/operations.js`** - Pure functions for 4 number operations (REVERSE, SUM, APPEND, DOUBLE)
 - **`src/exerciseGenerator.js`** - BFS-based exercise generation and solvability validation
 - **`src/gameHelpers.js`** - Configurable hint system and progress calculation utilities
+- **`src/pathfinding.js`** - **NEW**: Unified pathfinding engine and shared utilities
 - **`src/config.js`** - Global configuration management with preset system
 - **`src/sharing.js`** - Progressive enhancement sharing system with Web Share API
 - **`src/i18n.js`** - Bilingual support system (EN/ES) with sharing messages and master status translations
@@ -26,6 +27,33 @@
 - **`package.json`** - Dependencies, scripts
 
 ## Architecture Patterns
+
+### Unified Pathfinding System
+```javascript
+// src/pathfinding.js - Centralized pathfinding engine
+export function enhancedBFS(start, goal, options = {}) {
+  // Configurable BFS supporting both return formats:
+  // - "path": Returns array of operations (for hints)
+  // - "result": Returns solution objects with metadata (for validation)
+  const { returnFormat = "path", lazy = true, maxMoves = 25 } = options;
+  
+  // Unified algorithm with format-specific optimizations
+}
+
+// Shared utilities (previously duplicated)
+export function findDirectPath(from, to) { /* 15 lines */ }
+export function findReverseTargets(goal) { /* 50 lines */ }
+
+// PathfindingResult wrapper for format consistency
+export class PathfindingResult { /* Unified result API */ }
+```
+
+**Benefits**:
+- **65+ lines of duplicate code eliminated** (`findDirectPath` + `findReverseTargets` deduplicated)
+- **Consistent solution finding** between hint generation and exercise validation
+- **Configurable return formats** support both raw paths and metadata-rich results
+- **Single source of truth** for pathfinding logic ensures correctness
+- **Performance optimizations** shared across all pathfinding operations
 
 ### Helper System Features
 - **3-Level Hint Guidance**: Strategic (general direction), Tactical (specific guidance), Direct (exact move)

@@ -6,6 +6,7 @@
 import { t } from "./i18n.js";
 import { operations, mathUtils } from "./operations.js";
 import { doxinyConfig } from "./config.js";
+import { findDirectPath, findReverseTargets, enhancedBFS } from "./pathfinding.js";
 
 /**
  * Find shortest path from any start number to target using enhanced BFS with strategic approaches
@@ -73,42 +74,14 @@ function findQuickPath(start, target) {
 
 /**
  * Enhanced BFS with better pruning and tracking
+ * Uses unified BFS engine with path return format
  */
 function enhancedPathBFS(start, target, maxMoves = null) {
-  const config = doxinyConfig.get();
-  const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
-  const upperBoundLimit = config.bfsUpperBoundLimit;
-
-  const queue = [{ current: start, moves: 0, path: [] }];
-  const visited = new Map([[start, 0]]); // Track minimum moves to reach each number
-
-  while (queue.length > 0) {
-    const { current, moves, path } = queue.shift();
-
-    if (moves >= actualMaxMoves) continue;
-
-    for (const [opName, opFunc] of Object.entries(operations)) {
-      const next = opFunc(current);
-
-      if (next === target) {
-        return [...path, { operation: opName, from: current, to: next }];
-      }
-
-      if (next > 0 && next <= upperBoundLimit) {
-        const existingMoves = visited.get(next);
-        if (!existingMoves || moves + 1 < existingMoves) {
-          visited.set(next, moves + 1);
-          queue.push({
-            current: next,
-            moves: moves + 1,
-            path: [...path, { operation: opName, from: current, to: next }],
-          });
-        }
-      }
-    }
-  }
-
-  return [];
+  return enhancedBFS(start, target, {
+    maxMoves,
+    returnFormat: "path",
+    algorithm: "enhancedPathBFS"
+  });
 }
 
 /**
@@ -219,85 +192,6 @@ function findSingleDigitPath(start, target) {
   }
 
   return [];
-}
-
-/**
- * Find direct operational path between two numbers
- */
-function findDirectPath(from, to) {
-  const paths = [];
-
-  // Direct operations
-  if (operations.double(from) === to) {
-    paths.push({ operation: "double", from: from, to: to });
-  }
-  if (operations.reverse(from) === to) {
-    paths.push({ operation: "reverse", from: from, to: to });
-  }
-  if (operations.append1(from) === to) {
-    paths.push({ operation: "append1", from: from, to: to });
-  }
-  if (operations.sum && operations.sum(from) === to) {
-    paths.push({ operation: "sum", from: from, to: to });
-  }
-
-  return paths;
-}
-
-/**
- * Find numbers that can reach the goal in 1-2 operations (enhanced)
- */
-function findReverseTargets(goal) {
-  const targets = [];
-
-  // Numbers that when doubled give goal
-  if (goal % 2 === 0) {
-    targets.push({
-      number: goal / 2,
-      stepsToGoal: 1,
-      path: [{ operation: "double", from: goal / 2, to: goal }],
-    });
-  }
-
-  // Numbers that when reversed give goal
-  const reversed = mathUtils.reverseNumber(goal);
-  if (reversed !== goal && reversed > 0 && reversed <= 100000) {
-    targets.push({
-      number: reversed,
-      stepsToGoal: 1,
-      path: [{ operation: "reverse", from: reversed, to: goal }],
-    });
-  }
-
-  // Numbers that when sum-digits applied give goal (expanded search)
-  const maxSearchRange = Math.min(100000, goal * 20);
-  for (let candidate = goal * 2; candidate <= maxSearchRange; candidate++) {
-    if (mathUtils.sumDigits(candidate) === goal) {
-      targets.push({
-        number: candidate,
-        stepsToGoal: 1,
-        path: [{ operation: "sum", from: candidate, to: goal }],
-      });
-
-      // Only need a few good candidates to keep performance reasonable
-      if (targets.length >= 8) break;
-    }
-  }
-
-  // Numbers that when append1 applied give goal
-  const goalStr = goal.toString();
-  if (goalStr.endsWith("1") && goalStr.length > 1) {
-    const baseNumber = parseInt(goalStr.slice(0, -1));
-    if (baseNumber > 0) {
-      targets.push({
-        number: baseNumber,
-        stepsToGoal: 1,
-        path: [{ operation: "append1", from: baseNumber, to: goal }],
-      });
-    }
-  }
-
-  return targets;
 }
 
 /**
