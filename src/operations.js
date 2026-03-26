@@ -3,13 +3,42 @@
  * Each operation transforms the current number in a specific way
  */
 
+/**
+ * Utility functions for mathematical operations
+ */
+export const mathUtils = {
+  /**
+   * Check if a number is a power of 2
+   */
+  isPowerOfTwo: (n) => {
+    return n > 0 && (n & (n - 1)) === 0;
+  },
+
+  /**
+   * Reverse the digits of a number
+   */
+  reverseNumber: (n) => {
+    return parseInt(n.toString().split("").reverse().join(""), 10) || 0;
+  },
+
+  /**
+   * Sum all digits of a number  
+   */
+  sumDigits: (n) => {
+    return n
+      .toString()
+      .split("")
+      .reduce((sum, digit) => sum + parseInt(digit, 10), 0);
+  },
+};
+
 export const operations = {
   /**
    * REVERSE: Reverse all digits
    * Examples: 12 → 21, 100 → 1, 1234 → 4321
    */
   reverse: (n) => {
-    return parseInt(n.toString().split("").reverse().join("")) || 0;
+    return mathUtils.reverseNumber(n);
   },
 
   /**
@@ -17,10 +46,7 @@ export const operations = {
    * Examples: 128 → 1+2+8 = 11, 99 → 9+9 = 18
    */
   sum: (n) => {
-    return n
-      .toString()
-      .split("")
-      .reduce((acc, digit) => acc + Number(digit), 0);
+    return mathUtils.sumDigits(n);
   },
 
   /**
