@@ -285,4 +285,7 @@ function generateHints(currentNumber, targetNumber, movesMade, hintsUsed = 0) {
 - **Smart progression**: When user makes move, hint progression continues (strategic→tactical→direct) but hints are regenerated for new current number
 - **Fresh context**: Each hint is always relevant to current game state
 
+---
+Last Updated: March 26, 2026 (Fixed BFS upper bound optimization - increased to 1M, simplified logic)
+
 Last Updated: March 24, 2026 (Added completion counter system and level reset functionality)

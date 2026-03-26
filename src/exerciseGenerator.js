@@ -199,7 +199,7 @@ function checkQuickPatterns(goal) {
 }
 
 /**
- * Enhanced BFS with better pruning and early termination
+ * Enhanced BFS with optimal solution finding, better pruning and early termination
  */
 function enhancedBFS(start, goal, maxMoves, lazy = true) {
   const queue = [{ current: start, steps: 0, path: [] }];
@@ -220,7 +220,7 @@ function enhancedBFS(start, goal, maxMoves, lazy = true) {
     for (const [opName, opFunc] of Object.entries(operations)) {
       const next = opFunc(current);
 
-      if (next > 0 && next <= 100000) {
+      if (next > 0 && next <= 1000000) {
         const existingSteps = visited.get(next);
         if (!existingSteps || steps + 1 < existingSteps) {
           visited.set(next, steps + 1);
@@ -551,7 +551,7 @@ function enhancedPathBFS(start, target, maxMoves) {
         return [...path, { operation: opName, from: current, to: next }];
       }
 
-      if (next > 0 && next <= 100000) {
+      if (next > 0 && next <= 1000000) {
         const existingMoves = visited.get(next);
         if (!existingMoves || moves + 1 < existingMoves) {
           visited.set(next, moves + 1);

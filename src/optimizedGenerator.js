@@ -227,7 +227,7 @@ class UltimateOptimizedDoxinyGenerator {
       for (const [opName, opFunc] of Object.entries(this.operations)) {
         const next = opFunc(current);
 
-        if (next > 0 && next <= 10000) {
+        if (next > 0 && next <= 1000000) {
           const existingSteps = visited.get(next);
           if (!existingSteps || steps + 1 < existingSteps) {
             visited.set(next, steps + 1);
