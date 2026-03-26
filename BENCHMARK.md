@@ -9,11 +9,13 @@ This benchmark compares the performance and result quality between lazy and gree
 
 ## Quick Start
 
+### Local Testing
+
 ```bash
 # Test small range (2-100) - quick test
 npm run benchmark:small
 
-# Test medium range (2-1000) - moderate test  
+# Test medium range (2-1000) - moderate test
 npm run benchmark:medium
 
 # Test full range (2-10000) - comprehensive test (may take several minutes)
@@ -23,10 +25,21 @@ npm run benchmark
 START_NUMBER=50 END_NUMBER=500 npm run benchmark
 ```
 
+### GitHub Actions (Recommended)
+
+For cloud-based benchmarking with artifact storage:
+
+1. Go to **Actions** tab in GitHub repository
+2. Select **"🔬 Doxiny Validation Benchmark"**
+3. Click **"Run workflow"** and choose your configuration
+4. View results in job logs and download artifacts
+
+See [GitHub Actions Benchmark Guide](.github/BENCHMARK_ACTION.md) for detailed instructions.
+
 ## Environment Variables
 
 - `START_NUMBER`: Starting number (default: 2)
-- `END_NUMBER`: Ending number (default: 10000) 
+- `END_NUMBER`: Ending number (default: 10000)
 - `MAX_MOVES`: Maximum moves for validation (default: 30)
 
 ## Sample Output
@@ -43,7 +56,7 @@ The benchmark provides:
 Based on the algorithm design:
 
 - **Lazy should be faster**: Early exit saves computation
-- **Quality should be similar**: Both find valid solutions 
+- **Quality should be similar**: Both find valid solutions
 - **Greedy may be slightly better**: Explores all options for optimal path
 
 ## Interpreting Results

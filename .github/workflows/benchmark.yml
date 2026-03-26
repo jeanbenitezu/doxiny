@@ -1,0 +1,167 @@
+name: 🔬 Doxiny Validation Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      benchmark_type:
+        description: "Benchmark type to run"
+        required: true
+        default: "small"
+        type: choice
+        options:
+          - small
+          - medium
+          - full
+          - custom
+      start_number:
+        description: "Start number (for custom benchmark)"
+        required: false
+        default: "2"
+        type: string
+      end_number:
+        description: "End number (for custom benchmark)"
+        required: false
+        default: "100"
+        type: string
+      max_moves:
+        description: "Maximum moves for validation"
+        required: false
+        default: "30"
+        type: string
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Validate inputs
+        run: |
+          echo "Benchmark type: ${{ github.event.inputs.benchmark_type }}"
+          if [ "${{ github.event.inputs.benchmark_type }}" = "custom" ]; then
+            echo "Custom range: ${{ github.event.inputs.start_number }} to ${{ github.event.inputs.end_number }}"
+            echo "Max moves: ${{ github.event.inputs.max_moves }}"
+            
+            # Validate numbers
+            if ! [[ "${{ github.event.inputs.start_number }}" =~ ^[0-9]+$ ]]; then
+              echo "❌ Start number must be a positive integer"
+              exit 1
+            fi
+            
+            if ! [[ "${{ github.event.inputs.end_number }}" =~ ^[0-9]+$ ]]; then
+              echo "❌ End number must be a positive integer"
+              exit 1
+            fi
+            
+            if ! [[ "${{ github.event.inputs.max_moves }}" =~ ^[0-9]+$ ]]; then
+              echo "❌ Max moves must be a positive integer"
+              exit 1
+            fi
+            
+            if [ "${{ github.event.inputs.start_number }}" -ge "${{ github.event.inputs.end_number }}" ]; then
+              echo "❌ Start number must be less than end number"
+              exit 1
+            fi
+            
+            # Check for reasonable limits to prevent excessive resource usage
+            RANGE_SIZE=$(( ${{ github.event.inputs.end_number }} - ${{ github.event.inputs.start_number }} ))
+            if [ $RANGE_SIZE -gt 50000 ]; then
+              echo "❌ Range too large (max 50,000 numbers). Requested: $RANGE_SIZE"
+              exit 1
+            fi
+          fi
+
+      - name: 🏃 Run Small Benchmark (2-100)
+        if: github.event.inputs.benchmark_type == 'small'
+        run: |
+          echo "Running small benchmark..."
+          npm run benchmark:small
+
+      - name: 🏃 Run Medium Benchmark (2-1,000)
+        if: github.event.inputs.benchmark_type == 'medium'
+        run: |
+          echo "Running medium benchmark..."
+          npm run benchmark:medium
+
+      - name: 🏃 Run Full Benchmark (2-10,000)
+        if: github.event.inputs.benchmark_type == 'full'
+        run: |
+          echo "Running full benchmark..."
+          npm run benchmark
+
+      - name: 🏃 Run Custom Benchmark
+        if: github.event.inputs.benchmark_type == 'custom'
+        run: |
+          echo "Running custom benchmark..."
+          echo "Configuration:"
+          echo "  Start: ${{ github.event.inputs.start_number }}"
+          echo "  End: ${{ github.event.inputs.end_number }}"
+          echo "  Max moves: ${{ github.event.inputs.max_moves }}"
+          echo "  Numbers to test: $(( ${{ github.event.inputs.end_number }} - ${{ github.event.inputs.start_number }} + 1 ))"
+          echo ""
+          START_NUMBER=${{ github.event.inputs.start_number }} \
+          END_NUMBER=${{ github.event.inputs.end_number }} \
+          MAX_MOVES=${{ github.event.inputs.max_moves }} \
+          npm run benchmark
+
+      - name: 📊 Upload benchmark results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ github.event.inputs.benchmark_type }}-${{ github.run_number }}
+          path: |
+            benchmark-lazy-vs-greedy.js
+            BENCHMARK.md
+          retention-days: 30
+
+      - name: 💬 Add benchmark summary to job
+        if: always()
+        run: |
+          echo "## 🔬 Benchmark Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Type:** ${{ github.event.inputs.benchmark_type }}" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ github.event.inputs.benchmark_type }}" = "small" ]; then
+            echo "**Range:** 2 to 100 (99 numbers)" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ github.event.inputs.benchmark_type }}" = "medium" ]; then
+            echo "**Range:** 2 to 1,000 (999 numbers)" >> $GITHUB_STEP_SUMMARY  
+          elif [ "${{ github.event.inputs.benchmark_type }}" = "full" ]; then
+            echo "**Range:** 2 to 10,000 (9,999 numbers)" >> $GITHUB_STEP_SUMMARY
+          else
+            RANGE_SIZE=$(( ${{ github.event.inputs.end_number }} - ${{ github.event.inputs.start_number }} + 1 ))
+            echo "**Range:** ${{ github.event.inputs.start_number }} to ${{ github.event.inputs.end_number }} ($RANGE_SIZE numbers)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "**Max moves:** ${{ github.event.inputs.max_moves || '30' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Run time:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ **Benchmark completed successfully!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📊 Check the job logs above for detailed benchmark results, performance comparison, and recommendations." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Benchmark failed or was cancelled.**" >> $GITHUB_STEP_SUMMARY  
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🔍 Check the job logs above for error details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📄 **Benchmark artifacts are available for download and will be kept for 30 days.**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*To run another benchmark, go to Actions > 🔬 Doxiny Validation Benchmark > Run workflow*" >> $GITHUB_STEP_SUMMARY
