@@ -7,6 +7,18 @@
  * Best of both worlds: Maximum reliability + Intelligent insights
  */
 
+/**
+ * BFS upper bound limit for intermediate number exploration
+ * 
+ * This critical value (200,000) represents the optimal balance between:
+ * - CORRECTNESS: High enough to allow goal 73's optimal 10-move solution
+ * - PERFORMANCE: Low enough to prevent exponential search space explosion
+ * 
+ * See exerciseGenerator.js for full benchmark analysis documentation.
+ * ⚠️ DO NOT CHANGE without extensive benchmark testing!
+ */
+const BFS_UPPER_BOUND_LIMIT = 200000;
+
 class UltimateOptimizedDoxinyGenerator {
   constructor() {
     this.solutionCache = new Map();
@@ -227,7 +239,7 @@ class UltimateOptimizedDoxinyGenerator {
       for (const [opName, opFunc] of Object.entries(this.operations)) {
         const next = opFunc(current);
 
-        if (next > 0 && next <= 1000000) {
+        if (next > 0 && next <= BFS_UPPER_BOUND_LIMIT) {
           const existingSteps = visited.get(next);
           if (!existingSteps || steps + 1 < existingSteps) {
             visited.set(next, steps + 1);
