@@ -87,19 +87,19 @@ jobs:
         if: github.event.inputs.benchmark_type == 'small'
         run: |
           echo "Running small benchmark..."
-          npm run benchmark:small
+          npm run benchmark:small | tee benchmark-results.txt
 
       - name: 🏃 Run Medium Benchmark (2-1,000)
         if: github.event.inputs.benchmark_type == 'medium'
         run: |
           echo "Running medium benchmark..."
-          npm run benchmark:medium
+          npm run benchmark:medium | tee benchmark-results.txt
 
       - name: 🏃 Run Full Benchmark (2-10,000)
         if: github.event.inputs.benchmark_type == 'full'
         run: |
           echo "Running full benchmark..."
-          npm run benchmark
+          npm run benchmark | tee benchmark-results.txt
 
       - name: 🏃 Run Custom Benchmark
         if: github.event.inputs.benchmark_type == 'custom'
@@ -114,7 +114,35 @@ jobs:
           START_NUMBER=${{ github.event.inputs.start_number }} \
           END_NUMBER=${{ github.event.inputs.end_number }} \
           MAX_MOVES=${{ github.event.inputs.max_moves }} \
-          npm run benchmark
+          npm run benchmark | tee benchmark-results.txt
+
+      - name: 📝 Create benchmark metadata
+        if: always()
+        run: |
+          echo "# Benchmark Metadata" > benchmark-metadata.txt
+          echo "" >> benchmark-metadata.txt
+          echo "**Run ID**: ${{ github.run_number }}" >> benchmark-metadata.txt
+          echo "**Type**: ${{ github.event.inputs.benchmark_type }}" >> benchmark-metadata.txt
+          echo "**Triggered by**: @${{ github.actor }}" >> benchmark-metadata.txt
+          echo "**Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> benchmark-metadata.txt
+          echo "**Node.js**: $(node --version)" >> benchmark-metadata.txt
+          echo "**NPM**: $(npm --version)" >> benchmark-metadata.txt
+          echo "" >> benchmark-metadata.txt
+          
+          if [ "${{ github.event.inputs.benchmark_type }}" = "small" ]; then
+            echo "**Range**: 2 to 100 (99 numbers)" >> benchmark-metadata.txt
+          elif [ "${{ github.event.inputs.benchmark_type }}" = "medium" ]; then
+            echo "**Range**: 2 to 1,000 (999 numbers)" >> benchmark-metadata.txt  
+          elif [ "${{ github.event.inputs.benchmark_type }}" = "full" ]; then
+            echo "**Range**: 2 to 10,000 (9,999 numbers)" >> benchmark-metadata.txt
+          else
+            RANGE_SIZE=$(( ${{ github.event.inputs.end_number }} - ${{ github.event.inputs.start_number }} + 1 ))
+            echo "**Range**: ${{ github.event.inputs.start_number }} to ${{ github.event.inputs.end_number }} ($RANGE_SIZE numbers)" >> benchmark-metadata.txt
+          fi
+          
+          echo "**Max moves**: ${{ github.event.inputs.max_moves || '30' }}" >> benchmark-metadata.txt
+          echo "**Repository**: ${{ github.repository }}" >> benchmark-metadata.txt
+          echo "**Commit**: ${{ github.sha }}" >> benchmark-metadata.txt
 
       - name: 📊 Upload benchmark results as artifact
         if: always()
@@ -122,8 +150,8 @@ jobs:
         with:
           name: benchmark-results-${{ github.event.inputs.benchmark_type }}-${{ github.run_number }}
           path: |
-            benchmark-lazy-vs-greedy.js
-            BENCHMARK.md
+            benchmark-results.txt
+            benchmark-metadata.txt
           retention-days: 30
 
       - name: 💬 Add benchmark summary to job
@@ -152,15 +180,41 @@ jobs:
 
           if [ "${{ job.status }}" = "success" ]; then
             echo "✅ **Benchmark completed successfully!**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "📊 Check the job logs above for detailed benchmark results, performance comparison, and recommendations." >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Benchmark failed or was cancelled.**" >> $GITHUB_STEP_SUMMARY  
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "🔍 Check the job logs above for error details." >> $GITHUB_STEP_SUMMARY
           fi
-
+          
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Include benchmark metadata if file exists
+          if [ -f "benchmark-metadata.txt" ]; then
+            echo "## 📋 Benchmark Metadata" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat benchmark-metadata.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Include benchmark results if file exists
+          if [ -f "benchmark-results.txt" ]; then
+            echo "## 📊 Benchmark Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "<details>" >> $GITHUB_STEP_SUMMARY
+            echo "<summary><strong>Click to view full benchmark results</strong></summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat benchmark-results.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
           echo "📄 **Benchmark artifacts are available for download and will be kept for 30 days.**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
