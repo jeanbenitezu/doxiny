@@ -143,15 +143,6 @@ function checkQuickPatterns(goal) {
     };
   }
 
-  // Single digits (2-9) have known short paths
-  if (goal >= 2 && goal <= 9) {
-    return {
-      solvable: true,
-      minMoves: estimateMinMovesForDigit(goal),
-      solutionPath: [],
-    };
-  }
-
   return null;
 }
 
@@ -398,11 +389,6 @@ function findReverseTargets(goal) {
 // Helper functions
 function isPowerOfTwo(n) {
   return n > 0 && (n & (n - 1)) === 0;
-}
-
-function estimateMinMovesForDigit(digit) {
-  const shortcuts = { 2: 1, 4: 2, 8: 3, 3: 2, 6: 3, 9: 3, 5: 3, 7: 4 };
-  return shortcuts[digit] || 4;
 }
 
 function reverseNumber(n) {
