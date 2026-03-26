@@ -609,6 +609,3 @@ export function getDifficultyLevels() {
     goalRange: config.goalRange,
   }));
 }
-
-// Re-export functions for backward compatibility
-export { generateHints, calculateProgressToTarget };

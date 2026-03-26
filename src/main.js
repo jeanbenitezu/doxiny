@@ -7,14 +7,15 @@ import { createGameState, applyMove, resetGame } from "./game.js";
 import { operations } from "./operations.js";
 import {
   generateExercise,
-  generateHints,
   getAllSolutions,
   getDifficultyLevels,
-  calculateProgressToTarget,
   validateExercise,
   detectCustomExerciseLevel,
 } from "./exerciseGenerator.js";
-// } from "./optimizedGenerator.js";
+import {
+  calculateProgressToTarget,
+  generateHints,
+} from "./gameHelpers.js";
 import {
   translate,
   t,
