@@ -12,10 +12,7 @@ import {
   validateExercise,
   detectCustomExerciseLevel,
 } from "./exerciseGenerator.js";
-import {
-  calculateProgressToTarget,
-  generateHints,
-} from "./gameHelpers.js";
+import { calculateProgressToTarget, generateHints } from "./gameHelpers.js";
 import {
   translate,
   t,

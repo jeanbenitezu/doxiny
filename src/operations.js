@@ -22,7 +22,7 @@ export const mathUtils = {
   },
 
   /**
-   * Sum all digits of a number  
+   * Sum all digits of a number
    */
   sumDigits: (n) => {
     return n

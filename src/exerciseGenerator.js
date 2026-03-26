@@ -5,7 +5,11 @@
 
 import { operations, mathUtils } from "./operations.js";
 import { doxinyConfig } from "./config.js";
-import { findDirectPath, findReverseTargets, enhancedBFS as unifiedBFS } from "./pathfinding.js";
+import {
+  findDirectPath,
+  findReverseTargets,
+  enhancedBFS as unifiedBFS,
+} from "./pathfinding.js";
 
 /**
  * Simple difficulty configuration with i18n keys
@@ -103,8 +107,8 @@ function generateSimpleExercise(difficulty) {
 export function getAllSolutions(goal, maxMoves = null) {
   const config = doxinyConfig.get();
   const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
-  
-  const solutions = []
+
+  const solutions = [];
   // Quick pattern-based checks first
   const quickResult = checkQuickPatterns(goal);
   solutions.push(quickResult);
@@ -117,7 +121,7 @@ export function getAllSolutions(goal, maxMoves = null) {
   const strategicResult = tryStrategicApproaches(goal, actualMaxMoves + 5);
   solutions.push(strategicResult);
 
-  return solutions.flat(Infinity).filter(s => s.solvable);
+  return solutions.flat(Infinity).filter((s) => s.solvable);
 }
 
 /**
@@ -130,10 +134,10 @@ export function validateExercise(goal, maxMoves = null) {
   const config = doxinyConfig.get();
   const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
   const lazy = config.lazySearch;
-  
+
   if (lazy) {
     // Lazy mode: return first valid solution found, prioritizing the same order as strategic method execution
-    
+
     // Try quick pattern-based checks first
     const quickResults = checkQuickPatterns(goal);
     for (const result of quickResults) {
@@ -158,7 +162,12 @@ export function validateExercise(goal, maxMoves = null) {
       }
     }
 
-    return { solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" };
+    return {
+      solvable: false,
+      minMoves: Infinity,
+      solutionPath: [],
+      algorithm: "none",
+    };
   } else {
     // Non-lazy mode: get all solutions and return the best one
     const solutions = getAllSolutions(goal, actualMaxMoves);
@@ -170,7 +179,12 @@ export function validateExercise(goal, maxMoves = null) {
       );
     }
 
-    return { solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" };
+    return {
+      solvable: false,
+      minMoves: Infinity,
+      solutionPath: [],
+      algorithm: "none",
+    };
   }
 }
 
@@ -181,21 +195,30 @@ function checkQuickPatterns(goal) {
   // Powers of 2 are always reachable by doubling
   if (mathUtils.isPowerOfTwo(goal)) {
     const steps = Math.log2(goal);
-    return [{
-      solvable: true,
-      minMoves: steps,
-      algorithm: "powersOfTwo",
-      solutionPath: Array(steps)
-        .fill()
-        .map((_, i) => ({
-          operation: "double",
-          from: Math.pow(2, i),
-          to: Math.pow(2, i + 1),
-        })),
-    }];
+    return [
+      {
+        solvable: true,
+        minMoves: steps,
+        algorithm: "powersOfTwo",
+        solutionPath: Array(steps)
+          .fill()
+          .map((_, i) => ({
+            operation: "double",
+            from: Math.pow(2, i),
+            to: Math.pow(2, i + 1),
+          })),
+      },
+    ];
   }
 
-  return [{ solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" }];
+  return [
+    {
+      solvable: false,
+      minMoves: Infinity,
+      solutionPath: [],
+      algorithm: "none",
+    },
+  ];
 }
 
 /**
@@ -206,7 +229,7 @@ function enhancedBFS(start, goal, maxMoves = null) {
   return unifiedBFS(start, goal, {
     maxMoves,
     returnFormat: "result",
-    algorithm: "enhancedBFS"
+    algorithm: "enhancedBFS",
   });
 }
 
@@ -217,7 +240,7 @@ function tryStrategicApproaches(goal, maxMoves = null) {
   const config = doxinyConfig.get();
   const actualMaxMoves = maxMoves ?? config.defaultMaxMoves;
   const lazy = config.lazySearch;
-  
+
   const solutions = [];
   // Strategy 1: Try numbers that can be transformed into the goal
   const reverseTargets = findReverseTargets(goal);
@@ -225,7 +248,7 @@ function tryStrategicApproaches(goal, maxMoves = null) {
     const pathToTarget = enhancedBFS(
       1,
       target.number,
-      actualMaxMoves - target.stepsToGoal
+      actualMaxMoves - target.stepsToGoal,
     );
     if (pathToTarget.solvable) {
       const solution = {
@@ -246,7 +269,7 @@ function tryStrategicApproaches(goal, maxMoves = null) {
       const pathToVariant = enhancedBFS(
         1,
         variant.number,
-        actualMaxMoves - variant.stepsToGoal
+        actualMaxMoves - variant.stepsToGoal,
       );
       if (pathToVariant.solvable) {
         const solution = {
@@ -267,7 +290,7 @@ function tryStrategicApproaches(goal, maxMoves = null) {
     const pathToVariant = enhancedBFS(
       1,
       variant.number,
-      actualMaxMoves - variant.stepsToGoal
+      actualMaxMoves - variant.stepsToGoal,
     );
     if (pathToVariant.solvable) {
       const solution = {
@@ -283,7 +306,14 @@ function tryStrategicApproaches(goal, maxMoves = null) {
 
   if (solutions.length > 0) return solutions;
 
-  return [{ solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" }];
+  return [
+    {
+      solvable: false,
+      minMoves: Infinity,
+      solutionPath: [],
+      algorithm: "none",
+    },
+  ];
 }
 
 /**
@@ -426,7 +456,12 @@ export function detectCustomExerciseLevel(goal, optimalMoves) {
  * Returns a function that solves the current exercise step by step with delays using actual UI clicks
  */
 export function createAutoSolveFunction() {
-  return async function (solutionPath, goal, delayMs = 1000, clickCallback = null) {
+  return async function (
+    solutionPath,
+    goal,
+    delayMs = 1000,
+    clickCallback = null,
+  ) {
     if (!solutionPath || solutionPath.length === 0) {
       console.warn(
         "❌ No solution path provided. Please provide a valid solution path.",
@@ -441,9 +476,7 @@ export function createAutoSolveFunction() {
       return false;
     }
 
-    console.log(
-      `🤖 Auto-solving exercise: 1 → ${goal}`,
-    );
+    console.log(`🤖 Auto-solving exercise: 1 → ${goal}`);
     console.log(
       `📋 Solution has ${solutionPath.length} steps with ${delayMs}ms delay between steps`,
     );
@@ -462,7 +495,9 @@ export function createAutoSolveFunction() {
       try {
         const result = clickCallback(step.operation);
         if (result === false) {
-          console.error(`❌ Click callback returned false for operation: ${step.operation}`);
+          console.error(
+            `❌ Click callback returned false for operation: ${step.operation}`,
+          );
           return false;
         }
       } catch (error) {
@@ -476,9 +511,7 @@ export function createAutoSolveFunction() {
       }
     }
 
-    console.log(
-      `🎉 Auto-solve completed after ${stepCount} steps`,
-    );
+    console.log(`🎉 Auto-solve completed after ${stepCount} steps`);
     return true;
   };
 }

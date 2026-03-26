@@ -6,7 +6,11 @@
 import { t } from "./i18n.js";
 import { operations, mathUtils } from "./operations.js";
 import { doxinyConfig } from "./config.js";
-import { findDirectPath, findReverseTargets, enhancedBFS } from "./pathfinding.js";
+import {
+  findDirectPath,
+  findReverseTargets,
+  enhancedBFS,
+} from "./pathfinding.js";
 
 /**
  * Find shortest path from any start number to target using enhanced BFS with strategic approaches
@@ -80,7 +84,7 @@ function enhancedPathBFS(start, target, maxMoves = null) {
   return enhancedBFS(start, target, {
     maxMoves,
     returnFormat: "path",
-    algorithm: "enhancedPathBFS"
+    algorithm: "enhancedPathBFS",
   });
 }
 
@@ -419,7 +423,9 @@ function generateFallbackHints(current, target, hintsUsed) {
       hints.push({
         level: 2,
         type: "tactical",
-        message: t("hints.tactical.multiDigitOps", { count: currentStr.length }),
+        message: t("hints.tactical.multiDigitOps", {
+          count: currentStr.length,
+        }),
         confidence: "medium",
       });
     } else {

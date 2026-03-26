@@ -35,7 +35,7 @@ export class PathfindingResult {
       solvable: this.solvable,
       minMoves: this.minMoves,
       solutionPath: this.solutionPath,
-      algorithm: this.algorithm
+      algorithm: this.algorithm,
     };
   }
 
@@ -44,7 +44,7 @@ export class PathfindingResult {
     return new PathfindingResult(
       result.solutionPath || [],
       result.algorithm || "unknown",
-      { originalResult: result }
+      { originalResult: result },
     );
   }
 }
@@ -140,14 +140,14 @@ export function findReverseTargets(goal) {
  */
 export function enhancedBFS(start, goal, options = {}) {
   const config = doxinyConfig.get();
-  
+
   // Configuration with defaults
   const {
     maxMoves = config.defaultMaxMoves,
-    upperBoundLimit = config.bfsUpperBoundLimit, 
+    upperBoundLimit = config.bfsUpperBoundLimit,
     lazy = config.lazySearch,
     returnFormat = "path", // "path" for gameHelpers, "result" for exerciseGenerator
-    algorithm = "enhancedBFS"
+    algorithm = "enhancedBFS",
   } = options;
 
   const queue = [{ current: start, steps: 0, path: [] }];
@@ -159,15 +159,15 @@ export function enhancedBFS(start, goal, options = {}) {
 
     // Check if we reached the goal
     if (current === goal) {
-      const solution = { 
-        solvable: true, 
-        minMoves: steps, 
-        solutionPath: path, 
-        algorithm 
+      const solution = {
+        solvable: true,
+        minMoves: steps,
+        solutionPath: path,
+        algorithm,
       };
-      
+
       solutions.push(solution);
-      
+
       // Return immediately in lazy mode or when returnFormat is "path"
       if (lazy || returnFormat === "path") {
         return returnFormat === "path" ? path : [solution];
@@ -181,7 +181,10 @@ export function enhancedBFS(start, goal, options = {}) {
 
       // For "path" return format, check target in operation loop for early termination
       if (returnFormat === "path" && next === goal) {
-        const finalPath = [...path, { operation: opName, from: current, to: next }];
+        const finalPath = [
+          ...path,
+          { operation: opName, from: current, to: next },
+        ];
         return finalPath;
       }
 
@@ -203,11 +206,18 @@ export function enhancedBFS(start, goal, options = {}) {
   if (returnFormat === "path") {
     return []; // No path found
   }
-  
+
   // Return result format
   if (solutions.length > 0) {
     return solutions;
   }
-  
-  return [{ solvable: false, minMoves: Infinity, solutionPath: [], algorithm: "none" }];
+
+  return [
+    {
+      solvable: false,
+      minMoves: Infinity,
+      solutionPath: [],
+      algorithm: "none",
+    },
+  ];
 }
