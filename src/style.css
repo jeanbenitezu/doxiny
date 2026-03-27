@@ -199,6 +199,38 @@ body {
   transform-origin: 0 6px;
 }
 
+/* === LINEICONS STYLING === */
+/* Ensure LineIcons display properly and have consistent sizing */
+.lni {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-size: inherit;
+}
+
+/* Icon sizes for different contexts */
+button .lni {
+  font-size: 1.1em;
+  vertical-align: text-top;
+}
+
+/* Celebration emoji sizing */
+.celebration-emoji .lni {
+  font-size: inherit;
+  color: #fbbf24; /* yellow-400 */
+}
+
+/* Hint icon sizing */
+#hint-icon-display.lni {
+  font-size: 1.2em;
+  color: #fbbf24; /* yellow-400 */
+}
+
+/* Game mode icons */
+#current-mode-label .lni {
+  font-size: 1.1em;
+}
+
 .confetti-heart:after {
   left: 0;
   transform: rotate(45deg);

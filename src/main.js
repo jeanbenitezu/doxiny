@@ -287,30 +287,30 @@ class GameManager {
     if (efficiency >= 1.0)
       return {
         grade: translate("performanceGrades.perfect"),
-        emoji: "🏆",
+        emoji: "<i class='lni lni-crown'></i>",
         description: translate("performanceDescriptions.optimalSolution"),
       };
     if (efficiency >= 0.85)
       return {
         grade: translate("performanceGrades.excellent"),
-        emoji: "⭐",
+        emoji: "<i class='lni lni-star-fill'></i>",
         description: translate("performanceDescriptions.amazingEfficiency"),
       };
     if (efficiency >= 0.7)
       return {
         grade: translate("performanceGrades.great"),
-        emoji: "👍",
+        emoji: "<i class='lni lni-thumbs-up'></i>",
         description: translate("performanceDescriptions.wellDone"),
       };
     if (efficiency >= 0.55)
       return {
         grade: translate("performanceGrades.good"),
-        emoji: "😊",
+        emoji: "<i class='lni lni-smile'></i>",
         description: translate("performanceDescriptions.niceJob"),
       };
     return {
       grade: translate("performanceGrades.keepTrying"),
-      emoji: "💪",
+      emoji: "<i class='lni lni-sad'></i>",
       description: translate("performanceDescriptions.youCanDoBetter"),
     };
   }
@@ -455,7 +455,7 @@ function renderLevelSelectorUI() {
              ${isLocked ? "disabled" : ""}
              ${title ? `title="${title}"` : ""}>
           <span class="font-bold" style="font-size: clamp(0.7rem, 2vh, 1rem); font-size: clamp(0.7rem, 2svh, 1rem);">
-            ${isCustom ? "🎯" : isLocked ? "🔒" : lvl.level}
+            ${isCustom ? "<i class='lni lni-pencil'></i>" : isLocked ? "<i class='lni lni-lock'></i>" : lvl.level}
           </span>
           <span class="uppercase font-bold leading-tight${isLocked ? " hidden" : ""}" style="font-size: clamp(0.5rem, 1.2vh, 0.7rem); font-size: clamp(0.5rem, 1.2svh, 0.7rem);">
             ${isCustom ? translate("custom") || "Custom" : isLocked ? translate("blocked") : translate(`difficultyLevels.${lvl.nameKey}`)}
@@ -513,7 +513,7 @@ function showMasterAchievementModal() {
 
   modal.innerHTML = `
     <div class="bg-gradient-to-br from-yellow-400 via-gold-500 to-yellow-600 p-6 rounded-2xl max-w-sm mx-4 text-center shadow-2xl shadow-gold-500/50 animate-bounce-in">
-      <div class="text-6xl mb-4 animate-spin-once">👑</div>
+      <div class="text-6xl mb-4 animate-spin-once"><i class="lni lni-crown"></i></div>
       <h2 class="text-2xl font-bold text-white mb-2">${translate("masterAchievement.title")}</h2>
       <p class="text-white/90 mb-4">${translate("masterAchievement.message")}</p>
       <button id="master-achievement-continue-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all w-full">
@@ -686,25 +686,25 @@ function createGameUI() {
   return `
     <!-- BEGIN: MainHeader -->
     <header class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between py-1" data-purpose="app-header">
-      <div class="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
-        <span class="text-base sm:text-xl" style="font-size: clamp(1rem, 2.5vh, 1.5rem); font-size: clamp(1rem, 2.5svh, 1.5rem)"></span>
+      <div class="flex items-center justify-center sm:justify-start gap-1">
+        <i class="lni lni-calculator"></i>
         <h1 class="font-bold tracking-wide uppercase" style="font-size: clamp(0.8rem, 2vh, 1.2rem); font-size: clamp(0.8rem, 2svh, 1.2rem)">Doxiny</h1>
       </div>
       
       <!-- Game Mode & Language Controls -->
       <div class="flex gap-2 justify-center sm:justify-end items-center">
-        ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold relative" title="${translate("masterStatus.title")}">👑${gameManager.gameModeManager.getCompletionDisplay() ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 0.6rem; min-width: 1rem; min-height: 1rem;">${gameManager.gameModeManager.getCompletionDisplay()}</span>` : ""}</span>` : ""}
+        ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold relative" title="${translate("masterStatus.title")}"><i class="lni lni-crown"></i>${gameManager.gameModeManager.getCompletionDisplay() ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 0.6rem; min-width: 1rem; min-height: 1rem;">${gameManager.gameModeManager.getCompletionDisplay()}</span>` : ""}</span>` : ""}
         <!-- Game Mode Dropdown -->
         <div class="relative">
           <button id="game-mode-dropdown-btn" class="mode-indicator ${gameManager.gameModeManager.getGameMode()} btn-mode-${gameManager.gameModeManager.getGameMode()} hover:brightness-110 border border-white/20 rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
                   style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem); height: clamp(1.5rem, 3vh, 2rem); height: clamp(1.5rem, 3svh, 2rem);">
-            <span id="current-mode-label">${gameManager.gameModeManager.getGameMode() === "normal" ? "🎯" : "🔓"}</span>
+            <span id="current-mode-label">${gameManager.gameModeManager.getGameMode() === "normal" ? "<i class='lni lni-target'></i>" : "<i class='lni lni-unlock'></i>"}</span>
             <span id="current-mode-text">${translate(`gameModes.${gameManager.gameModeManager.getGameMode()}`)}</span>
             <span>▼</span>
           </button>
           <div id="game-mode-dropdown" class="hidden absolute top-full left-0 mt-1 bg-gray-800 border border-white/20 rounded shadow-lg shadow-black/50 z-50 min-w-full">
             <button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="normal">
-              <span>🎯</span>
+              <i class="lni lni-target"></i>
               <div>
                 <div class="font-semibold">${translate("gameModes.normal")}</div>
                 <div class="text-xs text-gray-400">${translate("gameModeDescriptions.normal")}</div>
@@ -713,14 +713,14 @@ function createGameUI() {
             ${
               gameManager.gameModeManager.isMaster()
                 ? `<button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="freeplay">
-                  <span>🔓</span>
+                  <span><i class="lni lni-unlock"></i></span>
                   <div>
                     <div class="font-semibold">${translate("gameModes.freeplay")}</div>
                     <div class="text-xs text-gray-400">${translate("gameModeDescriptions.freeplay")}</div>
                   </div>
                 </button>`
                 : `<button class="game-mode-option w-full px-3 py-2 text-left cursor-not-allowed opacity-50 flex items-center gap-2" data-mode="freeplay" disabled>
-                  <span>🔒</span>
+                  <span><i class="lni lni-lock"></i></span>
                   <div>
                     <div class="font-semibold text-gray-400">${translate("gameModes.freeplay")}</div>
                     <div class="text-xs text-gray-500">${translate("gameModeDescriptions.freeplayLocked")}</div>
@@ -756,7 +756,7 @@ function createGameUI() {
     <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-2 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between gap-1" style="height: 7rem;">
       <div class="flex flex-row sm:flex-col justify-center items-center gap-1 sm:mr-2">
         <button class="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap shadow-lg shadow-black-800 drop-shadow-lg" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="share-puzzle-btn">
-          🫶 <span>${translate("sharing.shareCurrentPuzzle")}</span>
+          <i class="lni lni-share-alt"></i> <span>${translate("sharing.shareCurrentPuzzle")}</span>
         </button>
       </div>
       <div class="text-center flex-1">
@@ -770,7 +770,7 @@ function createGameUI() {
           <div id="moves-count" class="text-white font-bold" style="font-size: clamp(0.9rem, 2.2vh, 1.3rem); font-size: clamp(0.9rem, 2.2svh, 1.3rem);">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
         </div>
         <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="new-exercise-btn">
-          🎲 <span>${translate("gameStates.newGame")}</span>
+          <i class="lni lni-reload"></i> <span>${translate("gameStates.newGame")}</span>
         </button>
       </div>
     </div>
@@ -834,16 +834,16 @@ function createGameUI() {
       <!-- Utility Row -->
       <section class="grid grid-cols-4 gap-2 flex-1 flex-shrink-0" style="max-height: 8vh; max-height: 8svh;" data-purpose="utility-controls">
         <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          ${translate("gameStates.reset")}
+          <i class="lni lni-spinner-arrow"></i> ${translate("gameStates.reset")}
         </button>
         <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 info-btn h-full" id="info-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          <span>ℹ️</span> <span>${translate("help")}</span>
+          <i class="lni lni-help"></i> <span>${translate("help")}</span>
         </button>
         <button class="bg-[#6b46c1] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          <span class="p-1">${showPreviews ? "👁️" : "🙈"}</span> <span>${translate("preview")}</span>
+          <i class="lni ${showPreviews ? "lni-star-fill" : "lni-star-empty"} p-2"></i> <span>${translate("preview")}</span>
         </button>
         <button class="${gameState.hints.used >= gameState.hints.maxHints ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-500"} border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full" id="hint-btn" ${gameState.hints.used >= gameState.hints.maxHints ? "disabled" : ""} style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          <span>💡</span> <span>${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})</span>
+          <i class="lni lni-bulb"></i> <span>${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})</span>
         </button>
       </section>
     </main>
@@ -873,7 +873,7 @@ function createGameUI() {
               <span class="text-base sm:text-lg font-bold text-blue-300">${translate("keyboardShortcuts").split(":")[0]}:</span>
             </div>
             <div class="text-center text-xs sm:text-sm">
-              <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">1-4</span> ${translate("operations.sumDigits").split(" ")[1]} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">R</span> ${translate("gameStates.reset").replace("↻ ", "")} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">N</span> ${translate("gameStates.newGame")}
+              <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">1-4</span> ${translate("operations.sumDigits").split(" ")[1]} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">R</span> ${translate("gameStates.reset")} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">N</span> ${translate("gameStates.newGame")}
             </div>
           </div>
           <div class="text-center text-emerald-300 font-semibold text-sm" id="difficulty-tip"></div>
@@ -886,7 +886,7 @@ function createGameUI() {
     <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40 p-2" id="success-modal">
       <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-t-4 border-emerald-500 rounded-t-2xl p-3 sm:p-4 max-w-sm mx-auto text-center shadow-2xl shadow-emerald-500/30">
         <div class="flex items-center justify-center gap-2 sm:gap-3 mb-2">
-          <div class="text-3xl sm:text-4xl celebration-emoji" id="celebration-emoji">🎉</div>
+          <div class="text-3xl sm:text-4xl celebration-emoji" id="celebration-emoji"><i class="lni lni-star-fill"></i></div>
           <h2 class="text-xl sm:text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">${translate("levelComplete")}</h2>
         </div>
         <p class="text-white/90 text-base sm:text-lg mb-2" id="success-message">${translate("congratulations")}</p>
@@ -940,7 +940,7 @@ function createGameUI() {
     <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 max-w-md w-full px-4 hint-display hidden" id="hint-display">
       <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-2 border-amber-400/50 rounded-xl p-4 shadow-xl backdrop-blur-sm">
         <div class="flex items-center gap-2 mb-2">
-          <span class="text-lg" id="hint-icon-display">💡</span>
+          <i class="lni lni-bulb text-lg" id="hint-icon-display"></i>
           <span class="font-bold text-amber-300 text-sm" id="hint-level-display">Hint #1</span>
           <button class="ml-auto text-white/60 hover:text-white text-lg" id="close-hint-display">×</button>
         </div>
@@ -1216,9 +1216,9 @@ function showSuccessModal() {
 
     // Set grade-based content
     const gradeData = completionResult.grade;
-    title.textContent = `${gradeData.grade} ${gradeData.emoji}`;
+    title.textContent = gradeData.grade;
     message.textContent = gradeData.description;
-    emoji.textContent = gradeData.emoji;
+    emoji.innerHTML = gradeData.emoji;
 
     // Handle level unlock notification
     if (completionResult.levelUnlocked) {
@@ -1663,12 +1663,12 @@ function showHintDisplay(hint, hintsUsed, maxHints) {
 
   // Set hint icon based on type
   const icons = {
-    strategic: "💡",
-    tactical: "🎯",
-    direct: "⚡",
+    strategic: "<i class='lni lni-bulb'></i>",
+    tactical: "<i class='lni lni-target'></i>",
+    direct: "<i class='lni lni-zap'></i>",
   };
 
-  hintIcon.textContent = icons[hint.type] || "💡";
+  hintIcon.innerHTML = icons[hint.type] || "<i class='lni lni-bulb'></i>";
   const hintTypeCopy = translate(`hints.ui.types.${hint.type}`) || hint.type;
   hintLevel.textContent = `${translate("hint")} #${hintsUsed} (${hintTypeCopy})`;
   hintMessage.textContent = hint.message;
@@ -2254,7 +2254,7 @@ function updateModeIndicator(mode) {
   }
 
   if (modeLabel) {
-    modeLabel.textContent = mode === "normal" ? "🎯" : "🔓";
+    modeLabel.innerHTML = mode === "normal" ? "<i class='lni lni-target'></i>" : "<i class='lni lni-unlock'></i>";
   }
 
   if (modeText) {

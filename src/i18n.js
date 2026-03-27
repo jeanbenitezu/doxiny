@@ -154,8 +154,8 @@ export const translations = {
       es: "🎉 ¡Objetivo Alcanzado!",
     },
     reset: {
-      en: "↻ Reset",
-      es: "↻ Reiniciar",
+      en: "Reset",
+      es: "Reiniciar",
     },
     newGame: {
       en: "New",

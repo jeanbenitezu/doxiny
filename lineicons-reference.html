@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LineIcons Reference - All 357 Free Icons</title>
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        h1 {
+            color: #2563eb;
+            margin-bottom: 0.3rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-container {
+            max-width: 500px;
+            margin: 0.5rem auto 0;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        #searchInput:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .container {
+            width: 100%;
+            margin: 1rem 0;
+            padding: 0 0.5rem;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border-radius: 6px;
+        }
+
+        .stat-number {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2563eb;
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.75rem;
+        }
+
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .icon-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 0.8rem 0.5rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .icon-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border-color: #2563eb;
+        }
+
+        .icon-card.copied {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .icon-display {
+            font-size: 1.8rem;
+            color: #2563eb;
+            margin-bottom: 0.4rem;
+            display: block;
+            transition: all 0.2s ease;
+        }
+
+        .icon-card:hover .icon-display {
+            transform: scale(1.1);
+            color: #1d4ed8;
+        }
+
+        .icon-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.3rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.65rem;
+            word-break: break-all;
+            line-height: 1.2;
+        }
+
+        .icon-usage {
+            font-size: 0.6rem;
+            color: #6b7280;
+            background: #f8fafc;
+            padding: 0.3rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            margin-top: 0.3rem;
+            line-height: 1.1;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .copy-notification.show {
+            transform: translateX(0);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 15px 15px 0 0;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0;
+            font-size: 1.2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .category-icons {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 0 0 15px 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.3rem;
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.8rem;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        @media (max-width: 768px) {
+            .icons-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 0 0.3rem;
+            }
+
+            .icon-display {
+                font-size: 1.5rem;
+            }
+
+            .icon-name {
+                font-size: 0.6rem;
+            }
+
+            .icon-usage {
+                font-size: 0.55rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>LineIcons Reference</h1>
+        <p class="subtitle">All 357 free icons available • Click any icon to copy HTML code</p>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search icons... (try 'arrow', 'heart', 'user')" />
+        </div>
+        
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All Icons</button>
+            <button class="filter-btn" data-filter="interface">Interface</button>
+            <button class="filter-btn" data-filter="arrows">Arrows</button>
+            <button class="filter-btn" data-filter="social">Social</button>
+            <button class="filter-btn" data-filter="media">Media</button>
+            <button class="filter-btn" data-filter="business">Business</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalIcons">357</span>
+                    <span class="stat-label">Total Icons</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="visibleIcons">357</span>
+                    <span class="stat-label">Visible Icons</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">FREE</span>
+                    <span class="stat-label">Cost</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">CDN</span>
+                    <span class="stat-label">Delivery</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="iconsContainer"></div>
+        
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>No icons found</h3>
+            <p>Try a different search term or browse all icons</p>
+        </div>
+    </div>
+
+    <div id="copyNotification" class="copy-notification">
+        ✅ HTML code copied to clipboard!
+    </div>
+
+    <script>
+        // All LineIcons extracted from CSS
+        const allIcons = [
+            // A
+            'add-files', 'agenda', 'alarm', 'alarm-clock', 'ambulance', 'amex', 'amazon', 'amazon-original', 'amazon-pay', 'anchor', 'android', 'android-original', 'angellist', 'angle-double-down', 'angle-double-left', 'angle-double-right', 'angle-double-up', 'angular', 'apartment', 'app-store', 'apple-brand', 'apple-music', 'apple-pay', 'archive', 'arrow-down', 'arrow-down-circle', 'arrow-left', 'arrow-left-circle', 'arrow-right', 'arrow-right-circle', 'arrow-top-left', 'arrow-top-right', 'arrow-up', 'arrow-up-circle', 'arrows-horizontal', 'arrows-vertical', 'atlassian', 'audi', 'aws', 'azure',
+            
+            // B
+            'backward', 'baloon', 'ban', 'bar-chart', 'basketball', 'behance', 'behance-original', 'bi-cycle', 'bitbucket', 'bitcoin', 'bittorrent', 'blackboard', 'blogger', 'bluetooth', 'bluetooth-original', 'bmw', 'bold', 'bolt', 'bolt-alt', 'book', 'bookmark', 'bookmark-alt', 'bootstrap', 'bootstrap-5', 'brave', 'bricks', 'bridge', 'briefcase', 'briefcase-alt', 'brush', 'brush-alt', 'btc', 'bubble', 'bug', 'bulb', 'bullhorn', 'burger', 'bus',
+            
+            // C
+            'cake', 'calculator', 'calculator-alt', 'calendar', 'camera', 'candy', 'candy-cane', 'capsule', 'car', 'car-alt', 'caravan', 'cart', 'cart-full', 'cash-app', 'certificate', 'check-box', 'checkmark', 'checkmark-circle', 'chef-hat', 'chevron-down', 'chevron-down-circle', 'chevron-left', 'chevron-left-circle', 'chevron-right', 'chevron-right-circle', 'chevron-up', 'chevron-up-circle', 'chrome', 'chromecast', 'circle-minus', 'circle-plus', 'cisco', 'clipboard', 'close', 'cloud', 'cloud-check', 'cloud-download', 'cloud-network', 'cloud-sync', 'cloud-upload', 'cloudflare', 'cloudy-sun', 'code', 'code-alt', 'codepen', 'coffee-cup', 'cog', 'cogs', 'coin', 'coinbase', 'comments', 'comments-alt-2', 'comments-reply', 'compass', 'connectdevelop', 'construction', 'construction-hammer', 'consulting', 'control-panel', 'cool', 'coral', 'cpanel', 'creative-commons', 'credit-cards', 'crop', 'cross-circle', 'crown', 'css3', 'cup', 'customer', 'cut',
+            
+            // D
+            'dashboard', 'database', 'delivery', 'dev', 'diamond-alt', 'diamond-shape', 'dialogflow', 'digitalocean', 'diners-club', 'dinner', 'direction', 'direction-alt', 'direction-ltr', 'direction-rtl', 'discord', 'discord-alt', 'discover', 'display', 'display-alt', 'docker', 'dollar', 'domain', 'download', 'dribbble', 'drop', 'dropbox', 'dropbox-original', 'drupal', 'drupal-original', 'dumbbell',
+            
+            // E-F
+            'edge', 'empty-file', 'enter', 'envelope', 'envato', 'eraser', 'ethereum', 'euro', 'exit', 'exit-down', 'exit-up', 'eye', 'facebook', 'facebook-fill', 'facebook-line', 'facebook-messenger', 'facebook-original', 'facebook-oval', 'facetime', 'figma', 'files', 'firebase', 'firefox', 'firefox-original', 'fireworks', 'first-aid', 'fitbit', 'flag', 'flag-alt', 'flags-alt-1', 'flickr', 'flower', 'flutter', 'folder', 'ford', 'forward', 'frame-expand', 'fresh-juice', 'friendly', 'full-screen', 'funnel',
+            
+            // G-H
+            'gallery', 'game', 'gatsby', 'gift', 'git', 'github', 'github-original', 'go', 'goodreads', 'google', 'google-cloud', 'google-drive', 'google-meet', 'google-pay', 'google-wallet', 'graduation', 'grammarly', 'graph', 'grid', 'grid-alt', 'grow', 'hacker-news', 'hammer', 'hand', 'handshake', 'happy', 'harddrive', 'headphone', 'heart', 'heart-fill', 'heart-monitor', 'helicopter', 'helmet', 'help', 'highlight', 'highlight-alt', 'home', 'hospital', 'hourglass', 'html5',
+            
+            // I-J-K-L
+            'image', 'imdb', 'inbox', 'indent-decrease', 'indent-increase', 'infinite', 'information', 'instagram', 'instagram-fill', 'instagram-original', 'invest-monitor', 'investment', 'invention', 'ios', 'island', 'italic', 'jaguar', 'jamstack', 'java', 'javascript', 'jcb', 'joomla', 'joomla-original', 'jsfiddle', 'juice', 'key', 'keyboard', 'keyword-research', 'kubernetes', 'laravel', 'laptop', 'laptop-phone', 'layers', 'layout', 'leaf', 'library', 'license', 'lifering', 'line', 'line-dashed', 'line-dotted', 'line-double', 'line-spacing', 'lineicons', 'lineicons-alt', 'lineicons-symbol', 'lineicons-symbol-alt', 'lineicons-symbol-alt-2', 'link', 'linkedin', 'linkedin-original', 'list', 'lock', 'lock-alt',
+            
+            // M
+            'magento', 'magnet', 'magnifier', 'mailchimp', 'map', 'map-marker', 'markdown', 'mashroom', 'mastercard', 'medium', 'medium-alt', 'menu', 'mercedes', 'meta', 'meta-1', 'meta-2', 'mic', 'microphone', 'microsoft', 'microsoft-edge', 'microsoft-teams', 'microscope', 'minus', 'mobile', 'mongodb', 'money-location', 'money-protection', 'more', 'more-alt', 'mouse', 'move', 'mushroom', 'music', 'mysql',
+            
+            // N-O-P
+            'netflix', 'netlify', 'network', 'nextjs', 'night', 'nissan', 'nodejs', 'nodejs-alt', 'notion', 'notepad', 'npm', 'oculus', 'offer', 'opera', 'package', 'paddle', 'page-break', 'pagination', 'paint-bucket-alt', 'paint-roller', 'pallet', 'paperclip', 'patreon', 'pause', 'paypal', 'paypal-original', 'pencil', 'pencil-alt', 'phone', 'phone-set', 'php', 'pie-chart', 'pilcrow', 'pin', 'pinterest', 'pizza', 'plane', 'play', 'play-store', 'play-store-alt', 'play-store-fill', 'playstation', 'plug', 'plus', 'pointer', 'pointer-down', 'pointer-left', 'pointer-right', 'pointer-top', 'popup', 'postcard', 'postgresql', 'postman', 'pound', 'power-switch', 'printer', 'producthunt', 'protection', 'pulse', 'pyramids', 'python',
+            
+            // Q-R
+            'question-circle', 'quotation', 'quora', 'radio-button', 'rain', 'react', 'reddit', 'reload', 'remove-file', 'reply', 'restaurant', 'revenue', 'road', 'rocket', 'rss-feed', 'ruler', 'ruler-alt', 'ruler-pencil', 'rupee',
+            
+            // S
+            'sad', 'safari', 'save', 'school-bench', 'school-bench-alt', 'scooter', 'scroll-down', 'search', 'search-alt', 'select-cursor', 'seo', 'service', 'share', 'share-alt', 'shield', 'shift-left', 'shift-right', 'ship', 'shopping-basket', 'shortcode', 'shovel', 'shuffle', 'signal', 'signal-app', 'sketch', 'skipping-rope', 'skype', 'slack', 'slack-line', 'slice', 'slideshare', 'slim', 'smile', 'snapchat', 'sort-alpha-asc', 'sort-amount-asc', 'sort-amount-dsc', 'soundcloud', 'soundcloud-original', 'speechless', 'spellcheck', 'spinner', 'spinner-arrow', 'spinner-solid', 'spotify', 'spotify-original', 'spray', 'sprout', 'squarespace', 'stackoverflow', 'stamp', 'star-empty', 'star-fill', 'star-half', 'stats-down', 'stats-up', 'steam', 'sthethoscope', 'stop', 'strikethrough', 'stripe', 'stumbleupon', 'sun', 'support', 'surf-board', 'suspect', 'svelte', 'swift', 'syringe',
+            
+            // T-U-V-W-X-Y-Z
+            't-shirt', 'tab', 'tag', 'tailwindcss', 'target', 'target-customer', 'target-revenue', 'taxi', 'teabag', 'telegram', 'telegram-original', 'tesla', 'text-align-center', 'text-align-justify', 'text-align-left', 'text-align-right', 'text-format', 'text-format-remove', 'thought', 'thumbs-down', 'thumbs-up', 'thunder', 'thunder-alt', 'ticket', 'ticket-alt', 'tiktok', 'tiktok-alt', 'timer', 'tounge', 'toyota', 'train', 'train-alt', 'trash-can', 'travel', 'tree', 'trees', 'trello', 'trowel', 'tumblr', 'twitch', 'twitter', 'twitter-fill', 'twitter-original', 'typescript', 'ubuntu', 'underline', 'unlink', 'unlock', 'unsplash', 'upload', 'user', 'users', 'ux', 'vector', 'vercel', 'video', 'vimeo', 'visa', 'vk', 'vmware', 'volkswagen', 'volume', 'volume-high', 'volume-low', 'volume-medium', 'volume-mute', 'vs-code', 'vuejs', 'wallet', 'warning', 'wechat', 'website', 'website-alt', 'webhooks', 'weight', 'whatsapp', 'wheelchair', 'wheelbarrow', 'windows', 'wordpress', 'wordpress-fill', 'world', 'world-alt', 'write', 'xbox', 'xrp', 'yahoo', 'ycombinator', 'yen', 'youtube', 'zapier', 'zip', 'zoom', 'zoom-in', 'zoom-out', '500px'
+        ];
+
+        // Category mapping for filtering
+        const categories = {
+            interface: ['information', 'menu', 'close', 'checkmark', 'eye', 'settings', 'cog', 'home', 'search', 'plus', 'minus', 'more', 'help', 'warning'],
+            arrows: ['arrow-up', 'arrow-down', 'arrow-left', 'arrow-right', 'angle-double-up', 'angle-double-down', 'chevron-up', 'chevron-down', 'pointer-top', 'pointer-down'],
+            social: ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'github', 'reddit', 'pinterest', 'whatsapp', 'telegram', 'tiktok', 'snapchat'],
+            media: ['play', 'pause', 'stop', 'volume-high', 'volume-low', 'music', 'video', 'camera', 'image', 'gallery'],
+            business: ['briefcase', 'handshake', 'target', 'graph', 'pie-chart', 'dollar', 'euro', 'calculator', 'notepad']
+        };
+
+        let currentFilter = 'all';
+        let filteredIcons = [...allIcons];
+
+        // Create icon cards
+        function createIconCard(iconName) {
+            const card = document.createElement('div');
+            card.className = 'icon-card';
+            card.innerHTML = `
+                <i class="lni lni-${iconName} icon-display"></i>
+                <div class="icon-name">lni-${iconName}</div>
+                <div class="icon-usage">&lt;i class="lni lni-${iconName}"&gt;&lt;/i&gt;</div>
+            `;
+            
+            card.addEventListener('click', () => copyToClipboard(iconName, card));
+            return card;
+        }
+
+        // Copy HTML code to clipboard
+        async function copyToClipboard(iconName, card) {
+            const htmlCode = `<i class="lni lni-${iconName}"></i>`;
+            
+            try {
+                await navigator.clipboard.writeText(htmlCode);
+                showNotification();
+                
+                // Visual feedback
+                card.classList.add('copied');
+                setTimeout(() => card.classList.remove('copied'), 1000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+        }
+
+        // Show copy notification
+        function showNotification() {
+            const notification = document.getElementById('copyNotification');
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 2000);
+        }
+
+        // Filter icons by category
+        function filterByCategory(category) {
+            currentFilter = category;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-filter="${category}"]`).classList.add('active');
+            
+            if (category === 'all') {
+                filteredIcons = [...allIcons];
+            } else {
+                const categoryIcons = categories[category] || [];
+                filteredIcons = allIcons.filter(icon => 
+                    categoryIcons.some(catIcon => icon.includes(catIcon))
+                );
+            }
+            
+            renderIcons();
+        }
+
+        // Search functionality
+        function searchIcons(query) {
+            const searchTerm = query.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredIcons = currentFilter === 'all' ? [...allIcons] : 
+                    allIcons.filter(icon => {
+                        const categoryIcons = categories[currentFilter] || [];
+                        return categoryIcons.some(catIcon => icon.includes(catIcon));
+                    });
+            } else {
+                const baseList = currentFilter === 'all' ? allIcons : 
+                    allIcons.filter(icon => {
+                        const categoryIcons = categories[currentFilter] || [];
+                        return categoryIcons.some(catIcon => icon.includes(catIcon));
+                    });
+                
+                filteredIcons = baseList.filter(icon => 
+                    icon.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderIcons();
+        }
+
+        // Render icons
+        function renderIcons() {
+            const container = document.getElementById('iconsContainer');
+            const noResults = document.getElementById('noResults');
+            
+            container.innerHTML = '';
+            
+            if (filteredIcons.length === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                
+                // Create grid container
+                const grid = document.createElement('div');
+                grid.className = 'icons-grid';
+                
+                filteredIcons.forEach(iconName => {
+                    grid.appendChild(createIconCard(iconName));
+                });
+                
+                container.appendChild(grid);
+            }
+            
+            // Update stats
+            document.getElementById('visibleIcons').textContent = filteredIcons.length;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup search
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => searchIcons(e.target.value));
+            
+            // Setup category filters
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => filterByCategory(e.target.dataset.filter));
+            });
+            
+            // Initial render
+            renderIcons();
+        });
+    </script>
+</body>
+</html>
