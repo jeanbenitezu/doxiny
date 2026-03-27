@@ -863,12 +863,9 @@ function createGameUI() {
     <!-- Info Modal -->
     <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm info-modal hidden p-4" id="info-modal">
       <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-2xl p-4 sm:p-6 max-w-sm w-full text-center shadow-2xl max-h-[90vh] max-h-[90svh] overflow-y-auto">
-        <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">ℹ️ ${translate("howToPlay")}</h3>
+        <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4"><i class="lni lni-question-circle"></i> ${translate("howToPlay")}</h3>
         <div class="text-white/95 text-sm text-left leading-relaxed mb-4 sm:mb-6" id="info-content">
           <div class="mb-3 sm:mb-4">
-            <div class="text-center mb-2 sm:mb-3">
-              <span class="text-base sm:text-lg font-bold text-blue-300">${translate("operations.sumDigits").split(" ")[1]}:</span>
-            </div>
             <div class="space-y-1 sm:space-y-2">
               <div>• <span class="font-bold text-yellow-300">${translate("operations.reverse")}:</span> ${translate("operationDescriptions.reverse")}</div>
               <div>• <span class="font-bold text-yellow-300">${translate("operations.sumDigits")}:</span> ${translate("operationDescriptions.sumDigits")}</div>
@@ -879,15 +876,7 @@ function createGameUI() {
           <div class="mb-3 sm:mb-4 text-center">
             <p class="text-white/80 text-sm">${translate("instructions")}</p>
           </div>
-          <div class="mb-3 sm:mb-4">
-            <div class="text-center mb-2">
-              <span class="text-base sm:text-lg font-bold text-blue-300">${translate("keyboardShortcuts").split(":")[0]}:</span>
-            </div>
-            <div class="text-center text-xs sm:text-sm">
-              <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">1-4</span> ${translate("operations.sumDigits").split(" ")[1]} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">R</span> ${translate("gameStates.reset")} • <span class="bg-gray-700 px-1 sm:px-2 py-1 rounded mx-1">N</span> ${translate("gameStates.newGame")}
-            </div>
-          </div>
-          <div class="text-center text-emerald-300 font-semibold text-sm" id="difficulty-tip"></div>
+          <div class="text-center text-yellow-300 font-semibold text-xl"><i class="lni lni-invention"></i> <span id="difficulty-tip" class="text-sm text-emerald-400"></span></div>
         </div>
         <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm" id="close-info-btn">${translate("close")}</button>
       </div>

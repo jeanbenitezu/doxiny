@@ -185,12 +185,6 @@ export const translations = {
     es: "¡Transforma el número actual al número objetivo usando las 4 operaciones. Trata de hacerlo en la menor cantidad de movimientos!",
   },
 
-  // Keyboard shortcuts
-  keyboardShortcuts: {
-    en: "Keyboard: 1-4 for operations, R to reset",
-    es: "Teclado: 1-4 para operaciones, R para reiniciar",
-  },
-
   // Additional UI elements
   help: {
     en: "Help",
@@ -377,28 +371,28 @@ export const translations = {
   // Difficulty Tips
   difficultyTips: {
     1: {
-      en: "💡 Beginner: Use ×2 to grow quickly, experiment with all operations!",
-      es: "💡 Principiante: Usa ×2 para crecer rápido, ¡experimenta con todas las operaciones!",
+      en: "Beginner: Use ×2 to grow quickly, experiment with all operations!",
+      es: "Principiante: Usa ×2 para crecer rápido, ¡experimenta con todas las operaciones!",
     },
     2: {
-      en: "💡 Easy: Try combining operations creatively.",
-      es: "💡 Fácil: Intenta combinar operaciones creativamente.",
+      en: "Easy: Try combining operations creatively.",
+      es: "Fácil: Intenta combinar operaciones creativamente.",
     },
     3: {
-      en: "💡 Medium: Look for patterns and plan your moves.",
-      es: "💡 Medio: Busca patrones y planifica tus movimientos.",
+      en: "Medium: Look for patterns and plan your moves.",
+      es: "Medio: Busca patrones y planifica tus movimientos.",
     },
     4: {
-      en: "💡 Hard: Think strategically about operation sequences.",
-      es: "💡 Difícil: Piensa estratégicamente sobre las secuencias de operaciones.",
+      en: "Hard: Think strategically about operation sequences.",
+      es: "Difícil: Piensa estratégicamente sobre las secuencias de operaciones.",
     },
     5: {
-      en: "💡 Expert: Master-level puzzles require creative thinking!",
-      es: "💡 Experto: ¡Los rompecabezas de nivel maestro requieren pensamiento creativo!",
+      en: "Expert: Master-level puzzles require creative thinking!",
+      es: "Experto: ¡Los rompecabezas de nivel maestro requieren pensamiento creativo!",
     },
     6: {
-      en: "💡 Insane: The ultimate challenge!",
-      es: "💡 Extremo: ¡El desafío definitivo!",
+      en: "Insane: The ultimate challenge!",
+      es: "Extremo: ¡El desafío definitivo!",
     },
   },
 
