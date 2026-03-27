@@ -633,7 +633,7 @@ function getOperationPreviews(currentNumber) {
  * Get colored SVG icons for operations
  */
 function getOperationIcon(operation, color = "currentColor") {
-  const icons = {
+  const svgIcons = {
     reverse: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" style="color: ${color};">
       <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m5 43.666A8.33 8.33 0 0 1 48.668 54H15.334A8.334 8.334 0 0 1 7 45.666V12.334A8.334 8.334 0 0 1 15.334 4h33.334A8.33 8.33 0 0 1 57 12.334z"/>
       <!-- Top arrow -->
@@ -657,6 +657,17 @@ function getOperationIcon(operation, color = "currentColor") {
       <path fill="currentColor" d="M52 2H12C6.479 2 2 6.477 2 12v40c0 5.523 4.479 10 10 10h40c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10m-20 40l16-8l-16-8v16z"/>
     </svg>`,
   };
+
+  const emojiIcons = {
+    reverse: `<i class="lni color-[${color}] lni-shuffle"></i>`,
+    sum: `<i class="lni color-[${color}] lni-more-alt"></i>`,
+    append1: `<i class="lni color-[${color}] lni-layers"></i>`,
+    double: `<i class="lni color-[${color}] lni-plus" style="transform: rotate(45deg);"></i>`,
+    start: `<i class="lni color-[${color}] lni-arrow-right"></i>`,
+  };
+
+  // read a query parameter to determine whether to use SVG icons or emoji icons
+  const icons = new URLSearchParams(window.location.search).get("icons") === "svg" ? svgIcons : emojiIcons;
 
   return icons[operation] || icons.start;
 }
