@@ -667,7 +667,10 @@ function getOperationIcon(operation, color = "currentColor") {
   };
 
   // read a query parameter to determine whether to use SVG icons or emoji icons
-  const icons = new URLSearchParams(window.location.search).get("icons") === "svg" ? svgIcons : emojiIcons;
+  const icons =
+    new URLSearchParams(window.location.search).get("icons") === "svg"
+      ? svgIcons
+      : emojiIcons;
 
   return icons[operation] || icons.start;
 }
@@ -2254,7 +2257,10 @@ function updateModeIndicator(mode) {
   }
 
   if (modeLabel) {
-    modeLabel.innerHTML = mode === "normal" ? "<i class='lni lni-target'></i>" : "<i class='lni lni-unlock'></i>";
+    modeLabel.innerHTML =
+      mode === "normal"
+        ? "<i class='lni lni-target'></i>"
+        : "<i class='lni lni-unlock'></i>";
   }
 
   if (modeText) {
