@@ -843,7 +843,7 @@ function createGameUI() {
           <i class="lni ${showPreviews ? "lni-star-fill" : "lni-star-empty"} p-2"></i> <span>${translate("preview")}</span>
         </button>
         <button class="${gameState.hints.used >= gameState.hints.maxHints ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-500"} border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full" id="hint-btn" ${gameState.hints.used >= gameState.hints.maxHints ? "disabled" : ""} style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-          <i class="lni lni-bulb"></i> <span>${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})</span>
+          <i class="lni lni-invention"></i> <span>${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})</span>
         </button>
       </section>
     </main>
@@ -883,8 +883,8 @@ function createGameUI() {
     </div>
     
     <!-- Success Modal -->
-    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40 p-2" id="success-modal">
-      <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-t-4 border-emerald-500 rounded-t-2xl p-3 sm:p-4 max-w-sm mx-auto text-center shadow-2xl shadow-emerald-500/30">
+    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40" id="success-modal">
+      <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-t-4 border-emerald-500 p-4 text-center shadow-2xl shadow-emerald-500/30">
         <div class="flex items-center justify-center gap-2 sm:gap-3 mb-2">
           <div class="text-3xl sm:text-4xl celebration-emoji" id="celebration-emoji"><i class="lni lni-star-fill"></i></div>
           <h2 class="text-xl sm:text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">${translate("levelComplete")}</h2>
@@ -918,19 +918,19 @@ function createGameUI() {
         <div class="flex flex-col gap-3 justify-center">
           <!-- Main action buttons -->
           <div class="flex gap-2 justify-between">
-            <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn">${translate("retry")}</button>
+            <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn"><i class="lni lni-spinner-arrow"></i> ${translate("retry")}</button>
             ${
               gameManager.gameModeManager.isNormal()
                 ? !gameManager.getNextLevelInfo().isAvailable
-                  ? `<button class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-teal-500/30" id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")}</button>`
-                  : `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")}</button>`
-                : `<button class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-indigo-500/30" id="try-normal-btn">${translate("gameModeMessages.tryNormalMode")}</button>`
+                  ? `<button class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-teal-500/30" id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")} <i class="lni lni-unlock"></i></button>`
+                  : `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")} <i class="lni lni-target"></i></button>`
+                : `<button class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-indigo-500/30" id="try-normal-btn">${translate("gameModeMessages.tryNormalMode")} <i class="lni lni-baloon"></i></button>`
             }
           </div>
           <!-- Share buttons row -->
           <div class="flex gap-2 justify-around">
-            <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/30" id="share-challenge-btn">${translate("sharing.shareChallenge")}</button>
-            <button class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-orange-500/30" id="share-victory-btn">${translate("sharing.shareVictory")}</button>
+            <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/30" id="share-challenge-btn"><i class="lni lni-friendly"></i> ${translate("sharing.shareChallenge")}</button>
+            <button class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-orange-500/30" id="share-victory-btn">${translate("sharing.shareVictory")} <i class="lni lni-cool"></i></button>
           </div>
         </div>
       </div>
@@ -940,7 +940,7 @@ function createGameUI() {
     <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 max-w-md w-full px-4 hint-display hidden" id="hint-display">
       <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-2 border-amber-400/50 rounded-xl p-4 shadow-xl backdrop-blur-sm">
         <div class="flex items-center gap-2 mb-2">
-          <i class="lni lni-bulb text-lg" id="hint-icon-display"></i>
+          <span class="text-lg" id="hint-icon-display"></span>
           <span class="font-bold text-amber-300 text-sm" id="hint-level-display">Hint #1</span>
           <button class="ml-auto text-white/60 hover:text-white text-lg" id="close-hint-display">×</button>
         </div>
@@ -1840,7 +1840,7 @@ function showCustomExerciseModal() {
         <!-- Modal Header -->
         <div class="p-4 sm:p-6">
           <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center justify-center gap-2">
-            🎯 ${translate("customExercise") || "Custom Exercise"}
+            <i class="lni lni-pencil-alt"></i> ${translate("customExercise") || "Custom Exercise"}
           </h3>
           <button id="close-custom-modal" class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors text-xl">
             ✕
@@ -1950,7 +1950,7 @@ function setupCustomExerciseModal() {
     if (validation.solvable) {
       validationContent.innerHTML = `
         <div class="text-emerald-300">
-          ✅ <strong>${t("customExerciseModal.validation.solvable")}</strong><br>
+          <i class="lni lni-check-box"></i> <strong>${t("customExerciseModal.validation.solvable")}</strong><br>
           ${t("customExerciseModal.validation.optimalSolution", { moves: validation.minMoves })}<br>
           <span class="text-xs text-white/70">${t("customExerciseModal.validation.reachableFrom")}</span><br>
           <span class="text-xs text-blue-300 font-semibold">${t("customExerciseModal.validation.detectedLevel", { level: levelName })}</span>
@@ -1961,7 +1961,7 @@ function setupCustomExerciseModal() {
     } else {
       validationContent.innerHTML = `
         <div class="text-yellow-300">
-          ❓ <strong>${t("customExerciseModal.validation.unknownSolvability")}</strong><br>
+          <i class="lni lni-question-circle"></i> <strong>${t("customExerciseModal.validation.unknownSolvability")}</strong><br>
           ${t("customExerciseModal.validation.notReachable")}<br>
           <span class="text-xs text-white/70">${t("customExerciseModal.validation.canStillTry")}</span><br>
           <span class="text-xs text-blue-300 font-semibold">${t("customExerciseModal.validation.detectedLevel", { level: levelName })}</span>
@@ -2307,7 +2307,6 @@ function showLevelUnlockNotification(level) {
   notification.style.minWidth = "280px";
 
   notification.innerHTML = `
-    <div class="text-2xl mb-2">🎉</div>
     <div class="font-bold text-lg mb-1">${message}</div>
     <div class="text-sm opacity-90">${translate(`difficultyLevels.${getDifficultyLevels()[level - 1]?.nameKey}`)}</div>
   `;
