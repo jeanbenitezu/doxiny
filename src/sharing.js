@@ -78,46 +78,8 @@ export async function shareContent(message, title = "Doxiny Number Puzzle") {
     }
   } catch (error) {
     console.error("Sharing failed:", error);
-    try {
-      // Final fallback - create temporary textarea for older browsers
-      const textarea = document.createElement("textarea");
-      textarea.value = message.message + " " + message.url;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      return { success: true, method: "fallback" };
-    } catch (fallbackError) {
-      return { success: false, error: fallbackError };
-    }
+    return { success: false, error: error };
   }
-}
-
-/**
- * Show user feedback after sharing attempt
- */
-export function showShareFeedback(shareResult) {
-  // Create temporary feedback element
-  const feedback = document.createElement("div");
-  feedback.className =
-    "fixed top-4 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 shadow-lg z-50 transition-all";
-
-  if (shareResult.success) {
-    feedback.textContent = t("sharing.linkCopied");
-    feedback.classList.add("bg-emerald-500");
-  } else {
-    feedback.textContent = t("sharing.shareFailed");
-    feedback.classList.add("bg-orange-500");
-  }
-
-  document.body.appendChild(feedback);
-
-  // Remove after 3 seconds
-  setTimeout(() => {
-    feedback.style.opacity = "0";
-    feedback.style.transform = "translate(-50%, -100%)";
-    setTimeout(() => document.body.removeChild(feedback), 300);
-  }, 3000);
 }
 
 /**
@@ -142,7 +104,6 @@ export async function handleShareVictory(gameState, gameManager) {
   );
 
   const result = await shareContent(message, t("sharing.sharedPuzzle"));
-  showShareFeedback(result);
 }
 
 /**
@@ -152,7 +113,6 @@ export async function handleShareChallenge(gameState) {
   const message = generateShareMessage(gameState.goal, gameState.level);
 
   const result = await shareContent(message, t("sharing.sharedPuzzle"));
-  showShareFeedback(result);
 }
 
 /**
