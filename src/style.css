@@ -390,13 +390,6 @@ button:active:not(:disabled) {
   }
 }
 
-/* Game Mode Dropdown Styles */
-#game-mode-dropdown {
-  min-width: 250px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
 /* Enhanced mode indicator styles */
 .mode-indicator {
   position: relative;

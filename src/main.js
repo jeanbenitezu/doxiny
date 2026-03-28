@@ -716,7 +716,7 @@ function createGameUI() {
             <span id="current-mode-text">${translate(`gameModesShort.${gameManager.gameModeManager.getGameMode()}`)}</span>
             <span>▼</span>
           </button>
-          <div id="game-mode-dropdown" class="hidden absolute top-full left-0 mt-1 bg-gray-800 shadow-lg shadow-black/50 z-50 min-w-full">
+          <div id="game-mode-dropdown" class="hidden absolute top-full right-0 mt-1 bg-gray-800 shadow-lg shadow-black/50 z-50 min-w-[200px]">
             <button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="normal">
               <i class="lni lni-target"></i>
               <div>
