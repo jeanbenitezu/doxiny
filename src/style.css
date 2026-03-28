@@ -55,7 +55,6 @@ body {
 .current-number.updated {
   transform: scale(1.05);
   background: rgba(56, 161, 105, 0.2) !important;
-  border-color: #38a169 !important;
   box-shadow: 0 0 30px rgba(56, 161, 105, 0.3) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -343,7 +342,6 @@ h3 {
 .hint-blink {
   animation: hintBlink 0.8s ease-in-out 4;
   box-shadow: 0 0 20px rgba(251, 191, 36, 0.8) !important;
-  border-color: rgba(251, 191, 36, 0.8) !important;
 }
 
 @keyframes hintBlink {
@@ -368,7 +366,6 @@ button:active:not(:disabled) {
   opacity: 0.4;
   cursor: not-allowed;
   background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
   box-shadow: none !important;
 }
 
@@ -398,14 +395,6 @@ button:active:not(:disabled) {
   min-width: 250px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-}
-
-.game-mode-option:first-child {
-  border-radius: 0.375rem 0.375rem 0 0;
-}
-
-.game-mode-option:last-child {
-  border-radius: 0 0 0.375rem 0.375rem;
 }
 
 /* Enhanced mode indicator styles */
@@ -455,13 +444,11 @@ button:active:not(:disabled) {
 /* Mode-specific button highlights */
 .btn-mode-normal {
   background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
-  border-color: rgba(59, 130, 246, 0.3);
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
 }
 
 .btn-mode-freeplay {
   background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-  border-color: rgba(16, 185, 129, 0.3);
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
 }
 
@@ -527,10 +514,6 @@ button:active:not(:disabled) {
 
 .bg-gold-600 {
   background-color: #b45309;
-}
-
-.border-gold-500 {
-  border-color: #d97706;
 }
 
 .shadow-gold-500\/50 {

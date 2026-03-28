@@ -100,7 +100,7 @@ export function showShareFeedback(shareResult) {
   // Create temporary feedback element
   const feedback = document.createElement("div");
   feedback.className =
-    "fixed top-4 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all";
+    "fixed top-4 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 shadow-lg z-50 transition-all";
 
   if (shareResult.success) {
     feedback.textContent = t("sharing.linkCopied");
@@ -179,7 +179,7 @@ export function handleSharedPuzzleURL() {
         // Show shared puzzle notification
         const notification = document.createElement("div");
         notification.className =
-          "fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-sm text-center";
+          "fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 shadow-lg z-50 max-w-sm text-center";
 
         if (solved === "1" && challengeMoves) {
           notification.innerHTML = t("sharing.friendChallengeWithMoves", {

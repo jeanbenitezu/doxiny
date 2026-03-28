@@ -429,17 +429,17 @@ function renderLevelSelectorUI() {
       if (isCustom) {
         // Custom button - purple when not active, orange when a custom exercise is loaded
         buttonClass = gameManager.isCustomExercise
-          ? "bg-orange-600 border border-orange-400 text-white"
-          : "bg-purple-600 border border-purple-400 text-white hover:bg-purple-500";
+          ? "bg-orange-600 text-white"
+          : "bg-purple-600 text-white hover:bg-purple-500";
       } else if (isLocked) {
         // Locked levels
         buttonClass =
-          "bg-gray-800/50 border border-gray-600/20 text-gray-500 cursor-not-allowed";
+          "bg-gray-800/50 text-gray-500 cursor-not-allowed";
       } else {
         // Regular level buttons
         buttonClass = isActive
-          ? "bg-orange-600 border border-orange-400"
-          : "bg-[#2a2f3a] border border-white/10 opacity-60";
+          ? "bg-orange-600 border-t-4 border-solid border-white-600"
+          : "bg-[#2a2f3a] opacity-60";
       }
 
       const title = isLocked
@@ -450,7 +450,7 @@ function renderLevelSelectorUI() {
           })
         : "";
 
-      return `<button class="${buttonClass} rounded-lg p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
+      return `<button class="${buttonClass} p-1 flex flex-col items-center justify-center transition-all active:scale-95 level-btn h-full" 
              data-level="${lvl.level}"
              ${isLocked ? "disabled" : ""}
              ${title ? `title="${title}"` : ""}>
@@ -466,8 +466,8 @@ function renderLevelSelectorUI() {
 
   return `
     <!-- Level Selector -->
-    <nav class="w-full mb-3" style="height: 6vh; height: 6svh; min-height: 2.5rem; max-height: 4rem;" data-purpose="level-selector">
-      <div class="grid gap-1 h-full" style="grid-template-columns: repeat(${availableLevels.length}, 1fr);">
+    <nav class="w-full" style="height: 6vh; height: 6svh; min-height: 2.5rem; max-height: 4rem;" data-purpose="level-selector">
+      <div class="grid h-full" style="grid-template-columns: repeat(${availableLevels.length}, 1fr);">
         ${levelButtons}
       </div>
     </nav>
@@ -512,11 +512,11 @@ function showMasterAchievementModal() {
   });
 
   modal.innerHTML = `
-    <div class="bg-gradient-to-br from-yellow-400 via-gold-500 to-yellow-600 p-6 rounded-2xl max-w-sm mx-4 text-center shadow-2xl shadow-gold-500/50 animate-bounce-in">
+    <div class="bg-gradient-to-br from-yellow-400 via-gold-500 to-yellow-600 p-6 max-w-sm mx-4 text-center shadow-2xl shadow-gold-500/50 animate-bounce-in">
       <div class="text-6xl mb-4 animate-spin-once"><i class="lni lni-crown"></i></div>
       <h2 class="text-2xl font-bold text-white mb-2">${translate("masterAchievement.title")}</h2>
       <p class="text-white/90 mb-4">${translate("masterAchievement.message")}</p>
-      <button id="master-achievement-continue-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all w-full">
+      <button id="master-achievement-continue-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 font-semibold transition-all w-full">
         ${translate("common.continue")}
       </button>
     </div>
@@ -590,8 +590,8 @@ function getProgressHTML(currentNumber, targetNumber) {
   );
 
   return `
-    <div class="relative bg-gray-800/50 rounded-full h-4 border border-white/10 overflow-hidden">
-      <div id="progress-bar-fill" class="h-full rounded-full transition-all duration-700 ease-out" 
+    <div class="relative bg-gray-800/50 h-4 overflow-hidden">
+      <div id="progress-bar-fill" class="h-full transition-all duration-700 ease-out" 
            style="
              width: ${progress}%;
              background: linear-gradient(to right, rgb(${color1}), rgb(${color2}));
@@ -710,13 +710,13 @@ function createGameUI() {
         ${gameManager.gameModeManager.isMaster() ? `<span class="master-indicator text-yellow-400 font-bold relative" title="${translate("masterStatus.title")}"><i class="lni lni-crown"></i>${gameManager.gameModeManager.getCompletionDisplay() ? `<span class="absolute -top-1 -right-1 bg-yellow-500 text-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 0.6rem; min-width: 1rem; min-height: 1rem;">${gameManager.gameModeManager.getCompletionDisplay()}</span>` : ""}</span>` : ""}
         <!-- Game Mode Dropdown -->
         <div class="relative">
-          <button id="game-mode-dropdown-btn" class="mode-indicator ${gameManager.gameModeManager.getGameMode()} btn-mode-${gameManager.gameModeManager.getGameMode()} hover:brightness-110 border border-white/20 rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
+          <button id="game-mode-dropdown-btn" class="mode-indicator ${gameManager.gameModeManager.getGameMode()} btn-mode-${gameManager.gameModeManager.getGameMode()} hover:brightness-110 px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
                   style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem); height: clamp(1.5rem, 3vh, 2rem); height: clamp(1.5rem, 3svh, 2rem);">
             <span id="current-mode-label">${gameManager.gameModeManager.getGameMode() === "normal" ? "<i class='lni lni-target'></i>" : "<i class='lni lni-unlock'></i>"}</span>
             <span id="current-mode-text">${translate(`gameModes.${gameManager.gameModeManager.getGameMode()}`)}</span>
             <span>▼</span>
           </button>
-          <div id="game-mode-dropdown" class="hidden absolute top-full left-0 mt-1 bg-gray-800 border border-white/20 rounded shadow-lg shadow-black/50 z-50 min-w-full">
+          <div id="game-mode-dropdown" class="hidden absolute top-full left-0 mt-1 bg-gray-800 shadow-lg shadow-black/50 z-50 min-w-full">
             <button class="game-mode-option w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors flex items-center gap-2" data-mode="normal">
               <i class="lni lni-target"></i>
               <div>
@@ -749,8 +749,8 @@ function createGameUI() {
         ${Object.values(languages)
           .map(
             (lang) => `
-          <button class="language-btn ${getCurrentLanguage() === lang.code ? "bg-blue-600 border border-blue-400" : "bg-gray-600/50 border border-white/20"} 
-                         rounded px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1"
+          <button class="language-btn ${getCurrentLanguage() === lang.code ? "bg-blue-600" : "bg-gray-600/50"} 
+                         px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1"
                   style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem); height: clamp(1.5rem, 3vh, 2rem); height: clamp(1.5rem, 3svh, 2rem);"
                   data-lang="${lang.code}">
             <span>${lang.flag}</span>
@@ -767,9 +767,9 @@ function createGameUI() {
     ${renderLevelSelectorUI()}
     
     <!-- Goal Display with Share button on left, Moves and New Exercise on the right -->  
-    <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl p-2 border-2 border-emerald-500 flex flex-col sm:flex-row sm:justify-between gap-1" style="height: 7rem;">
+    <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 p-2 flex flex-col sm:flex-row sm:justify-between gap-1" style="height: 7rem;">
       <div class="flex flex-row sm:flex-col justify-center items-center gap-1 sm:mr-2">
-        <button class="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap shadow-lg shadow-black-800 drop-shadow-lg" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="share-puzzle-btn">
+        <button class="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white font-bold px-2 py-1 transition-all active:scale-95 whitespace-nowrap shadow-lg shadow-black-800 drop-shadow-lg" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="share-puzzle-btn">
           <i class="lni lni-share-alt"></i> <span>${translate("sharing.shareCurrentPuzzle")}</span>
         </button>
       </div>
@@ -783,16 +783,16 @@ function createGameUI() {
           <div class="text-emerald-200 uppercase tracking-wide font-semibold" style="font-size: clamp(0.6rem, 1.3vh, 0.8rem); font-size: clamp(0.6rem, 1.3svh, 0.8rem);">${translate("moves")}</div>
           <div id="moves-count" class="text-white font-bold" style="font-size: clamp(0.9rem, 2.2vh, 1.3rem); font-size: clamp(0.9rem, 2.2svh, 1.3rem);">${gameState.moves}/${exercise.optimalMoves === Infinity ? "∞" : exercise.optimalMoves}</div>
         </div>
-        <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white font-bold px-2 py-1 rounded-lg transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="new-exercise-btn">
+        <button class="bg-purple-800/80 hover:bg-purple-700/80 text-white font-bold px-2 py-1 transition-all active:scale-95 whitespace-nowrap" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem); height: clamp(1.8rem, 4vh, 2.5rem); height: clamp(1.8rem, 4svh, 2.5rem);" id="new-exercise-btn">
           <i class="lni lni-reload"></i> <span>${translate("gameStates.newGame")}</span>
         </button>
       </div>
     </div>
     
     <!-- Progress Indicator -->
-    <div class="w-full p-1" id="progress-container">
-      <div class="relative bg-gray-800/50 rounded-full h-4 border border-white/10 overflow-hidden">
-        <div id="progress-bar-fill" class="h-full rounded-full transition-all duration-700 ease-out" 
+    <div class="w-full" id="progress-container">
+      <div class="relative bg-gray-800/50 h-4 overflow-hidden">
+        <div id="progress-bar-fill" class="h-full transition-all duration-700 ease-out" 
              style="width: 0%; background: linear-gradient(to right, rgb(107, 114, 128), rgb(100, 116, 139));"></div>
         <div id="progress-percentage" class="absolute inset-0 flex items-center justify-center text-white font-bold text-xs drop-shadow-lg">
           0%
@@ -803,13 +803,13 @@ function createGameUI() {
     <!-- BEGIN: GameBoard -->
     <main class="w-full flex-1 flex flex-col" style="height: 70vh; height: 70svh; gap: 1vh; gap: 1svh;">
       <!-- Central Number Display -->
-      <section class="rounded-xl flex justify-center items-center" style="height: 18vh; height: 18svh; min-height: 4rem;" id="number-display" data-purpose="number-display">
+      <section class="flex justify-center items-center" style="height: 18vh; height: 18svh; min-height: 4rem;" id="number-display" data-purpose="number-display">
         <span class="font-black text-white tracking-tighter current-number" id="current-number" style="font-size: clamp(2.5rem, 8vh, 5rem); font-size: clamp(2.5rem, 8svh, 5rem);">${gameState.current}</span>
       </section>
       
       <!-- Inline History -->
       <section class="flex-shrink-0" style="min-height: 3rem;" data-purpose="inline-history">
-        <div class="bg-[#1a1a1a] rounded-lg p-2 border border-white/10 transition-all duration-300 h-full" id="history-container">
+        <div class="bg-[#1a1a1a] p-2 transition-all duration-300 h-full" id="history-container">
           <div class="flex items-center justify-between mb-1">
             <h4 class="text-white/70 uppercase tracking-wide font-semibold" style="font-size: clamp(0.6rem, 1.4vh, 0.8rem); font-size: clamp(0.6rem, 1.4svh, 0.8rem);">${translate("history")}</h4>
           </div>
@@ -826,15 +826,15 @@ function createGameUI() {
             const previews = getOperationPreviews(gameState.current);
             const isBlocked = gameState.moves >= moveLimit;
             const buttonClass = isBlocked
-              ? "bg-gray-600 text-gray-400 cursor-not-allowed border border-gray-500/50 shadow-inner"
-              : "bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-400 hover:via-red-500 hover:to-red-600 text-white transition-all duration-200 active:scale-95 border border-red-400/50 hover:border-red-300/70 shadow-lg hover:shadow-red-500/30 hover:shadow-xl relative before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-transparent before:rounded-xl before:pointer-events-none";
+              ? "bg-gray-600 text-gray-400 cursor-not-allowed shadow-inner"
+              : "bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-400 hover:via-red-500 hover:to-red-600 text-white transition-all duration-200 active:scale-95 shadow-lg hover:shadow-red-500/30 hover:shadow-xl relative before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-transparent before:pointer-events-none";
             const previewText = isBlocked
               ? translate("blocked")
               : previews[op === "sumDigits" ? "sum" : op];
             const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
             const operationKey = op === "sumDigits" ? "sum" : op;
             const translatedLabel = translate(`operations.${op}`);
-            return `<button class="${buttonClass} font-black rounded-xl shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="height: 13vh; height: 13svh; max-height: 7rem; font-size: clamp(0.6rem, 1.8vh, 0.9rem); font-size: clamp(0.6rem, 1.8svh, 0.9rem);">
+            return `<button class="${buttonClass} font-black shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full" data-operation="${operationKey}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="height: 13vh; height: 13svh; max-height: 7rem; font-size: clamp(0.6rem, 1.8vh, 0.9rem); font-size: clamp(0.6rem, 1.8svh, 0.9rem);">
             <div class="flex items-center gap-1">
               ${getOperationIcon(operationKey, iconColor)}
               <span>${translatedLabel}</span>
@@ -847,16 +847,16 @@ function createGameUI() {
       
       <!-- Utility Row -->
       <section class="grid grid-cols-4 gap-2 flex-1 flex-shrink-0" style="max-height: 8vh; max-height: 8svh;" data-purpose="utility-controls">
-        <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20 border-yellow-400" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
+        <button class="bg-[#374151] flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           <i class="lni lni-spinner-arrow"></i> ${translate("gameStates.reset")}
         </button>
-        <button class="bg-[#374151] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 info-btn h-full" id="info-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
+        <button class="bg-[#374151] flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 info-btn h-full" id="info-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           <i class="lni lni-help"></i> <span>${translate("help")}</span>
         </button>
-        <button class="bg-[#6b46c1] border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
+        <button class="bg-[#6b46c1] flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full ${showPreviews ? "bg-purple-600" : "bg-gray-600"}" id="preview-toggle-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           <i class="lni ${showPreviews ? "lni-star-fill" : "lni-star-empty"} p-2"></i> <span>${translate("preview")}</span>
         </button>
-        <button class="${gameState.hints.used >= gameState.hints.maxHints ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-500"} border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full" id="hint-btn" ${gameState.hints.used >= gameState.hints.maxHints ? "disabled" : ""} style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
+        <button class="${gameState.hints.used >= gameState.hints.maxHints ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-500"} flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full" id="hint-btn" ${gameState.hints.used >= gameState.hints.maxHints ? "disabled" : ""} style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           <i class="lni lni-invention"></i> <span>${translate("hint")} (${gameState.hints.used}/${gameState.hints.maxHints})</span>
         </button>
       </section>
@@ -865,7 +865,7 @@ function createGameUI() {
     
     <!-- Info Modal -->
     <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm info-modal hidden p-4" id="info-modal">
-      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-2xl p-4 sm:p-6 max-w-sm w-full text-center shadow-2xl max-h-[90vh] max-h-[90svh] overflow-y-auto">
+      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] p-4 sm:p-6 max-w-sm w-full text-center shadow-2xl max-h-[90vh] max-h-[90svh] overflow-y-auto">
         <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4"><i class="lni lni-question-circle"></i> ${translate("howToPlay")}</h3>
         <div class="text-white/95 text-sm text-left leading-relaxed mb-4 sm:mb-6" id="info-content">
           <div class="mb-3 sm:mb-4">
@@ -881,13 +881,13 @@ function createGameUI() {
           </div>
           <div class="text-center text-yellow-300 font-semibold text-xl"><i class="lni lni-invention"></i> <span id="difficulty-tip" class="text-sm text-emerald-400"></span></div>
         </div>
-        <button class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm" id="close-info-btn">${translate("close")}</button>
+        <button class="bg-white/20 hover:bg-white/30 text-white px-4 sm:px-6 py-2 sm:py-3 font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm" id="close-info-btn">${translate("close")}</button>
       </div>
     </div>
     
     <!-- Success Modal -->
     <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40" id="success-modal">
-      <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] border-t-4 border-emerald-500 p-4 text-center shadow-2xl shadow-emerald-500/30">
+      <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] p-4 text-center shadow-2xl shadow-emerald-500/30">
         <div class="flex items-center justify-center gap-2 sm:gap-3 mb-2">
           <div class="text-3xl sm:text-4xl celebration-emoji" id="celebration-emoji"><i class="lni lni-star-fill"></i></div>
           <h2 class="text-xl sm:text-2xl font-bold text-emerald-400 drop-shadow-lg" id="success-title">${translate("levelComplete")}</h2>
@@ -921,19 +921,19 @@ function createGameUI() {
         <div class="flex flex-col gap-3 justify-center">
           <!-- Main action buttons -->
           <div class="flex gap-2 justify-between">
-            <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn"><i class="lni lni-spinner-arrow"></i> ${translate("retry")}</button>
+            <button class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold px-4 py-2 uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/30 retry-exercise-btn" id="retry-exercise-btn"><i class="lni lni-spinner-arrow"></i> ${translate("retry")}</button>
             ${
               gameManager.gameModeManager.isNormal()
                 ? !gameManager.getNextLevelInfo().isAvailable
-                  ? `<button class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-teal-500/30" id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")} <i class="lni lni-unlock"></i></button>`
-                  : `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")} <i class="lni lni-target"></i></button>`
-                : `<button class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold px-4 py-2 rounded-xl uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-indigo-500/30" id="try-normal-btn">${translate("gameModeMessages.tryNormalMode")} <i class="lni lni-baloon"></i></button>`
+                  ? `<button class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold px-4 py-2 uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-teal-500/30" id="try-freeplay-btn">${translate("gameModeMessages.tryFreePlay")} <i class="lni lni-unlock"></i></button>`
+                  : `<button class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold px-4 py-2 uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-purple-500/30 text-nowrap" id="next-exercise-btn">${translate("nextLevel")} <i class="lni lni-target"></i></button>`
+                : `<button class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold px-4 py-2 uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-indigo-500/30" id="try-normal-btn">${translate("gameModeMessages.tryNormalMode")} <i class="lni lni-baloon"></i></button>`
             }
           </div>
           <!-- Share buttons row -->
           <div class="flex gap-2 justify-around">
-            <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/30" id="share-challenge-btn"><i class="lni lni-friendly"></i> ${translate("sharing.shareChallenge")}</button>
-            <button class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-3 py-2 rounded-lg text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-orange-500/30" id="share-victory-btn">${translate("sharing.shareVictory")} <i class="lni lni-cool"></i></button>
+            <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-3 py-2 text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/30" id="share-challenge-btn"><i class="lni lni-friendly"></i> ${translate("sharing.shareChallenge")}</button>
+            <button class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-3 py-2 text-xs uppercase tracking-wide transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-orange-500/30" id="share-victory-btn">${translate("sharing.shareVictory")} <i class="lni lni-cool"></i></button>
           </div>
         </div>
       </div>
@@ -941,7 +941,7 @@ function createGameUI() {
     
     <!-- Hint Display Area (Non-modal) -->
     <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 max-w-md w-full px-4 hint-display hidden" id="hint-display">
-      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-2 border-amber-400/50 rounded-xl p-4 shadow-xl backdrop-blur-sm">
+      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] p-4 shadow-xl backdrop-blur-sm">
         <div class="flex items-center gap-2 mb-2">
           <span class="text-lg" id="hint-icon-display"></span>
           <span class="font-bold text-amber-300 text-sm" id="hint-level-display">Hint #1</span>
@@ -978,7 +978,7 @@ function renderInlineHistory() {
         operationMap[operationKey] || operationMap[entry.action.toLowerCase()];
       const color = index === 0 ? "#2563EB" : "#10b981"; // emerald-500
 
-      return `<div class="flex items-center gap-1 bg-[${color}10] border border-[${color}20] rounded-lg px-2 py-1" title="${entry.action}: ${gameState.history[index].value} → ${entry.value}">
+      return `<div class="flex items-center gap-1 bg-[${color}10] px-2 py-1" title="${entry.action}: ${gameState.history[index].value} → ${entry.value}">
         ${getOperationIcon(op, color)}
         <span class="text-[${color}] text-xs font-bold">${entry.value}</span>
       </div>`;
@@ -1134,7 +1134,6 @@ function updateDisplay() {
         "ring-opacity-75",
         "animate-pulse",
         "bg-yellow-500/20",
-        "border-yellow-400",
       );
     } else {
       resetBtn.classList.remove(
@@ -1143,7 +1142,6 @@ function updateDisplay() {
         "ring-opacity-75",
         "animate-pulse",
         "bg-yellow-500/20",
-        "border-yellow-400",
       );
     }
   }
@@ -1159,11 +1157,11 @@ function updateDisplay() {
     // Update button styling based on hints remaining
     if (gameState.hints.used >= gameState.hints.maxHints) {
       hintBtn.className =
-        "bg-gray-600 text-gray-400 cursor-not-allowed border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
+        "bg-gray-600 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
       hintBtn.disabled = true;
     } else {
       hintBtn.className =
-        "bg-amber-600 hover:bg-amber-500 border border-white/10 rounded-xl flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
+        "bg-amber-600 hover:bg-amber-500 flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 h-full";
       hintBtn.disabled = false;
     }
   }
@@ -1839,7 +1837,7 @@ function showCustomExerciseModal() {
   // Create modal HTML
   const modalHTML = `
     <div id="custom-exercise-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm p-4">
-      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] border-3 border-[#4a5568] rounded-2xl shadow-2xl max-w-sm w-full text-center max-h-[90vh] max-h-[90svh] overflow-y-auto">
+      <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] shadow-2xl max-w-sm w-full text-center max-h-[90vh] max-h-[90svh] overflow-y-auto">
         <!-- Modal Header -->
         <div class="p-4 sm:p-6">
           <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center justify-center gap-2">
@@ -1862,7 +1860,7 @@ function showCustomExerciseModal() {
             <input 
               type="number" 
               id="custom-target" 
-              class="w-full bg-white/10 border-2 border-white/20 focus:border-blue-300 rounded-xl px-4 py-3 text-white text-xl font-bold text-center transition-all outline-none"
+              class="w-full bg-white/10 px-4 py-3 text-white text-xl font-bold text-center transition-all outline-none"
               placeholder="e.g., 128"
               min="2"
               max="10000"
@@ -1873,14 +1871,14 @@ function showCustomExerciseModal() {
           
           <!-- Validation Info -->
           <div id="validation-info" class="mb-4 hidden">
-            <div id="validation-content" class="p-3 rounded-lg text-sm">
+            <div id="validation-content" class="p-3 text-sm">
               <!-- Validation info will go here -->
             </div>
           </div>
           
           <!-- Actions -->
           <div class="flex gap-3 justify-center">
-            <button id="load-custom-btn" class="bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 hover:border-white/50 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            <button id="load-custom-btn" class="bg-white/20 hover:bg-white/30 text-white px-4 sm:px-6 py-2 sm:py-3 font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
               ${translate("loadExercise") || "Load Exercise"}
             </button>
           </div>
@@ -1960,7 +1958,7 @@ function setupCustomExerciseModal() {
         </div>
       `;
       validationContent.className =
-        "p-3 rounded-lg text-sm bg-emerald-900/20 border border-emerald-500/30";
+        "p-3 text-sm bg-emerald-900/20";
     } else {
       validationContent.innerHTML = `
         <div class="text-yellow-300">
@@ -1971,7 +1969,7 @@ function setupCustomExerciseModal() {
         </div>
       `;
       validationContent.className =
-        "p-3 rounded-lg text-sm bg-yellow-900/20 border border-yellow-500/30";
+        "p-3 text-sm bg-yellow-900/20";
     }
 
     validationInfo.classList.remove("hidden");
@@ -2309,7 +2307,7 @@ function showLevelUnlockNotification(level) {
   // Create special celebration notification
   const notification = document.createElement("div");
   notification.className =
-    "notification fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-4 rounded-xl shadow-2xl z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center";
+    "notification fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-4 shadow-2xl z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center";
   notification.style.minWidth = "280px";
 
   notification.innerHTML = `
