@@ -713,7 +713,7 @@ function createGameUI() {
           <button id="game-mode-dropdown-btn" class="mode-indicator ${gameManager.gameModeManager.getGameMode()} btn-mode-${gameManager.gameModeManager.getGameMode()} hover:brightness-110 px-2 py-1 font-semibold transition-all active:scale-95 flex items-center gap-1" 
                   style="font-size: clamp(0.6rem, 1.5vh, 0.8rem); font-size: clamp(0.6rem, 1.5svh, 0.8rem); height: clamp(1.5rem, 3vh, 2rem); height: clamp(1.5rem, 3svh, 2rem);">
             <span id="current-mode-label">${gameManager.gameModeManager.getGameMode() === "normal" ? "<i class='lni lni-target'></i>" : "<i class='lni lni-unlock'></i>"}</span>
-            <span id="current-mode-text">${translate(`gameModes.${gameManager.gameModeManager.getGameMode()}`)}</span>
+            <span id="current-mode-text">${translate(`gameModesShort.${gameManager.gameModeManager.getGameMode()}`)}</span>
             <span>▼</span>
           </button>
           <div id="game-mode-dropdown" class="hidden absolute top-full left-0 mt-1 bg-gray-800 shadow-lg shadow-black/50 z-50 min-w-full">
@@ -2262,7 +2262,7 @@ function updateModeIndicator(mode) {
   }
 
   if (modeText) {
-    modeText.textContent = translate(`gameModes.${mode}`);
+    modeText.textContent = translate(`gameModesShort.${mode}`);
   }
 }
 

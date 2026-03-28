@@ -51,6 +51,17 @@ export const translations = {
     },
   },
 
+  gameModesShort: {
+    normal: {
+      en: "Normal",
+      es: "Normal",
+    },
+    freeplay: {
+      en: "Full",
+      es: "Libre",
+    },
+  },
+
   gameModeDescriptions: {
     normal: {
       en: "Progressive difficulty with unlock requirements",
