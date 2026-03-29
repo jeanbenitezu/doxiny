@@ -14,13 +14,11 @@ import {
   validateExercise,
   detectCustomExerciseLevel,
 } from "./exerciseGenerator.js";
-import { calculateProgressToTarget, generateHints } from "./gameHelpers.js";
+import { generateHints } from "./gameHelpers.js";
 import {
   translate,
   t,
-  getCurrentLanguage,
   setLanguage,
-  languages,
 } from "./i18n.js";
 import {
   handleShareVictory,
@@ -113,7 +111,7 @@ function createAutoSolveFunction() {
     console.log(
       `${uiManager.gameState.isComplete ? "🎉" : "⚠️"} Auto-solve completed. Final result: ${uiManager.gameState.current}`,
     );
-    return gameState.isComplete;
+    return uiManager.gameState.isComplete;
   };
 }
 
@@ -124,18 +122,14 @@ function handleOperationClick(operation) {
   // Clear any hint effects when user takes action
   clearHintEffects();
 
-  let gameState = uiManager.gameState;
-
-  if (!gameState.isComplete && gameState.moves < gameState.moveLimit) {
+  if (!uiManager.gameState.isComplete && uiManager.gameState.moves < uiManager.gameState.moveLimit) {
     try {
       // Calculate what the result would be
-      const resultValue = operations[operation](gameState.current);
+      const resultValue = operations[operation](uiManager.gameState.current);
 
       // Only apply the move if the result is different from current value
-      if (resultValue !== gameState.current) {
-        gameState = applyMove(gameState, operation);
-        // Update UI manager with new game state
-        uiManager.gameState = gameState;
+      if (resultValue !== uiManager.gameState.current) {
+        uiManager.gameState = applyMove(uiManager.gameState, operation);
       }
       // Always update display to show user that operation was attempted
       uiManager.updateDisplay();
@@ -199,20 +193,18 @@ function togglePreviews() {
  * Handle hint request from user
  */
 function handleHintRequest() {
-  const gameState = uiManager.gameState;
-
   // Check if hints are available
-  if (gameState.hints.used >= gameState.hints.maxHints) {
+  if (uiManager.gameState.hints.used >= uiManager.gameState.hints.maxHints) {
     console.log("💡 No more hints available for this exercise");
     return;
   }
 
   // Generate hint based on current state
   const hints = generateHints(
-    gameState.current,
-    gameState.goal,
-    gameState.moves,
-    gameState.hints.used,
+    uiManager.gameState.current,
+    uiManager.gameState.goal,
+    uiManager.gameState.moves,
+    uiManager.gameState.hints.used,
   );
 
   if (hints.length === 0) {
@@ -221,20 +213,20 @@ function handleHintRequest() {
   }
 
   // Get the next hint (based on how many have been used)
-  const nextHint = hints[gameState.hints.used] ?? hints[hints.length - 1]; // Fallback to last hint if out of range
+  const nextHint = hints[uiManager.gameState.hints.used] ?? hints[hints.length - 1]; // Fallback to last hint if out of range
 
   // Update game state
-  gameState.hints.used += 1;
-  gameState.hints.hintsData.push(nextHint);
+  uiManager.gameState.hints.used += 1;
+  uiManager.gameState.hints.hintsData.push(nextHint);
 
   // Show hint (modal or button blink depending on type)
-  showHint(nextHint, gameState.hints.used, gameState.hints.maxHints);
+  showHint(nextHint, uiManager.gameState.hints.used, uiManager.gameState.hints.maxHints);
 
   // Update UI to reflect hint usage
   uiManager.updateDisplay();
 
   console.log(
-    `💡 Hint ${gameState.hints.used}/${gameState.hints.maxHints} provided:`,
+    `💡 Hint ${uiManager.gameState.hints.used}/${uiManager.gameState.hints.maxHints} provided:`,
     nextHint.message,
   );
 }

@@ -4,8 +4,8 @@
  */
 
 import { operations } from "./operations.js";
-import { generateExercise, getDifficultyLevels } from "./exerciseGenerator.js";
-import { calculateProgressToTarget, generateHints } from "./gameHelpers.js";
+import { getDifficultyLevels } from "./exerciseGenerator.js";
+import { calculateProgressToTarget } from "./gameHelpers.js";
 import { t, translate, getCurrentLanguage, languages } from "./i18n.js";
 
 export class UIManager {
