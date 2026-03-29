@@ -3,7 +3,7 @@
  * Mathematical puzzle game with elegant solutions
  */
 
-import { createGameState, applyMove } from "./game.js";
+import { createGameState, applyMove } from "./gameState.js";
 import { operations } from "./operations.js";
 import { GameManager } from "./GameManager.js";
 import { UIManager } from "./UIManager.js";
