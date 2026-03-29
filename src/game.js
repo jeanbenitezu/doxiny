@@ -14,6 +14,7 @@ export function createGameState(goalNumber = 10, level = 1) {
     goal: goalNumber,
     level: level,
     moves: 0,
+    moveLimit: 12,
     history: [{ action: "START", value: 1 }],
     isComplete: false,
     startTime: Date.now(),

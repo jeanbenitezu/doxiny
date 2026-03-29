@@ -38,16 +38,13 @@ let gameState = createGameState(
 // UI state for preview visibility
 let showPreviews = true;
 
-// Dynamic move limit based on exercise difficulty
-let moveLimit = 12;
-
 /**
  * Update move limit based on current exercise optimal moves
  */
 function updateMoveLimit() {
-  moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 12);
+  gameState.moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 12);
   console.log(
-    `🎯 Move limit updated to: ${moveLimit} (optimal: ${gameManager.currentExercise.optimalMoves})`,
+    `🎯 Move limit updated to: ${gameState.moveLimit} (optimal: ${gameManager.currentExercise.optimalMoves})`,
   );
 }
 
@@ -491,7 +488,7 @@ function createGameUI() {
         ${["reverse", "sumDigits", "append1", "double"]
           .map((op) => {
             const previews = getOperationPreviews(gameState.current);
-            const isBlocked = gameState.moves >= moveLimit;
+            const isBlocked = gameState.moves >= gameState.moveLimit;
             const buttonClass = isBlocked
               ? "bg-gray-600 text-gray-400 cursor-not-allowed shadow-inner"
               : "bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-400 hover:via-red-500 hover:to-red-600 text-white transition-all duration-200 active:scale-95 shadow-lg hover:shadow-red-500/30 hover:shadow-xl relative before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-transparent before:pointer-events-none";
@@ -514,7 +511,7 @@ function createGameUI() {
       
       <!-- Utility Row -->
       <section class="grid grid-cols-4 gap-2 flex-1 flex-shrink-0" style="max-height: 8vh; max-height: 8svh;" data-purpose="utility-controls">
-        <button class="bg-[#374151] flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
+        <button class="bg-[#374151] flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${gameState.moves >= gameState.moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
           <i class="lni lni-spinner-arrow"></i> ${translate("gameStates.reset")}
         </button>
         <button class="bg-[#374151] flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 info-btn h-full" id="info-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
@@ -736,7 +733,7 @@ function updateDisplay() {
 
   // Update operation preview text and button states
   const previews = getOperationPreviews(gameState.current);
-  const isBlocked = gameState.moves >= moveLimit;
+  const isBlocked = gameState.moves >= gameState.moveLimit;
 
   document.querySelectorAll(".operation-btn").forEach((btn) => {
     const operation = btn.dataset.operation;
@@ -1200,7 +1197,7 @@ function handleOperationClick(operation) {
   // Clear any hint effects when user takes action
   clearHintEffects();
 
-  if (!gameState.isComplete && gameState.moves < moveLimit) {
+  if (!gameState.isComplete && gameState.moves < gameState.moveLimit) {
     try {
       // Calculate what the result would be
       const resultValue = operations[operation](gameState.current);

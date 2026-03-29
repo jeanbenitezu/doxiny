@@ -1,6 +1,6 @@
 # Doxiny - Development Patterns & Best Practices
 
-*Last Updated: March 28, 2026 - CLASS EXTRACTION: GameModeManager and GameManager refactored to separate modules*
+*Last Updated: March 28, 2026 - REFACTORING: Class extraction & moveLimit moved to game state*
 
 ## Code Organization Principles
 
@@ -29,6 +29,39 @@ import { GameManager } from './GameManager.js';
 - GameManager.js: Imports GameModeManager and required utility functions  
 - main.js: Updated to import both classes and pass required callbacks
 - Dependency injection for UI functions (updateLevelSelectorUI callback)
+
+### State Management Refactoring (March 28, 2026)
+
+```javascript
+// REFACTORED: Move limit variable moved from main.js to game state
+
+// Before: Global variable in main.js
+let moveLimit = 12;
+function updateMoveLimit() {
+  moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 12);
+}
+
+// After: Part of game state in game.js
+export function createGameState(goalNumber = 10, level = 1) {
+  return {
+    current: 1,
+    goal: goalNumber,
+    moves: 0,
+    moveLimit: 12, // ✅ Now part of state
+    // ... other state
+  };
+}
+
+function updateMoveLimit() {
+  gameState.moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 12);
+}
+```
+
+**State Management Benefits:**
+- **Better State Cohesion**: moveLimit belongs logically with other game state
+- **Cleaner Code**: Eliminates global variable in main.js
+- **State Persistence**: moveLimit can be saved/restored with game state
+- **Testability**: moveLimit is part of testable state objects
 
 ### Pathfinding Unification Pattern
 
