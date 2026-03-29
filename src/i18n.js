@@ -732,8 +732,8 @@ export const translations = {
         es: "Tu Objetivo",
       },
       message: {
-        en: "Transform the number 1 into the number 3 using exactly 4 moves. Try to find the most efficient path!",
-        es: "Transforma el número 1 al número 3 usando exactamente 4 movimientos. ¡Trata de encontrar el camino más eficiente!",
+        en: "Transform the number 1 into the goal number X using approximately Y moves. Try to find the most efficient path!",
+        es: "Transforma el número 1 al número objetivo X usando aproximadamente Y movimientos. ¡Trata de encontrar el camino más eficiente!",
       },
     },
     currentNumber: {

@@ -267,16 +267,16 @@ export class TourManager {
 
     const modal = document.createElement("div");
     modal.className =
-      "tour-modal bg-white dark:bg-slate-800 p-6 max-w-md mx-auto mt-20 text-black dark:text-white";
+      "tour-modal bg-white dark:bg-slate-800 p-4 mx-auto absolute bottom-60 left-0 w-full text-black dark:text-white rounded-lg shadow-lg max-w-md";
 
     modal.innerHTML = `
       <div class="text-center">
-        <h2 class="text-2xl font-bold mb-4">${translate(step.titleKey)}</h2>
-        <p class="text-lg mb-6">${translate(step.messageKey)}</p>
-        <div class="flex gap-3 justify-center">
-          ${step.showSkip ? `<button class="tour-btn tour-skip px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 transition-colors">${translate("tour.skip")}</button>` : ""}
-          ${step.showNext ? `<button class="tour-btn tour-next px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors">${translate("tour.next")}</button>` : ""}
-          ${step.showPlay ? `<button class="tour-btn tour-play px-6 py-3 bg-green-600 text-white hover:bg-green-700 transition-colors text-xl font-bold">${translate("tour.play")}</button>` : ""}
+        <h2 class="text-xl font-bold mb-3">${translate(step.titleKey)}</h2>
+        <p class="text-base mb-4">${translate(step.messageKey)}</p>
+        <div class="flex gap-2 justify-center">
+          ${step.showSkip ? `<button class="tour-btn tour-skip px-3 py-2 bg-gray-500 text-white hover:bg-gray-600 transition-colors text-sm">${translate("tour.skip")}</button>` : ""}
+          ${step.showNext ? `<button class="tour-btn tour-next px-3 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm">${translate("tour.next")}</button>` : ""}
+          ${step.showPlay ? `<button class="tour-btn tour-play px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition-colors text-lg font-bold">${translate("tour.play")}</button>` : ""}
         </div>
       </div>
     `;
@@ -334,7 +334,7 @@ export class TourManager {
   createOverlay() {
     const overlay = document.createElement("div");
     overlay.className =
-      "tour-overlay fixed inset-0 bg-black bg-opacity-10 z-50";
+      "tour-overlay fixed inset-0 bg-black bg-opacity-50 z-50";
     return overlay;
   }
 
@@ -361,14 +361,14 @@ export class TourManager {
     const rect = target.getBoundingClientRect();
     const tooltip = document.createElement("div");
     tooltip.className =
-      "tour-tooltip bg-white dark:bg-slate-800 p-4 shadow-lg max-w-xs text-black dark:text-white z-52 fixed";
+      "tour-tooltip bg-white dark:bg-slate-800 p-3 shadow-lg max-w-xs text-black dark:text-white z-52 fixed";
 
     tooltip.innerHTML = `
-      <h3 class="font-bold mb-2">${translate(step.titleKey)}</h3>
-      <p class="mb-3">${translate(step.messageKey)}</p>
+      <h3 class="font-bold mb-2 text-sm">${translate(step.titleKey)}</h3>
+      <p class="mb-3 text-sm">${translate(step.messageKey)}</p>
       <div class="flex gap-2">
-        ${step.showSkip ? `<button class="tour-btn tour-skip px-3 py-1 bg-gray-500 text-white hover:bg-gray-600 transition-colors text-sm">${translate("tour.skip")}</button>` : ""}
-        ${step.showNext ? `<button class="tour-btn tour-next px-3 py-1 bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm">${translate("tour.next")}</button>` : ""}
+        ${step.showSkip ? `<button class="tour-btn tour-skip px-2 py-1 bg-gray-500 text-white hover:bg-gray-600 transition-colors text-xs">${translate("tour.skip")}</button>` : ""}
+        ${step.showNext ? `<button class="tour-btn tour-next px-2 py-1 bg-blue-600 text-white hover:bg-blue-700 transition-colors text-xs">${translate("tour.next")}</button>` : ""}
       </div>
     `;
 
