@@ -701,6 +701,122 @@ export const translations = {
       es: "Cerrar",
     },
   },
+
+  // Guided Tour
+  tour: {
+    skip: {
+      en: "Skip",
+      es: "Saltar",
+    },
+    next: {
+      en: "Next",
+      es: "Siguiente",
+    },
+    play: {
+      en: "Play!",
+      es: "¡Jugar!",
+    },
+    welcome: {
+      title: {
+        en: "Welcome to Doxiny!",
+        es: "¡Bienvenido a Doxiny!",
+      },
+      message: {
+        en: "Let's take a quick tour to learn how to play this number transformation puzzle.",
+        es: "Hagamos un recorrido rápido para aprender cómo jugar este rompecabezas de transformación de números.",
+      },
+    },
+    objective: {
+      title: {
+        en: "Your Goal",
+        es: "Tu Objetivo",
+      },
+      message: {
+        en: "Transform the number 1 into the number 3 using exactly 4 moves. Try to find the most efficient path!",
+        es: "Transforma el número 1 al número 3 usando exactamente 4 movimientos. ¡Trata de encontrar el camino más eficiente!",
+      },
+    },
+    currentNumber: {
+      title: {
+        en: "Current Number",
+        es: "Número Actual",
+      },
+      message: {
+        en: "This is your current number. It starts at 1, and you need to transform it to reach your goal.",
+        es: "Este es tu número actual. Comienza en 1, y necesitas transformarlo para alcanzar tu objetivo.",
+      },
+    },
+    firstOperation: {
+      title: {
+        en: "First Move: Double",
+        es: "Primer Movimiento: Duplicar",
+      },
+      message: {
+        en: "Click the DOUBLE button to multiply your current number by 2. This will transform 1 → 2.",
+        es: "Haz clic en el botón DUPLICAR para multiplicar tu número actual por 2. Esto transformará 1 → 2.",
+      },
+    },
+    secondOperation: {
+      title: {
+        en: "Second Move: Append 1",
+        es: "Segundo Movimiento: Agregar 1",
+      },
+      message: {
+        en: "Now click ADD 1 to append the digit '1' to the end. This will transform 2 → 21.",
+        es: "Ahora haz clic en AGREGAR 1 para añadir el dígito '1' al final. Esto transformará 2 → 21.",
+      },
+    },
+    thirdOperation: {
+      title: {
+        en: "Third Move: Reverse",
+        es: "Tercer Movimiento: Invertir",
+      },
+      message: {
+        en: "Click REVERSE to flip the digits. This will transform 21 → 12.",
+        es: "Haz clic en INVERTIR para voltear los dígitos. Esto transformará 21 → 12.",
+      },
+    },
+    helpButtons: {
+      title: {
+        en: "Help Tools",
+        es: "Herramientas de Ayuda",
+      },
+      message: {
+        en: "These buttons can help you when you're stuck. The Hint button gives you strategic guidance.",
+        es: "Estos botones pueden ayudarte cuando estés atascado. El botón Pista te da orientación estratégica.",
+      },
+    },
+    hintDemo: {
+      title: {
+        en: "Try Getting a Hint",
+        es: "Prueba Obtener una Pista",
+      },
+      message: {
+        en: "Click the Hint button to get help for your final move. Hints become more specific each time you ask.",
+        es: "Haz clic en el botón Pista para obtener ayuda con tu movimiento final. Las pistas se vuelven más específicas cada vez que pides.",
+      },
+    },
+    hintResult: {
+      title: {
+        en: "Final Move: Sum Digits",
+        es: "Movimiento Final: Sumar Dígitos",
+      },
+      message: {
+        en: "The hint showed you the way! Click SUM DIGITS to add the digits together: 1 + 2 = 3.",
+        es: "¡La pista te mostró el camino! Haz clic en SUMAR DÍGITOS para sumar los dígitos: 1 + 2 = 3.",
+      },
+    },
+    completion: {
+      title: {
+        en: "Congratulations! 🎉",
+        es: "¡Felicitaciones! 🎉",
+      },
+      message: {
+        en: "You've successfully completed the tutorial! You transformed 1 → 2 → 21 → 12 → 3 in 4 moves. Now you're ready to start your Doxiny journey!",
+        es: "¡Has completado exitosamente el tutorial! Transformaste 1 → 2 → 21 → 12 → 3 en 4 movimientos. ¡Ahora estás listo para comenzar tu viaje en Doxiny!",
+      },
+    },
+  },
 };
 
 // Utility functions for i18n

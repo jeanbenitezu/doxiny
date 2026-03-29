@@ -25,6 +25,8 @@ import {
   handleShareChallenge,
   handleSharedPuzzleURL,
 } from "./sharing.js";
+import { TourManager } from "./TourManager.js";
+import { doxinyConfig } from "./config.js";
 import "./style.css";
 
 // Initialize game manager
@@ -35,6 +37,9 @@ const uiManager = new UIManager(gameManager, createGameState(
   gameManager.currentExercise.goal,
   gameManager.currentDifficulty,
 ));
+
+// Initialize tour manager
+const tourManager = new TourManager(uiManager, gameManager, () => handleNewExercise());
 
 /**
  * Update move limit based on current exercise optimal moves
@@ -597,6 +602,11 @@ function setupGlobalEventListeners() {
 
   // Single global click handler using event delegation
   document.addEventListener("click", (e) => {
+    // Handle tour clicks first (blocks other interactions when active)
+    if (tourManager.handleTourClick(e)) {
+      return;
+    }
+
     if (e.target.closest(".operation-btn")) {
       const operationBtn = e.target.closest(".operation-btn");
       const operation = operationBtn.dataset.operation;
@@ -690,6 +700,25 @@ function init() {
   applyGameModeBackground(currentMode);
   console.log(`🎨 Applied ${currentMode} mode background`);
 
+  // Check for first-time tour based on config
+  const tourConfig = doxinyConfig.get();
+  const shouldShowTour = tourConfig.enableTour && 
+    (tourConfig.forceShowTour || (!tourManager.hasCompletedTour() && tourConfig.tourAutoStart));
+  
+  console.log('🎪 Tour config:', { 
+    enableTour: tourConfig.enableTour, 
+    forceShowTour: tourConfig.forceShowTour, 
+    tourAutoStart: tourConfig.tourAutoStart,
+    hasCompleted: tourManager.hasCompletedTour(),
+    willShow: shouldShowTour 
+  });
+  
+  if (shouldShowTour) {
+    console.log("🎪 Starting guided tour");
+    tourManager.startTour((lvl) => loadCustomExercise(lvl));
+    return; // Skip normal initialization when tour is active
+  }
+
   // Render initial UI
   uiManager.start();
 
@@ -719,9 +748,22 @@ function init() {
       operations: operations,
       generateExercise: generateExercise,
       autoSolve: (delayMs = 1000) => createAutoSolveFunction()(delayMs),
+      tourManager: tourManager,
+      startTour: () => tourManager.startTour(),
+      skipTour: () => tourManager.skipTour(),
+      resetTour: () => {
+        localStorage.removeItem(tourManager.TOUR_FLAG);
+        console.log("🎪 Tour flag reset - reload page to see tour again");
+      },
+      config: doxinyConfig,
+      applyPreset: (preset) => {
+        doxinyConfig.applyPreset(preset);
+        console.log(`🔧 Applied preset: ${preset}`);
+      },
     };
 
     console.log("🔧 Dev tools available: window.doxinyDev");
+    console.log("📋 Available presets:", Object.keys(doxinyConfig.constructor.presets));
   }
 
   const exercise = gameManager.currentExercise;

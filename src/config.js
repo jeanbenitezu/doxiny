@@ -30,6 +30,11 @@ class DoxinyConfig {
       enableStrategicHints: true, // Level 1: General strategic guidance
       enableTacticalHints: false, // Level 2: Specific operational hints
       enableDirectHints: true, // Level 3: Exact next move guidance
+
+      // Tour System Configuration
+      enableTour: true, // Enable first-time user guided tour
+      forceShowTour: false, // Force tour to appear (ignores localStorage flag)
+      tourAutoStart: true, // Auto-start tour for first-time users
     };
   }
 
@@ -126,6 +131,7 @@ class DoxinyConfig {
       maxIterations: 50000,
       lazySearch: false, // Thorough analysis, find all solutions
       debugMode: true,
+      enableTour: false, // Research mode doesn't need tour
     },
     
     // Beginner-friendly (all hint types enabled) 
@@ -134,6 +140,8 @@ class DoxinyConfig {
       enableTacticalHints: true,
       enableDirectHints: true,
       lazySearch: true,
+      enableTour: true,
+      tourAutoStart: true,
     },
     
     // Expert mode (minimal hints)
@@ -143,6 +151,17 @@ class DoxinyConfig {
       enableDirectHints: false,
       bfsUpperBoundLimit: 500000,
       lazySearch: false,
+      enableTour: false, // Experts don't need the tour
+    },
+
+    // Development/Testing mode
+    development: {
+      debugMode: true,
+      enableTour: true,
+      forceShowTour: true, // Always show tour for testing
+      tourAutoStart: false, // Manual control in dev mode
+      bfsUpperBoundLimit: 100000,
+      lazySearch: true,
     },
   };
 
