@@ -918,7 +918,7 @@ export class UIManager {
       // Handle master achievement celebration
       if (completionResult.masterAchieved) {
         setTimeout(() => {
-          showMasterAchievementModal();
+          this.showMasterAchievementModal();
         }, 2000); // Show after level unlock notification
       }
 

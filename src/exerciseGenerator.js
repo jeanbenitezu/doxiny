@@ -13,25 +13,25 @@ import {
 
 /**
  * Algorithm-aware difficulty configuration with i18n keys
- * Based on difficulty score ranges instead of simple number/move ranges
+ * Based on difficulty score ranges with minimum 3 steps requirement
  */
 const difficultyLevels = {
   1: {
     nameKey: "beginner",
     descriptionKey: "beginner",
-    difficultyScoreRange: [0, 4.0],
-    targetGoalRange: [5, 50], // Wider range, algorithm will determine actual difficulty
+    difficultyScoreRange: [3.6, 5.5], // Minimum 3 steps with 1.2x multiplier
+    targetGoalRange: [5, 50],
   },
   2: {
     nameKey: "easy",
     descriptionKey: "easy",
-    difficultyScoreRange: [4.1, 7.5],
+    difficultyScoreRange: [5.6, 8.5],
     targetGoalRange: [10, 100],
   },
   3: {
     nameKey: "medium",
     descriptionKey: "medium",
-    difficultyScoreRange: [7.6, 12.0],
+    difficultyScoreRange: [8.6, 12.0],
     targetGoalRange: [20, 200],
   },
   4: {
@@ -56,18 +56,20 @@ const difficultyLevels = {
 
 /**
  * Generate algorithm-aware exercise by trying goals and validating against difficulty score
+ * Requires minimum 3 steps to avoid trivial exercises
  */
 function generateSimpleExercise(difficulty) {
   const config = difficultyLevels[difficulty];
   const [minGoal, maxGoal] = config.targetGoalRange;
   const [minScore, maxScore] = config.difficultyScoreRange;
+  const MINIMUM_STEPS = 3;
 
   // Try random goals and validate them against algorithm-aware difficulty scoring
-  for (let attempt = 0; attempt < 30; attempt++) {
+  for (let attempt = 0; attempt < 40; attempt++) { // Increased attempts due to minimum steps requirement
     const goal = Math.floor(Math.random() * (maxGoal - minGoal + 1)) + minGoal;
     const validation = validateExercise(goal);
 
-    if (validation.solvable) {
+    if (validation.solvable && validation.minMoves >= MINIMUM_STEPS) {
       const difficultyScore = calculateAlgorithmicDifficulty(
         validation.minMoves, 
         validation.algorithm
@@ -86,24 +88,30 @@ function generateSimpleExercise(difficulty) {
     }
   }
 
-  // Fallback: use curated goals known to work well for each difficulty level
+  // Fallback: use curated goals known to work well for each difficulty level (all 3+ steps)
   const fallbackGoals = {
-    1: [8, 16, 12, 10],              // Simple powers of 2 and easy targets
-    2: [32, 25, 34, 22, 44],         // Mix of patterns
-    3: [64, 56, 78, 89, 98],         // Moderate complexity
-    4: [128, 132, 156, 189, 231],    // Requires more strategy
-    5: [256, 334, 443, 512, 678],    // Advanced algorithmic thinking
-    6: [867, 987, 765, 834, 729, 999], // Maximum complexity
+    1: [12, 15, 24, 21, 18],         // 3-4 steps, simple patterns
+    2: [34, 43, 26, 36, 48],         // 4-6 steps, mix of patterns
+    3: [64, 56, 78, 89, 98],         // 6-8 steps, moderate complexity
+    4: [128, 132, 156, 189, 231],    // 8-12 steps, requires strategy
+    5: [256, 334, 443, 512, 678],    // 12-16 steps, advanced thinking
+    6: [987, 876, 543, 678, 789, 456], // 16+ steps, maximum complexity
   };
 
   const goalOptions = fallbackGoals[difficulty] || [128];
-  const randomIndex = Math.floor(Math.random() * goalOptions.length);
-  const fallbackGoal = goalOptions[randomIndex];
-  const validation = validateExercise(fallbackGoal);
+  let fallbackGoal;
+  let validation;
+  
+  // Ensure fallback also meets minimum steps requirement
+  do {
+    const randomIndex = Math.floor(Math.random() * goalOptions.length);
+    fallbackGoal = goalOptions[randomIndex];
+    validation = validateExercise(fallbackGoal);
+  } while (validation.solvable && validation.minMoves < MINIMUM_STEPS && goalOptions.length > 1);
   
   const difficultyScore = validation.solvable 
     ? calculateAlgorithmicDifficulty(validation.minMoves, validation.algorithm)
-    : minScore; // Use minimum score if unsolvable
+    : minScore;
 
   return {
     goal: fallbackGoal,
@@ -454,12 +462,12 @@ export function detectCustomExerciseLevel(goal, optimalMoves, algorithm = "enhan
   const difficultyScore = calculateAlgorithmicDifficulty(optimalMoves, algorithm);
 
   // Map difficulty score to levels with algorithm-aware thresholds
-  if (difficultyScore <= 4.0) return 1; // Beginner: Simple patterns or very few moves
-  if (difficultyScore <= 7.5) return 2; // Easy: Straightforward BFS solutions
-  if (difficultyScore <= 12.0) return 3; // Medium: Moderate complexity or more moves
-  if (difficultyScore <= 18.0) return 4; // Hard: Complex algorithms or many moves
-  if (difficultyScore <= 28.0) return 5; // Expert: Advanced strategies required
-  return 6; // Insane: Highest complexity algorithms or very long sequences
+  if (difficultyScore <= 5.5) return 1; // Beginner: 3-4 steps with simple algorithms
+  if (difficultyScore <= 8.5) return 2; // Easy: 4-6 steps
+  if (difficultyScore <= 12.0) return 3; // Medium: 6-8 steps or complex algorithms
+  if (difficultyScore <= 18.0) return 4; // Hard: 8-12 steps or strategic approaches
+  if (difficultyScore <= 28.0) return 5; // Expert: 12+ steps or advanced strategies
+  return 6; // Insane: Maximum complexity
 }
 
 /**
