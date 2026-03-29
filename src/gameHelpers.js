@@ -4,7 +4,7 @@
  */
 
 import { t } from "./i18n.js";
-import { operations, mathUtils } from "./operations.js";
+import { mathUtils } from "./operations.js";
 import { doxinyConfig } from "./config.js";
 import {
   findDirectPath,
@@ -110,88 +110,6 @@ function findStrategicPath(start, target, maxMoves) {
     );
     if (pathToIntermediate.length > 0) {
       return [...pathToIntermediate, ...reverseTarget.path];
-    }
-  }
-
-  // Strategy 2: For single digit targets, try known efficient patterns
-  if (target >= 2 && target <= 9 && start <= 50) {
-    return findSingleDigitPath(start, target);
-  }
-
-  return [];
-}
-
-/**
- * Find paths to single digit numbers using efficient patterns
- */
-function findSingleDigitPath(start, target) {
-  // Common efficient paths for single digits
-  const patterns = {
-    3: [
-      {
-        condition: (s) => s === 1,
-        path: [
-          { operation: "append1", from: 1, to: 11 },
-          { operation: "sumDigits", from: 11, to: 2 },
-          { operation: "append1", from: 2, to: 21 },
-          { operation: "sumDigits", from: 21, to: 3 },
-        ],
-      },
-      {
-        condition: (s) => s === 2,
-        path: [
-          { operation: "append1", from: 2, to: 21 },
-          { operation: "sumDigits", from: 21, to: 3 },
-        ],
-      },
-    ],
-    5: [
-      {
-        condition: (s) => s === 1,
-        path: [
-          { operation: "double", from: 1, to: 2 },
-          { operation: "append1", from: 2, to: 21 },
-          { operation: "sumDigits", from: 21, to: 3 },
-          { operation: "append1", from: 3, to: 31 },
-          { operation: "sumDigits", from: 31, to: 4 },
-          { operation: "append1", from: 4, to: 41 },
-          { operation: "sumDigits", from: 41, to: 5 },
-        ],
-      },
-    ],
-    6: [
-      {
-        condition: (s) => s === 3,
-        path: [{ operation: "double", from: 3, to: 6 }],
-      },
-      {
-        condition: (s) => s === 2,
-        path: [
-          { operation: "append1", from: 2, to: 21 },
-          { operation: "sumDigits", from: 21, to: 3 },
-          { operation: "double", from: 3, to: 6 },
-        ],
-      },
-    ],
-    9: [
-      {
-        condition: (s) => s === 3,
-        path: [
-          { operation: "append1", from: 3, to: 33 },
-          { operation: "sumDigits", from: 33, to: 6 },
-          { operation: "append1", from: 6, to: 63 },
-          { operation: "sumDigits", from: 63, to: 9 },
-        ],
-      },
-    ],
-  };
-
-  const targetPatterns = patterns[target];
-  if (targetPatterns) {
-    for (const pattern of targetPatterns) {
-      if (pattern.condition(start)) {
-        return pattern.path;
-      }
     }
   }
 
