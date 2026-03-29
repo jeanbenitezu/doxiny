@@ -72,7 +72,7 @@ export class TourManager {
         messageKey: "tour.firstOperation.message",
         target: '[data-operation="double"]',
         expectedOperation: "double",
-        position: "bottom",
+        position: "top",
         showSkip: true,
       },
       {
@@ -82,7 +82,7 @@ export class TourManager {
         messageKey: "tour.secondOperation.message",
         target: '[data-operation="append1"]',
         expectedOperation: "append1",
-        position: "bottom",
+        position: "top",
         showSkip: true,
       },
       {
