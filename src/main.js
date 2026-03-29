@@ -180,9 +180,6 @@ function togglePreviews() {
 
   // Re-render UI to update all button states and toggle button appearance
   uiManager.render();
-
-  // Reapply dynamic scaling and other display updates after re-render
-  uiManager.updateDisplay();
 }
 
 /**
@@ -405,8 +402,6 @@ function handleLanguageChange(langCode) {
     uiManager.cleanupSuccessAnimations();
     // Re-render the entire UI with new language
     uiManager.render();
-    // Set up event listeners again after re-render
-    uiManager.updateDisplay();
   }
 }
 
@@ -589,7 +584,6 @@ function loadCustomExercise(targetValue) {
 
   // Re-render UI
   uiManager.render();
-  uiManager.updateDisplay();
 }
 
 // Global event handler - only set up once
@@ -667,7 +661,6 @@ function setupGlobalEventListeners() {
       uiManager.hideMasterAchievementModal();
       // Refresh UI to show newly available Free Play mode
       uiManager.render();
-      uiManager.updateDisplay();
     }
 
     // Close game mode dropdown if clicking outside
@@ -701,10 +694,7 @@ function init() {
   updateMoveLimit();
 
   // Render initial UI
-  uiManager.render();
-
-  // Ensure we start at the top of the page
-  scrollToTop();
+  uiManager.start();
 
   // Handle shared puzzle URLs
   const shareResult = handleSharedPuzzleURL();
@@ -739,6 +729,9 @@ function init() {
     `🧮 Number Puzzle loaded! Difficulty: ${gameManager.currentDifficulty}, Goal: 1 → ${exercise.goal}`,
   );
   console.log(`🎯 This exercise: ${exercise.optimalMoves} moves optimal`);
+
+    // Ensure we start at the top of the page
+    scrollToTop();
 }
 
 /**

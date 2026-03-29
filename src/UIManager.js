@@ -1100,9 +1100,16 @@ export class UIManager {
 
   // === RENDER MAIN UI ===
 
-  render() {
+  start() {
     if (this.app) {
       this.app.innerHTML = this.createGameUI();
     }
+  }
+
+  render() {
+    this.start();
+
+    // Reapply dynamic scaling and other display updates after re-render
+    this.updateDisplay();
   }
 }
