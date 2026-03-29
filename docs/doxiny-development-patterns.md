@@ -1,6 +1,34 @@
 # Doxiny - Development Patterns & Best Practices
 
+*Last Updated: March 28, 2026 - CLASS EXTRACTION: GameModeManager and GameManager refactored to separate modules*
+
 ## Code Organization Principles
+
+### Class Modularization Pattern (March 28, 2026) 
+
+```javascript
+// REFACTORED: Large classes extracted from main.js to dedicated modules
+
+// Before: Classes in main.js (monolithic)
+// class GameModeManager { ... }    // 155 lines
+// class GameManager { ... }        // 174 lines
+
+// After: Separate modules with clean imports
+import { GameModeManager } from './GameModeManager.js';
+import { GameManager } from './GameManager.js';
+
+// Benefits:
+// - Better file organization (main.js reduced by ~330 lines)
+// - Clear separation of concerns  
+// - Isolated testing capabilities
+// - Cleaner dependency management
+```
+
+**Key Implementation Details:**
+- GameModeManager.js: Exports class with no external dependencies
+- GameManager.js: Imports GameModeManager and required utility functions  
+- main.js: Updated to import both classes and pass required callbacks
+- Dependency injection for UI functions (updateLevelSelectorUI callback)
 
 ### Pathfinding Unification Pattern
 

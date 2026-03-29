@@ -5,6 +5,7 @@
 
 import { createGameState, applyMove, resetGame } from "./game.js";
 import { operations } from "./operations.js";
+import { GameManager } from "./GameManager.js";
 import {
   generateExercise,
   getAllSolutions,
@@ -26,339 +27,6 @@ import {
   handleSharedPuzzleURL,
 } from "./sharing.js";
 import "./style.css";
-
-// Game Mode Management
-class GameModeManager {
-  constructor() {
-    this.modes = {
-      NORMAL: "normal",
-      FREEPLAY: "freeplay",
-    };
-    this.currentMode = this.loadGameMode();
-    this.unlockedLevels = this.loadUnlockedLevels();
-  }
-
-  loadGameMode() {
-    const saved = localStorage.getItem("doxiny-gamemode");
-    return saved === "freeplay" ? this.modes.FREEPLAY : this.modes.NORMAL; // Default to Normal
-  }
-
-  saveGameMode() {
-    localStorage.setItem("doxiny-gamemode", this.currentMode);
-  }
-
-  isFreePlay() {
-    return this.currentMode === this.modes.FREEPLAY;
-  }
-
-  isNormal() {
-    return this.currentMode === this.modes.NORMAL;
-  }
-
-  loadUnlockedLevels() {
-    const saved = localStorage.getItem("doxiny-unlocked-levels");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.warn("Failed to parse unlocked levels:", e);
-      }
-    }
-    return [1]; // Level 1 is always unlocked
-  }
-
-  saveUnlockedLevels() {
-    localStorage.setItem(
-      "doxiny-unlocked-levels",
-      JSON.stringify(this.unlockedLevels),
-    );
-  }
-
-  getGameMode() {
-    return this.currentMode;
-  }
-
-  setGameMode(mode) {
-    if (mode === this.modes.NORMAL || mode === this.modes.FREEPLAY) {
-      this.currentMode = mode;
-      this.saveGameMode();
-      return true;
-    }
-    return false;
-  }
-
-  isLevelUnlocked(level) {
-    // In Free Play mode, all levels are unlocked
-    if (this.isFreePlay()) {
-      return true;
-    }
-    // In Normal mode, check unlocked levels
-    return this.unlockedLevels.includes(level);
-  }
-
-  unlockLevel(level) {
-    if (!this.unlockedLevels.includes(level)) {
-      this.unlockedLevels.push(level);
-      this.unlockedLevels.sort((a, b) => a - b);
-      this.saveUnlockedLevels();
-      return true; // Level was newly unlocked
-    }
-    return false; // Level was already unlocked
-  }
-
-  getUnlockedLevels() {
-    return [...this.unlockedLevels];
-  }
-
-  getHighestUnlockedLevel() {
-    return Math.max(...this.unlockedLevels);
-  }
-
-  getEfficiencyRequirement(level) {
-    // 80% for all levels
-    return 0.8;
-  }
-
-  resetProgression() {
-    this.unlockedLevels = [1];
-    this.saveUnlockedLevels();
-    // Also reset master status
-    localStorage.removeItem("doxiny-master-status");
-    localStorage.removeItem("doxiny-completion-count");
-  }
-
-  // === MASTERY SYSTEM ===
-
-  isMaster() {
-    const masterStatus = localStorage.getItem("doxiny-master-status");
-    return masterStatus === "true";
-  }
-
-  setMasterStatus(isMaster) {
-    localStorage.setItem("doxiny-master-status", isMaster.toString());
-  }
-
-  getCompletionCount() {
-    const count = localStorage.getItem("doxiny-completion-count");
-    return count ? parseInt(count, 10) : 0;
-  }
-
-  incrementCompletionCount() {
-    const currentCount = this.getCompletionCount();
-    localStorage.setItem(
-      "doxiny-completion-count",
-      (currentCount + 1).toString(),
-    );
-  }
-
-  getCompletionDisplay() {
-    const count = this.getCompletionCount();
-    if (count <= 1) return "";
-    if (count <= 9) return count.toString();
-    return "∞";
-  }
-
-  isAllLevelsCompleted() {
-    // Check if player has unlocked all 6 levels (meaning they completed level 5 successfully)
-    const maxLevel = 6;
-    return (
-      this.unlockedLevels.length >= maxLevel &&
-      this.unlockedLevels.includes(maxLevel)
-    );
-  }
-
-  checkAndAwardMasterStatus() {
-    if (this.isAllLevelsCompleted()) {
-      const alreadyMaster = this.isMaster();
-
-      this.setMasterStatus(true);
-      // Increment completion counter
-      this.incrementCompletionCount();
-
-      // Reset levels back to level 1 for next playthrough
-      this.unlockedLevels = [1];
-      this.saveUnlockedLevels();
-
-      return !alreadyMaster; // Return true if master status was newly awarded
-    }
-    return false; // Already was master or hasn't completed all levels
-  }
-}
-
-// Dynamic game manager with exercise generation
-class GameManager {
-  constructor() {
-    this.gameModeManager = new GameModeManager();
-
-    // In Normal mode, start at highest unlocked level
-    if (this.gameModeManager.isNormal()) {
-      this.currentDifficulty = this.gameModeManager.getHighestUnlockedLevel();
-    } else {
-      this.currentDifficulty = 1; // Default for Free Play mode
-    }
-
-    this.currentExercise = null;
-    this.isCustomExercise = false;
-    this.customExerciseLevel = null;
-    this.generateNewExercise();
-  }
-
-  generateNewExercise() {
-    this.currentExercise = generateExercise(this.currentDifficulty);
-    this.isCustomExercise = false;
-    this.customExerciseLevel = null;
-    console.log(
-      `🎯 New Exercise: 1 → ${this.currentExercise.goal} (${this.currentExercise.optimalMoves} moves optimal)`,
-    );
-    return this.currentExercise;
-  }
-
-  onExerciseComplete(moves) {
-    const optimal = this.currentExercise.optimalMoves;
-    const efficiency = optimal / moves;
-    const isPerfect = moves <= optimal;
-
-    // Handle Normal Game mode progression
-    let levelUnlocked = null;
-    let masterAchieved = false;
-    if (this.gameModeManager.isNormal()) {
-      const requiredEfficiency = this.gameModeManager.getEfficiencyRequirement(
-        this.currentDifficulty,
-      );
-      if (efficiency >= requiredEfficiency) {
-        // Check for unlocking next level (if not at max level)
-        if (this.currentDifficulty < 6) {
-          const nextLevel = this.currentDifficulty + 1;
-          if (this.gameModeManager.unlockLevel(nextLevel)) {
-            levelUnlocked = nextLevel;
-            updateLevelSelectorUI();
-          }
-        }
-        // Award mastery only when successfully completing level 6
-        else if (this.currentDifficulty === 6) {
-          masterAchieved = this.gameModeManager.checkAndAwardMasterStatus();
-        }
-      }
-    }
-
-    // Calculate level change (only for display, actual unlocking handled above)
-    const levelChange = this.getNextLevelInfo();
-
-    return {
-      efficiency,
-      isPerfect,
-      grade: this.getPerformanceGrade(efficiency),
-      levelChange,
-      levelUnlocked,
-      masterAchieved,
-    };
-  }
-
-  getNextLevelInfo() {
-    const maxLevel = 6;
-    if (this.currentDifficulty < maxLevel) {
-      const oldDifficulty = this.currentDifficulty;
-      const nextDifficulty = this.currentDifficulty + 1;
-
-      console.log(`🎯 New level available: ${nextDifficulty}`);
-
-      return {
-        isAvailable: true,
-        oldDifficulty,
-        nextDifficulty: nextDifficulty,
-        direction: "increased",
-      };
-    }
-
-    return { isAvailable: false };
-  }
-
-  moveToNextLevel() {
-    const levelChange = this.getNextLevelInfo();
-    if (levelChange.isAvailable) {
-      this.currentDifficulty = levelChange.nextDifficulty;
-      console.log(`🎯 Advanced to level ${this.currentDifficulty}!`);
-    } else {
-      console.log(`🎯 Already at max level! Keep mastering the challenges!`);
-    }
-  }
-
-  getPerformanceGrade(efficiency) {
-    if (efficiency >= 1.0)
-      return {
-        grade: translate("performanceGrades.perfect"),
-        emoji: "<i class='lni lni-crown'></i>",
-        description: translate("performanceDescriptions.optimalSolution"),
-      };
-    if (efficiency >= 0.85)
-      return {
-        grade: translate("performanceGrades.excellent"),
-        emoji: "<i class='lni lni-star-fill'></i>",
-        description: translate("performanceDescriptions.amazingEfficiency"),
-      };
-    if (efficiency >= 0.7)
-      return {
-        grade: translate("performanceGrades.great"),
-        emoji: "<i class='lni lni-thumbs-up'></i>",
-        description: translate("performanceDescriptions.wellDone"),
-      };
-    if (efficiency >= 0.55)
-      return {
-        grade: translate("performanceGrades.good"),
-        emoji: "<i class='lni lni-smile'></i>",
-        description: translate("performanceDescriptions.niceJob"),
-      };
-    return {
-      grade: translate("performanceGrades.keepTrying"),
-      emoji: "<i class='lni lni-sad'></i>",
-      description: translate("performanceDescriptions.youCanDoBetter"),
-    };
-  }
-
-  setDifficulty(newDifficulty) {
-    if (newDifficulty >= 1 && newDifficulty <= 6) {
-      // Check if level is unlocked in Normal mode
-      if (!this.gameModeManager.isLevelUnlocked(newDifficulty)) {
-        console.log(`Level ${newDifficulty} is locked in Normal Game mode`);
-        return false;
-      }
-
-      this.currentDifficulty = newDifficulty;
-      this.generateNewExercise();
-      return true;
-    }
-    return false;
-  }
-
-  setCustomExercise(goal, optimalMoves, solutionPath = []) {
-    // Detect appropriate level for this custom exercise
-    this.customExerciseLevel = detectCustomExerciseLevel(goal, optimalMoves);
-
-    this.currentExercise = {
-      goal: goal,
-      optimalMoves: optimalMoves,
-      solutionPath: solutionPath,
-      isCustom: true,
-    };
-
-    this.isCustomExercise = true;
-
-    console.log(
-      `🎯 Custom Exercise: 1 → ${goal} (detected level: ${this.customExerciseLevel}, ${optimalMoves} moves optimal)`,
-    );
-    return this.currentExercise;
-  }
-
-  getCurrentExerciseInfo() {
-    const difficultyInfo = getDifficultyLevels().find(
-      (d) => d.level === this.currentDifficulty,
-    );
-    return {
-      exercise: this.currentExercise,
-      difficulty: difficultyInfo,
-    };
-  }
-}
 
 // Initialize game manager
 const gameManager = new GameManager();
@@ -433,8 +101,7 @@ function renderLevelSelectorUI() {
           : "bg-purple-600 text-white hover:bg-purple-500";
       } else if (isLocked) {
         // Locked levels
-        buttonClass =
-          "bg-gray-800/50 text-gray-500 cursor-not-allowed";
+        buttonClass = "bg-gray-800/50 text-gray-500 cursor-not-allowed";
       } else {
         // Regular level buttons
         buttonClass = isActive
@@ -1201,7 +868,10 @@ function showSuccessModal() {
 
   if (modal && finalMoves) {
     // Process exercise completion with game manager
-    const completionResult = gameManager.onExerciseComplete(gameState.moves);
+    const completionResult = gameManager.onExerciseComplete(
+      gameState.moves,
+      updateLevelSelectorUI,
+    );
     const exercise = gameManager.currentExercise;
     const actualEfficiency = completionResult.efficiency;
     const efficiency = Math.round(actualEfficiency * 100);
@@ -1957,8 +1627,7 @@ function setupCustomExerciseModal() {
           <span class="text-xs text-blue-300 font-semibold">${t("customExerciseModal.validation.detectedLevel", { level: levelName })}</span>
         </div>
       `;
-      validationContent.className =
-        "p-3 text-sm bg-emerald-900/20";
+      validationContent.className = "p-3 text-sm bg-emerald-900/20";
     } else {
       validationContent.innerHTML = `
         <div class="text-yellow-300">
@@ -1968,8 +1637,7 @@ function setupCustomExerciseModal() {
           <span class="text-xs text-blue-300 font-semibold">${t("customExerciseModal.validation.detectedLevel", { level: levelName })}</span>
         </div>
       `;
-      validationContent.className =
-        "p-3 text-sm bg-yellow-900/20";
+      validationContent.className = "p-3 text-sm bg-yellow-900/20";
     }
 
     validationInfo.classList.remove("hidden");

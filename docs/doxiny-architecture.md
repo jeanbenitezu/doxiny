@@ -1,5 +1,7 @@
 # Doxiny - Architecture & Code Structure
 
+*Last Updated: March 28, 2026 - CLASS REFACTORING: Extracted GameModeManager and GameManager to separate files*
+
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
 - **Styling**: Tailwind CSS v3 (CDN), custom CSS variables, gold accent system
@@ -10,7 +12,9 @@
 ## File Structure & Responsibilities
 
 ### Core Game Files
-- **`src/main.js`** - Game manager, GameModeManager class, UI orchestration, mastery system, main game loop
+- **`src/main.js`** - UI orchestration, main game loop, event handlers (refactored: classes moved out)
+- **`src/GameModeManager.js`** - **NEW**: Game mode management, level progression, mastery system, progression tracking  
+- **`src/GameManager.js`** - **NEW**: Exercise generation coordination, completion logic, performance grading system
 - **`src/game.js`** - Game state management, move history, state transitions
 - **`src/operations.js`** - Pure functions for 4 number operations (REVERSE, SUM, APPEND, DOUBLE)
 - **`src/exerciseGenerator.js`** - BFS-based exercise generation and solvability validation
@@ -26,6 +30,43 @@
 - **`package.json`** - Dependencies, scripts
 
 ## Architecture Patterns
+
+### Class Refactoring (March 28, 2026)
+**Extracted large classes from main.js for better maintainability and separation of concerns.**
+
+```javascript
+// Before: Classes defined in main.js
+// After: Separate modules with clean imports
+
+// GameModeManager.js - Handles game modes and progression
+export class GameModeManager {
+  constructor() { /* ... */ }
+  isLevelUnlocked(level) { /* ... */ }
+  checkAndAwardMasterStatus() { /* ... */ }
+}
+
+// GameManager.js - Handles exercise logic and completion
+export class GameManager {
+  constructor() { 
+    this.gameModeManager = new GameModeManager(); 
+  }
+  onExerciseComplete(moves, updateLevelSelectorUI) { /* ... */ }
+  getPerformanceGrade(efficiency) { /* ... */ }
+}
+```
+
+**Refactoring Benefits:**
+- **Better Organization**: Classes now have dedicated files with clear responsibilities
+- **Improved Maintainability**: Easier to find and modify specific functionality
+- **Cleaner Imports**: Clear dependency management between modules
+- **Reduced Main.js Size**: Moved ~330 lines of class code to separate files
+- **Enhanced Testability**: Classes can be tested in isolation
+
+**Migration Details:**
+- `GameModeManager` class (155 lines) → `src/GameModeManager.js`
+- `GameManager` class (174 lines) → `src/GameManager.js`  
+- Updated imports in main.js to use new modules
+- Fixed dependency injection for `updateLevelSelectorUI` function
 
 ### Unified Pathfinding System
 ```javascript
