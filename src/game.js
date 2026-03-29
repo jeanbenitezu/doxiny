@@ -6,70 +6,107 @@
 import { operationLabels, operations, isValidOperation } from "./operations.js";
 
 /**
- * Create initial game state
+ * GameState class for managing game state, moves, and history
  */
-export function createGameState(goalNumber = 10, level = 1) {
-  return {
-    current: 1,
-    goal: goalNumber,
-    level: level,
-    moves: 0,
-    moveLimit: 12,
-    history: [{ action: "START", value: 1 }],
-    isComplete: false,
-    startTime: Date.now(),
-    hints: {
+export class GameState {
+  constructor(goalNumber = 10, level = 1) {
+    this.current = 1;
+    this.goal = goalNumber;
+    this.level = level;
+    this.moves = 0;
+    this.moveLimit = 12;
+    this.history = [{ action: "START", value: 1 }];
+    this.isComplete = false;
+    this.startTime = Date.now();
+    this.hints = {
       used: 0,
       maxHints: 3,
       hintsData: [],
-    },
-  };
-}
-
-/**
- * Apply a move and return new game state
- */
-export function applyMove(state, operation) {
-  if (!isValidOperation(operation)) {
-    throw new Error(`Invalid operation: ${operation}`);
+    };
   }
 
-  if (state.isComplete) {
-    return state; // Can't move after completion
-  }
+  /**
+   * Apply a move and return new game state
+   */
+  applyMove(operation) {
+    if (!isValidOperation(operation)) {
+      throw new Error(`Invalid operation: ${operation}`);
+    }
 
-  const newValue = operations[operation](state.current);
-  const newState = {
-    ...state,
-    current: newValue,
-    moves: state.moves + 1,
-    history: [
-      ...state.history,
+    if (this.isComplete) {
+      return this; // Can't move after completion
+    }
+
+    const newValue = operations[operation](this.current);
+    const newState = new GameState(this.goal, this.level);
+    
+    // Copy current state to new state
+    newState.current = newValue;
+    newState.moves = this.moves + 1;
+    newState.moveLimit = this.moveLimit;
+    newState.startTime = this.startTime;
+    newState.history = [
+      ...this.history,
       {
         action: (operationLabels[operation] ?? operation).toUpperCase(),
         value: newValue,
       },
-    ],
+    ];
+    
     // Only clear cached hints but keep progression counter
-    hints: {
-      ...state.hints,
+    newState.hints = {
+      ...this.hints,
       hintsData: [], // Clear old hints since optimal path changed
-    },
-  };
+    };
 
-  // Check if goal is reached
-  newState.isComplete = newValue === state.goal;
-  if (newState.isComplete) {
-    newState.completionTime = Date.now();
-    newState.duration = newState.completionTime - state.startTime;
+    // Check if goal is reached
+    newState.isComplete = newValue === this.goal;
+    if (newState.isComplete) {
+      newState.completionTime = Date.now();
+      newState.duration = newState.completionTime - this.startTime;
+    }
+
+    return newState;
   }
 
-  return newState;
+  /**
+   * Reset to initial state and return new game state
+   */
+  reset(goalNumber = this.goal, level = this.level) {
+    return new GameState(goalNumber, level);
+  }
+
+  /**
+   * Create a copy of the current state
+   */
+  clone() {
+    const newState = new GameState(this.goal, this.level);
+    newState.current = this.current;
+    newState.moves = this.moves;
+    newState.moveLimit = this.moveLimit;
+    newState.startTime = this.startTime;
+    newState.history = [...this.history];
+    newState.isComplete = this.isComplete;
+    newState.hints = {
+      used: this.hints.used,
+      maxHints: this.hints.maxHints,
+      hintsData: [...this.hints.hintsData],
+    };
+    
+    if (this.completionTime) {
+      newState.completionTime = this.completionTime;
+      newState.duration = this.duration;
+    }
+    
+    return newState;
+  }
 }
 
-/**
- * Reset game to initial state
- */
-export function resetGame(goalNumber = 10, level = 1) {
-  return createGameState(goalNumber, level);
+// Backwards compatibility exports
+export function createGameState(goalNumber = 10, level = 1) {
+  return new GameState(goalNumber, level);
+}
+
+export function applyMove(state, operation) {
+  return state.applyMove(operation);
 }

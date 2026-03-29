@@ -3,7 +3,7 @@
  * Mathematical puzzle game with elegant solutions
  */
 
-import { createGameState, applyMove, resetGame } from "./game.js";
+import { createGameState, applyMove } from "./game.js";
 import { operations } from "./operations.js";
 import { GameManager } from "./GameManager.js";
 import { UIManager } from "./UIManager.js";
@@ -140,30 +140,11 @@ function handleOperationClick(operation) {
 }
 
 /**
- * Load game with specified goal and difficulty
+ * Reset the game to the current exercise
  */
-function loadGame(goal, difficulty) {
+function reloadGame() {
   clearHintEffects();
   uiManager.cleanupSuccessAnimations();
-  uiManager.gameState = resetGame(goal, difficulty);
-  uiManager.updateDisplay();
-  scrollToTop();
-}
-
-/**
- * Handle reset button click
- */
-function handleReset() {
-  loadGame(gameManager.currentExercise.goal, gameManager.currentDifficulty);
-}
-
-/**
- * Generate new exercise
- */
-function handleNewExercise() {
-  clearHintEffects();
-  uiManager.cleanupSuccessAnimations();
-  gameManager.generateNewExercise();
   updateMoveLimit();
   uiManager.gameState = createGameState(
     gameManager.currentExercise.goal,
@@ -173,6 +154,21 @@ function handleNewExercise() {
   // Re-render UI to reset all button states
   uiManager.render();
   scrollToTop();
+}
+
+/**
+ * Handle reset button click
+ */
+function handleReset() {
+  reloadGame();
+}
+
+/**
+ * Generate new exercise
+ */
+function handleNewExercise() {
+  gameManager.generateNewExercise();
+  reloadGame();
 }
 
 /**
@@ -381,16 +377,7 @@ function handleTryNormalMode() {
  */
 function handleDifficultySelect(difficulty) {
   if (gameManager.setDifficulty(difficulty)) {
-    clearHintEffects();
-    uiManager.cleanupSuccessAnimations();
-    updateMoveLimit();
-    uiManager.gameState = createGameState(
-      gameManager.currentExercise.goal,
-      gameManager.currentDifficulty,
-    );
-    // Re-render UI (event listeners are already set up globally)
-    uiManager.render();
-    scrollToTop();
+    reloadGame();
   }
 }
 
@@ -634,30 +621,16 @@ function setupGlobalEventListeners() {
       if (nextBtn && nextBtn.disabled) {
         return; // Prevent action if button is disabled
       }
-      uiManager.cleanupSuccessAnimations();
-      document.getElementById("success-modal").classList.add("hidden");
-      scrollToTop();
       handleNextExercise();
     } else if (e.target.closest("#try-freeplay-btn")) {
-      uiManager.cleanupSuccessAnimations();
-      document.getElementById("success-modal").classList.add("hidden");
-      scrollToTop();
       handleTryFreePlay();
     } else if (e.target.closest("#try-normal-btn")) {
-      uiManager.cleanupSuccessAnimations();
-      document.getElementById("success-modal").classList.add("hidden");
-      scrollToTop();
       handleTryNormalMode();
     } else if (e.target.closest("#retry-exercise-btn")) {
-      uiManager.cleanupSuccessAnimations();
-      document.getElementById("success-modal").classList.add("hidden");
-      scrollToTop();
       handleRetryExercise();
     } else if (e.target.closest("#share-victory-btn")) {
       handleShareVictory(uiManager.gameState, gameManager);
-    } else if (e.target.closest("#share-challenge-btn")) {
-      handleShareChallenge(uiManager.gameState);
-    } else if (e.target.closest("#share-puzzle-btn")) {
+    } else if (e.target.closest("#share-challenge-btn") || e.target.closest("#share-puzzle-btn")) {
       handleShareChallenge(uiManager.gameState);
     } else if (e.target.closest("#game-mode-dropdown-btn")) {
       toggleGameModeDropdown();
@@ -716,40 +689,6 @@ function setupGlobalEventListeners() {
  * Initialize the game
  */
 function init() {
-  // Handle service worker cleanup for existing users
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.addEventListener("message", (event) => {
-      if (event.data && event.data.action === "cleanup-complete") {
-        console.log("🧹 Cleanup message received:", event.data.message);
-
-        // Unregister the service worker
-        navigator.serviceWorker.getRegistration().then((registration) => {
-          if (registration) {
-            registration.unregister().then((success) => {
-              if (success) {
-                console.log("✅ Service Worker unregistered successfully");
-              }
-            });
-          }
-        });
-      }
-    });
-
-    // Also try to unregister any existing service worker immediately
-    navigator.serviceWorker.getRegistration().then((registration) => {
-      if (registration) {
-        console.log(
-          "🧹 Found existing service worker, attempting to unregister...",
-        );
-        registration.unregister().then((success) => {
-          if (success) {
-            console.log("✅ Existing service worker unregistered successfully");
-          }
-        });
-      }
-    });
-  }
-
   // Set up global event listeners (only once)
   setupGlobalEventListeners();
 

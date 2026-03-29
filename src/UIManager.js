@@ -370,6 +370,7 @@ export class UIManager {
   }
 
   cleanupSuccessAnimations() {
+    document.getElementById("success-modal").classList.add("hidden");
     // Remove rainbow animation from current number
     const currentNumberEl = document.getElementById("current-number");
     if (
