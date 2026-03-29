@@ -12,95 +12,105 @@ import {
 } from "./pathfinding.js";
 
 /**
- * Simple difficulty configuration with i18n keys
+ * Algorithm-aware difficulty configuration with i18n keys
+ * Based on difficulty score ranges instead of simple number/move ranges
  */
 const difficultyLevels = {
   1: {
     nameKey: "beginner",
     descriptionKey: "beginner",
-    targetMoves: [3, 6],
-    goalRange: [5, 20],
+    difficultyScoreRange: [0, 4.0],
+    targetGoalRange: [5, 50], // Wider range, algorithm will determine actual difficulty
   },
   2: {
     nameKey: "easy",
     descriptionKey: "easy",
-    targetMoves: [4, 8],
-    goalRange: [10, 50],
+    difficultyScoreRange: [4.1, 7.5],
+    targetGoalRange: [10, 100],
   },
   3: {
     nameKey: "medium",
     descriptionKey: "medium",
-    targetMoves: [5, 10],
-    goalRange: [20, 100],
+    difficultyScoreRange: [7.6, 12.0],
+    targetGoalRange: [20, 200],
   },
   4: {
     nameKey: "hard",
     descriptionKey: "hard",
-    targetMoves: [6, 12],
-    goalRange: [50, 200],
+    difficultyScoreRange: [12.1, 18.0],
+    targetGoalRange: [50, 300],
   },
   5: {
     nameKey: "expert",
     descriptionKey: "expert",
-    targetMoves: [7, 15],
-    goalRange: [100, 500],
+    difficultyScoreRange: [18.1, 28.0],
+    targetGoalRange: [100, 500],
   },
   6: {
     nameKey: "insane",
     descriptionKey: "insane",
-    targetMoves: [8, 18],
-    goalRange: [300, 999],
+    difficultyScoreRange: [28.1, Infinity],
+    targetGoalRange: [200, 999],
   },
 };
 
 /**
- * Generate a simple exercise by trying random goals within range
+ * Generate algorithm-aware exercise by trying goals and validating against difficulty score
  */
 function generateSimpleExercise(difficulty) {
   const config = difficultyLevels[difficulty];
-  const [minGoal, maxGoal] = config.goalRange;
+  const [minGoal, maxGoal] = config.targetGoalRange;
+  const [minScore, maxScore] = config.difficultyScoreRange;
 
-  // Try more goals with slightly more flexible criteria
-  for (let attempt = 0; attempt < 25; attempt++) {
+  // Try random goals and validate them against algorithm-aware difficulty scoring
+  for (let attempt = 0; attempt < 30; attempt++) {
     const goal = Math.floor(Math.random() * (maxGoal - minGoal + 1)) + minGoal;
-    const validation = validateExercise(goal); // Increased max moves for validation
+    const validation = validateExercise(goal);
 
-    if (
-      validation.solvable &&
-      validation.minMoves >= config.targetMoves[0] &&
-      validation.minMoves <= config.targetMoves[1] + 5
-    ) {
-      // More flexible move range
-      return {
-        goal,
-        optimalMoves: validation.minMoves,
-        solutionPath: validation.solutionPath,
-        algorithm: validation.algorithm,
-      };
+    if (validation.solvable) {
+      const difficultyScore = calculateAlgorithmicDifficulty(
+        validation.minMoves, 
+        validation.algorithm
+      );
+      
+      // Check if the difficulty score fits the target level
+      if (difficultyScore >= minScore && difficultyScore <= maxScore) {
+        return {
+          goal,
+          optimalMoves: validation.minMoves,
+          solutionPath: validation.solutionPath,
+          algorithm: validation.algorithm,
+          difficultyScore,
+        };
+      }
     }
   }
 
-  // Fallback to diverse known good goals for each difficulty
+  // Fallback: use curated goals known to work well for each difficulty level
   const fallbackGoals = {
-    1: [10, 12, 21],
-    2: [25, 34, 43, 55],
-    3: [64, 89, 98, 77],
-    4: [128, 132, 231, 189],
-    5: [256, 289, 982, 334, 443],
-    6: [729, 867, 678, 987, 765, 345, 534, 672, 267, 387, 783, 832, 238],
+    1: [8, 16, 12, 10],              // Simple powers of 2 and easy targets
+    2: [32, 25, 34, 22, 44],         // Mix of patterns
+    3: [64, 56, 78, 89, 98],         // Moderate complexity
+    4: [128, 132, 156, 189, 231],    // Requires more strategy
+    5: [256, 334, 443, 512, 678],    // Advanced algorithmic thinking
+    6: [867, 987, 765, 834, 729, 999], // Maximum complexity
   };
 
-  const goalOptions = fallbackGoals[difficulty] || [171];
-  // Pick a random goal from the fallback options instead of always the same one
+  const goalOptions = fallbackGoals[difficulty] || [128];
   const randomIndex = Math.floor(Math.random() * goalOptions.length);
   const fallbackGoal = goalOptions[randomIndex];
   const validation = validateExercise(fallbackGoal);
+  
+  const difficultyScore = validation.solvable 
+    ? calculateAlgorithmicDifficulty(validation.minMoves, validation.algorithm)
+    : minScore; // Use minimum score if unsolvable
 
   return {
     goal: fallbackGoal,
     optimalMoves: validation.minMoves,
     solutionPath: validation.solutionPath,
     algorithm: validation.algorithm,
+    difficultyScore,
   };
 }
 
@@ -382,7 +392,7 @@ function generateFactorVariants(goal) {
 }
 
 /**
- * Main function: Generate a complete exercise
+ * Main function: Generate a complete exercise using algorithm-aware difficulty system
  */
 export function generateExercise(difficulty = 3) {
   if (!difficultyLevels[difficulty]) {
@@ -392,6 +402,13 @@ export function generateExercise(difficulty = 3) {
   const config = difficultyLevels[difficulty];
   const result = generateSimpleExercise(difficulty);
 
+  // Verify that the generated exercise meets algorithm-aware difficulty requirements
+  const detectedLevel = detectCustomExerciseLevel(
+    result.goal,
+    result.optimalMoves,
+    result.algorithm
+  );
+  
   return {
     goal: result.goal,
     level: difficulty,
@@ -399,14 +416,57 @@ export function generateExercise(difficulty = 3) {
     levelDescriptionKey: config.descriptionKey,
     optimalMoves: result.optimalMoves,
     solutionPath: result.solutionPath,
+    // Algorithm-aware metadata
+    algorithm: result.algorithm,
+    algorithmicLevel: detectedLevel,
+    difficultyScore: result.difficultyScore || calculateAlgorithmicDifficulty(result.optimalMoves, result.algorithm),
   };
 }
 
 /**
- * Determine difficulty level for a custom exercise based on goal and optimal moves
- * Returns level number (1-6) with fallback to level 6 (insane)
+ * Algorithm complexity scoring system
+ * Higher scores indicate more sophisticated algorithms requiring advanced thinking
  */
-export function detectCustomExerciseLevel(goal, optimalMoves) {
+const algorithmComplexityScores = {
+  powersOfTwo: 1.0, // Simple pattern recognition - doubling sequence
+  enhancedBFS: 1.2, // Standard exploratory search - moderate complexity
+  factorization: 1.4, // Number theory concepts - reverse and factors
+  strategicReverseTarget: 1.6, // Strategic thinking - working backwards from goal
+  digitManipulation: 2.0, // Advanced digit operations - sum manipulation
+  none: 1.1, // Unknown/failed algorithm - base complexity
+};
+
+/**
+ * Calculate algorithmic difficulty score based on moves and strategy complexity
+ */
+function calculateAlgorithmicDifficulty(optimalMoves, algorithm = "enhancedBFS") {
+  const baseComplexity = optimalMoves;
+  const algorithmMultiplier = algorithmComplexityScores[algorithm] || 1.2;
+  return baseComplexity * algorithmMultiplier;
+}
+
+/**
+ * Enhanced difficulty detection considering both moves and algorithmic complexity
+ * Returns level number (1-6) based on hybrid scoring system
+ */
+export function detectCustomExerciseLevel(goal, optimalMoves, algorithm = "enhancedBFS") {
+  // Calculate hybrid difficulty score
+  const difficultyScore = calculateAlgorithmicDifficulty(optimalMoves, algorithm);
+
+  // Map difficulty score to levels with algorithm-aware thresholds
+  if (difficultyScore <= 4.0) return 1; // Beginner: Simple patterns or very few moves
+  if (difficultyScore <= 7.5) return 2; // Easy: Straightforward BFS solutions
+  if (difficultyScore <= 12.0) return 3; // Medium: Moderate complexity or more moves
+  if (difficultyScore <= 18.0) return 4; // Hard: Complex algorithms or many moves
+  if (difficultyScore <= 28.0) return 5; // Expert: Advanced strategies required
+  return 6; // Insane: Highest complexity algorithms or very long sequences
+}
+
+/**
+ * Legacy difficulty detection for backwards compatibility
+ * Uses original range-based system when algorithm info is not available
+ */
+export function detectCustomExerciseLevelLegacy(goal, optimalMoves) {
   if (optimalMoves < 5) return 1;
 
   // Check each difficulty level to see if the exercise fits
@@ -452,14 +512,100 @@ export function detectCustomExerciseLevel(goal, optimalMoves) {
 }
 
 /**
- * Get available difficulty levels with i18n keys
+ * Analyze difficulty of a given number with detailed breakdown
+ * Returns comprehensive difficulty information including scoring factors
+ */
+export function analyzeDifficulty(goal, maxMoves = null) {
+  const validation = validateExercise(goal, maxMoves);
+  
+  if (!validation.solvable) {
+    return {
+      goal,
+      solvable: false,
+      level: 6, // Unsolvable = maximum difficulty
+      levelName: difficultyLevels[6].nameKey,
+      analysis: {
+        reason: "unsolvable",
+        optimalMoves: Infinity,
+        algorithm: "none",
+        difficultyScore: Infinity,
+        complexityMultiplier: 1.1,
+      }
+    };
+  }
+
+  const algorithm = validation.algorithm;
+  const optimalMoves = validation.minMoves;
+  const difficultyScore = calculateAlgorithmicDifficulty(optimalMoves, algorithm);
+  const detectedLevel = detectCustomExerciseLevel(goal, optimalMoves, algorithm);
+  const legacyLevel = detectCustomExerciseLevelLegacy(goal, optimalMoves);
+  
+  return {
+    goal,
+    solvable: true,
+    level: detectedLevel,
+    levelName: difficultyLevels[detectedLevel].nameKey,
+    analysis: {
+      optimalMoves,
+      algorithm,
+      difficultyScore: Math.round(difficultyScore * 10) / 10,
+      complexityMultiplier: algorithmComplexityScores[algorithm] || 1.2,
+      algorithmDescription: getAlgorithmDescription(algorithm),
+      comparisonWithLegacy: {
+        legacyLevel,
+        difference: detectedLevel - legacyLevel,
+        improved: detectedLevel !== legacyLevel
+      }
+    },
+    solutionPath: validation.solutionPath
+  };
+}
+
+/**
+ * Get human-readable description of algorithm complexity
+ */
+function getAlgorithmDescription(algorithm) {
+  const descriptions = {
+    powersOfTwo: "Simple pattern - power of 2 sequence",
+    enhancedBFS: "Standard exploration - breadth-first search", 
+    factorization: "Moderate complexity - number theory approach",
+    strategicReverseTarget: "Advanced strategy - reverse engineering from goal",
+    digitManipulation: "High complexity - sophisticated digit operations",
+    none: "Unknown algorithm - fallback approach"
+  };
+  
+  return descriptions[algorithm] || descriptions.none;
+}
+
+/**
+ * Batch analyze multiple numbers for difficulty comparison
+ */
+export function compareDifficulties(goals, maxMoves = null) {
+  return goals.map(goal => ({
+    goal,
+    ...analyzeDifficulty(goal, maxMoves)
+  })).sort((a, b) => {
+    // Sort by difficulty score (ascending)
+    if (!a.solvable && !b.solvable) return 0;
+    if (!a.solvable) return 1;
+    if (!b.solvable) return -1;
+    return a.analysis.difficultyScore - b.analysis.difficultyScore;
+  });
+}
+
+/**
+ * Get available difficulty levels with algorithm-aware metadata
  */
 export function getDifficultyLevels() {
   return Object.entries(difficultyLevels).map(([level, config]) => ({
     level: parseInt(level),
     nameKey: config.nameKey,
     descriptionKey: config.descriptionKey,
-    targetMoves: config.targetMoves,
-    goalRange: config.goalRange,
+    difficultyScoreRange: config.difficultyScoreRange,
+    targetGoalRange: config.targetGoalRange,
   }));
 }
+
+
+
+

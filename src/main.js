@@ -145,11 +145,11 @@ function handleOperationClick(operation) {
 function reloadGame() {
   clearHintEffects();
   uiManager.cleanupSuccessAnimations();
-  updateMoveLimit();
   uiManager.gameState = createGameState(
     gameManager.currentExercise.goal,
     gameManager.currentDifficulty,
   );
+  updateMoveLimit();
 
   // Re-render UI to reset all button states
   uiManager.render();
@@ -690,11 +690,11 @@ function init() {
   applyGameModeBackground(currentMode);
   console.log(`🎨 Applied ${currentMode} mode background`);
 
-  // Update move limit for initial exercise
-  updateMoveLimit();
-
   // Render initial UI
   uiManager.start();
+
+  // Update move limit for initial exercise
+  updateMoveLimit();
 
   // Handle shared puzzle URLs
   const shareResult = handleSharedPuzzleURL();
