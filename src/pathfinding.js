@@ -221,3 +221,107 @@ export function enhancedBFS(start, goal, options = {}) {
     },
   ];
 }
+
+/**
+ * Find shortest path from any start number to target using enhanced BFS with strategic approaches
+ */
+export function findShortestPath(start, target) {
+  const config = doxinyConfig.get();
+  const maxMoves = config.defaultMaxMoves;
+  const paths = [];
+  if (start === target) return [];
+
+  // Quick pattern-based checks for direct paths
+  const quickPath = findQuickPath(start, target);
+  if (quickPath.length > 0) paths.push(quickPath);
+
+  // Enhanced BFS with strategic approaches
+  const directPath = enhancedPathBFS(start, target, maxMoves);
+  if (directPath.length > 0) paths.push(directPath);
+
+  // If direct path fails, try strategic reverse approaches
+  const strategicPath = findStrategicPath(start, target, maxMoves);
+  if (strategicPath.length > 0) paths.push(strategicPath);
+
+  // return shortest path found, or empty if none
+  if (paths.length > 0) {
+    return paths.reduce((shortest, path) =>
+      path.length < shortest.length ? path : shortest,
+    );
+  }
+
+  return [];
+}
+
+/**
+ * Quick pattern-based path finding
+ */
+function findQuickPath(start, target) {
+  // Direct single operation check
+  const directPaths = findDirectPath(start, target);
+  if (directPaths.length > 0) return directPaths;
+
+  // Powers of 2 pattern from start
+  if (
+    mathUtils.isPowerOfTwo(target) &&
+    mathUtils.isPowerOfTwo(start) &&
+    target >= start
+  ) {
+    const startExp = Math.log2(start);
+    const targetExp = Math.log2(target);
+    const doublingSteps = targetExp - startExp;
+
+    if (doublingSteps > 0 && doublingSteps <= 8) {
+      const path = [];
+      let current = start;
+      for (let i = 0; i < doublingSteps; i++) {
+        const next = current * 2;
+        path.push({ operation: "double", from: current, to: next });
+        current = next;
+      }
+      return path;
+    }
+  }
+
+  return [];
+}
+
+/**
+ * Enhanced BFS with better pruning and tracking
+ * Uses unified BFS engine with path return format
+ */
+function enhancedPathBFS(start, target, maxMoves = null) {
+  return enhancedBFS(start, target, {
+    maxMoves,
+    returnFormat: "path",
+    algorithm: "enhancedPathBFS",
+  });
+}
+
+/**
+ * Strategic path finding using reverse targeting
+ */
+function findStrategicPath(start, target, maxMoves) {
+  // Strategy 1: Find intermediate numbers that can reach target in 1 operation
+  const reverseTargets = findReverseTargets(target);
+
+  for (const reverseTarget of reverseTargets.slice(0, 5)) {
+    // Limit to top 5 for performance
+    if (reverseTarget.number === start) {
+      // Direct path found
+      return reverseTarget.path;
+    }
+
+    // Try to find path from start to this intermediate number
+    const pathToIntermediate = enhancedPathBFS(
+      start,
+      reverseTarget.number,
+      maxMoves - reverseTarget.stepsToGoal,
+    );
+    if (pathToIntermediate.length > 0) {
+      return [...pathToIntermediate, ...reverseTarget.path];
+    }
+  }
+
+  return [];
+}
