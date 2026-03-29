@@ -45,7 +45,7 @@ export const operations = {
    * SUM: Add all digits together
    * Examples: 128 → 1+2+8 = 11, 99 → 9+9 = 18
    */
-  sum: (n) => {
+  sumDigits: (n) => {
     return mathUtils.sumDigits(n);
   },
 
@@ -71,7 +71,7 @@ export const operations = {
  */
 export const operationLabels = {
   reverse: "REVERSE",
-  sum: "SUM DIGITS",
+  sumDigits: "SUM DIGITS",
   append1: "APPEND 1",
   double: "DOUBLE",
 };

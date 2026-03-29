@@ -1,6 +1,6 @@
 # Doxiny - Architecture & Code Structure
 
-*Last Updated: March 28, 2026 - CLASS REFACTORING: Extracted GameModeManager and GameManager to separate files*
+*Last Updated: March 28, 2026 - UI MANAGEMENT REFACTORING: Created UIManager class for unified visual responsibilities*
 
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
@@ -12,14 +12,15 @@
 ## File Structure & Responsibilities
 
 ### Core Game Files
-- **`src/main.js`** - UI orchestration, main game loop, event handlers (refactored: classes moved out)
-- **`src/GameModeManager.js`** - **NEW**: Game mode management, level progression, mastery system, progression tracking  
-- **`src/GameManager.js`** - **NEW**: Exercise generation coordination, completion logic, performance grading system
+- **`src/main.js`** - Game logic coordination, event handling, initialization (refactored: UI moved to UIManager)
+- **`src/UIManager.js`** - **NEW**: Unified UI management class for all visual responsibilities and DOM operations
+- **`src/GameModeManager.js`** - Game mode management, level progression, mastery system, progression tracking  
+- **`src/GameManager.js`** - Exercise generation coordination, completion logic, performance grading system
 - **`src/game.js`** - Game state management, move history, state transitions
-- **`src/operations.js`** - Pure functions for 4 number operations (REVERSE, SUM, APPEND, DOUBLE)
+- **`src/operations.js`** - Pure functions for 4 number operations (REVERSE, SUMDIGITS, APPEND, DOUBLE)
 - **`src/exerciseGenerator.js`** - BFS-based exercise generation and solvability validation
 - **`src/gameHelpers.js`** - Configurable hint system and progress calculation utilities
-- **`src/pathfinding.js`** - **NEW**: Unified pathfinding engine and shared utilities
+- **`src/pathfinding.js`** - Unified pathfinding engine and shared utilities
 - **`src/config.js`** - Global configuration management with preset system
 - **`src/sharing.js`** - Progressive enhancement sharing system with Web Share API
 - **`src/i18n.js`** - Bilingual support system (EN/ES) with sharing messages and master status translations
@@ -67,6 +68,44 @@ export class GameManager {
 - `GameManager` class (174 lines) → `src/GameManager.js`  
 - Updated imports in main.js to use new modules
 - Fixed dependency injection for `updateLevelSelectorUI` function
+
+### UI Management Unification (March 28, 2026)
+**Created unified UIManager class to consolidate all visual responsibilities and eliminate scattered UI logic.**
+
+```javascript
+// UIManager.js - Unified UI management class
+export class UIManager {
+  constructor(gameManager, gameState) {
+    this.gameManager = gameManager;
+    this.gameState = gameState;
+    this.showPreviews = true;
+    this.app = document.querySelector("#app");
+  }
+
+  // Consolidated UI methods
+  render() { /* createGameUI functionality */ }
+  updateDisplay() { /* all display updates */ }
+  updateLevelSelectorUI() { /* level selector updates */ }
+  renderInlineHistory() { /* history rendering */ }
+  showMasterAchievementModal() { /* modal management */ }
+  createConfettiExplosion() { /* visual effects */ }
+  scrollToTop() { /* utility methods */ }
+}
+
+// Updated main.js usage
+const uiManager = new UIManager(gameManager, gameState);
+uiManager.render();           // instead of createGameUI()
+uiManager.updateDisplay();    // instead of updateDisplay()
+uiManager.togglePreviews();   // instead of showPreviews manipulation
+```
+
+**UI Unification Benefits:**
+- **Single Responsibility**: All visual logic consolidated in one class
+- **Reduced Bundle Size**: Eliminated ~19KB of redundant UI code (82KB → 63KB)
+- **Better State Management**: UI state (showPreviews, etc.) encapsulated in class
+- **Cleaner main.js**: Focused on game logic coordinatio and event handling only
+- **Consistent UI Interface**: Standardized method names and calling patterns
+- **Easier Testing**: UI logic can be tested in isolation
 
 ### Unified Pathfinding System
 ```javascript

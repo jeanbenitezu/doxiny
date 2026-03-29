@@ -340,7 +340,7 @@ function generateDigitManipulationVariants(goal) {
           number: base,
           stepsToGoal: 1 + pathFromSum.length,
           path: [
-            { operation: "sum", from: base, to: targetSum },
+            { operation: "sumDigits", from: base, to: targetSum },
             ...pathFromSum,
           ],
         });

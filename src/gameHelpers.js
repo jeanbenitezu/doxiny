@@ -132,16 +132,16 @@ function findSingleDigitPath(start, target) {
         condition: (s) => s === 1,
         path: [
           { operation: "append1", from: 1, to: 11 },
-          { operation: "sum", from: 11, to: 2 },
+          { operation: "sumDigits", from: 11, to: 2 },
           { operation: "append1", from: 2, to: 21 },
-          { operation: "sum", from: 21, to: 3 },
+          { operation: "sumDigits", from: 21, to: 3 },
         ],
       },
       {
         condition: (s) => s === 2,
         path: [
           { operation: "append1", from: 2, to: 21 },
-          { operation: "sum", from: 21, to: 3 },
+          { operation: "sumDigits", from: 21, to: 3 },
         ],
       },
     ],
@@ -151,11 +151,11 @@ function findSingleDigitPath(start, target) {
         path: [
           { operation: "double", from: 1, to: 2 },
           { operation: "append1", from: 2, to: 21 },
-          { operation: "sum", from: 21, to: 3 },
+          { operation: "sumDigits", from: 21, to: 3 },
           { operation: "append1", from: 3, to: 31 },
-          { operation: "sum", from: 31, to: 4 },
+          { operation: "sumDigits", from: 31, to: 4 },
           { operation: "append1", from: 4, to: 41 },
-          { operation: "sum", from: 41, to: 5 },
+          { operation: "sumDigits", from: 41, to: 5 },
         ],
       },
     ],
@@ -168,7 +168,7 @@ function findSingleDigitPath(start, target) {
         condition: (s) => s === 2,
         path: [
           { operation: "append1", from: 2, to: 21 },
-          { operation: "sum", from: 21, to: 3 },
+          { operation: "sumDigits", from: 21, to: 3 },
           { operation: "double", from: 3, to: 6 },
         ],
       },
@@ -178,9 +178,9 @@ function findSingleDigitPath(start, target) {
         condition: (s) => s === 3,
         path: [
           { operation: "append1", from: 3, to: 33 },
-          { operation: "sum", from: 33, to: 6 },
+          { operation: "sumDigits", from: 33, to: 6 },
           { operation: "append1", from: 6, to: 63 },
-          { operation: "sum", from: 63, to: 9 },
+          { operation: "sumDigits", from: 63, to: 9 },
         ],
       },
     ],
@@ -258,7 +258,7 @@ function generateStrategicHint(current, target, path) {
     };
   }
 
-  if (nextMove.operation === "sum") {
+  if (nextMove.operation === "sumDigits") {
     return {
       level: 1,
       type: "strategic",
@@ -320,7 +320,7 @@ function generateTacticalHint(current, target, path) {
     };
   }
 
-  if (nextMove.operation === "sum") {
+  if (nextMove.operation === "sumDigits") {
     const digits = current.toString().split("").join(" + ");
     return {
       level: 2,

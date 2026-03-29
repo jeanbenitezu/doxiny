@@ -1,5 +1,7 @@
 # Doxiny - Game Mechanics & Algorithms
 
+*Last Updated: March 28, 2026 - Operation naming consistency (sum → sumDigits)*
+
 ## Core Game Concept
 **Goal**: Transform number 1 to a target number using exactly 4 operations in minimum moves possible.
 

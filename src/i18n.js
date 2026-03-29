@@ -528,7 +528,7 @@ export const translations = {
         en: "REVERSE",
         es: "INVERTIR",
       },
-      sum: {
+      sumDigits: {
         en: "SUM DIGITS",
         es: "SUMAR DÍGITOS",
       },
