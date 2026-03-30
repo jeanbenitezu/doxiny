@@ -92,7 +92,7 @@ export function createGameState(goalNumber = 10, level = 1) {
 }
 
 function updateMoveLimit() {
-  gameState.moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 12);
+  gameState.moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 20);
 }
 ```
 
