@@ -356,9 +356,9 @@ h3 {
   }
 }
 
-/* Improved button active states */
+/* Simple button active states */
 button:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: scale(0.95);
 }
 
 /* Level button locked state */

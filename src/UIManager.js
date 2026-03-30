@@ -547,7 +547,7 @@ export class UIManager {
                 : previews[op];
               const iconColor = isBlocked ? "#9ca3af" : "#ffffff";
               const translatedLabel = translate(`operations.${op}`);
-              return `<button class="${buttonClass} font-black shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full" data-operation="${op}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="height: 13vh; height: 13svh; max-height: 7rem; font-size: clamp(0.6rem, 1.8vh, 0.9rem); font-size: clamp(0.6rem, 1.8svh, 0.9rem);">
+              return `<button class="${buttonClass} font-black shadow-lg uppercase tracking-wide operation-btn flex flex-col items-center justify-center gap-1 h-full transition-transform active:scale-95" data-operation="${op}" aria-label="${translatedLabel} operation" ${isBlocked ? "disabled" : ""} style="height: 13vh; height: 13svh; max-height: 7rem; font-size: clamp(0.6rem, 1.8vh, 0.9rem); font-size: clamp(0.6rem, 1.8svh, 0.9rem);">
               <div class="flex items-center gap-1">
                 ${this.getOperationIcon(op, iconColor)}
                 <span>${translatedLabel}</span>
@@ -561,7 +561,7 @@ export class UIManager {
         <!-- Utility Row -->
         <section class="grid grid-cols-4 gap-2 flex-1 flex-shrink-0" style="max-height: 8vh; max-height: 8svh;" data-purpose="utility-controls">
           <button class="bg-[#374151] flex items-center justify-center gap-1 font-bold transition-all active:scale-95 reset-btn h-full ${this.gameState.moves >= this.gameState.moveLimit ? "ring-2 ring-yellow-400 ring-opacity-75 animate-pulse bg-yellow-500/20" : ""}" id="reset-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
-            <i class="lni lni-spinner-arrow"></i> ${translate("gameStates.reset")}
+            <i class="lni lni-spinner-arrow"></i> <span>${translate("gameStates.reset")}</span>
           </button>
           <button class="bg-[#374151] flex items-center justify-center gap-1 font-bold transition-transform active:scale-95 info-btn h-full" id="info-btn" style="font-size: clamp(0.6rem, 1.6vh, 0.85rem); font-size: clamp(0.6rem, 1.6svh, 0.85rem);">
             <i class="lni lni-help"></i> <span>${translate("help")}</span>
