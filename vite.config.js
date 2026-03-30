@@ -4,7 +4,8 @@ export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   
   return {
-    base: '/', // Set to root for now - adjust for deployment as needed
+    // set /doxiny in build time for github pages action
+    base: env.VITE_BASE_URL || '/',
     define: {
       __FIREBASE_CONFIG__: JSON.stringify({
         apiKey: env.VITE_FIREBASE_API_KEY || '',
