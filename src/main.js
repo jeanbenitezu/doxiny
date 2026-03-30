@@ -394,6 +394,43 @@ function handleDifficultySelect(difficulty) {
 }
 
 /**
+ * Check if the tour should be shown based on configuration and completion status
+ */
+function shouldShowTour(tourConfig = null) {
+  const config = tourConfig || doxinyConfig.get();
+  return config.enableTour && 
+    (config.forceShowTour || (!tourManager.hasCompletedTour() && config.tourAutoStart));
+}
+
+/**
+ * Check if privacy notice should be shown (localStorage check only)
+ */
+function shouldShowPrivacyNotice() {
+  const PRIVACY_NOTICE_KEY = 'privacy-notice-shown';
+  
+  try {
+    return localStorage.getItem(PRIVACY_NOTICE_KEY) !== 'true';
+  } catch (e) {
+    // localStorage not available, show notice
+    console.warn('Privacy notice: localStorage not available');
+    return true;
+  }
+}
+
+/**
+ * Mark privacy notice as shown in localStorage
+ */
+function markPrivacyNoticeShown() {
+  const PRIVACY_NOTICE_KEY = 'privacy-notice-shown';
+  
+  try {
+    localStorage.setItem(PRIVACY_NOTICE_KEY, 'true');
+  } catch (e) {
+    console.warn('Privacy notice: Could not set localStorage flag');
+  }
+}
+
+/**
  * Show info modal with game help
  */
 function showInfoModal() {
@@ -633,6 +670,16 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#close-info-btn")) {
       document.getElementById("info-modal").classList.add("hidden");
       scrollToTop();
+    } else if (e.target.closest("#close-privacy-btn")) {
+      uiManager.hidePrivacyModal();
+      markPrivacyNoticeShown();
+
+      // If tour should be shown after privacy notice, start it now
+      if (shouldShowTour()) {
+        console.log("🎪 Starting guided tour after privacy notice");
+        analyticsService.trackTourStarted?.();
+        tourManager.startTour((lvl) => loadCustomExercise(lvl));
+      }
     } else if (e.target.closest("#info-btn")) {
       showInfoModal();
     } else if (e.target.closest("#next-exercise-btn")) {
@@ -742,20 +789,34 @@ async function init() {
   applyGameModeBackground(currentMode);
   console.log(`🎨 Applied ${currentMode} mode background`);
 
+  // Check if privacy notice should be shown (early check)
+  const needsPrivacyNotice = shouldShowPrivacyNotice();
+  
+  // Render initial UI first
+  uiManager.start();
+
+  // Show privacy notice if needed (now that UI exists)
+  let privacyNoticeShown = false;
+  if (needsPrivacyNotice) {
+    uiManager.showPrivacyModal();
+    privacyNoticeShown = true;
+  }
+  
   // Check for first-time tour based on config
   const tourConfig = doxinyConfig.get();
-  const shouldShowTour = tourConfig.enableTour && 
-    (tourConfig.forceShowTour || (!tourManager.hasCompletedTour() && tourConfig.tourAutoStart));
+  const tourShouldShow = shouldShowTour(tourConfig);
   
   console.log('🎪 Tour config:', { 
     enableTour: tourConfig.enableTour, 
     forceShowTour: tourConfig.forceShowTour, 
     tourAutoStart: tourConfig.tourAutoStart,
     hasCompleted: tourManager.hasCompletedTour(),
-    willShow: shouldShowTour 
+    willShow: tourShouldShow,
+    privacyNeeded: needsPrivacyNotice
   });
-  
-  if (shouldShowTour) {
+
+  // Start tour only if privacy notice was not shown (to avoid conflicts)
+  if (tourShouldShow && !privacyNoticeShown) {
     console.log("🎪 Starting guided tour");
     // Track tour start
     await firebaseStarted.then(() => {
@@ -765,9 +826,6 @@ async function init() {
     tourManager.startTour((lvl) => loadCustomExercise(lvl));
     return; // Skip normal initialization when tour is active
   }
-
-  // Render initial UI
-  uiManager.start();
 
   // Update move limit for initial exercise
   updateMoveLimit();

@@ -315,6 +315,22 @@ export class UIManager {
     if (modal) modal.remove();
   }
 
+  // === PRIVACY NOTICE MODAL ===
+
+  showPrivacyModal() {
+    const modal = document.getElementById("privacy-modal");
+    if (modal) {
+      modal.classList.remove("hidden");
+    }
+  }
+
+  hidePrivacyModal() {
+    const modal = document.getElementById("privacy-modal");
+    if (modal) {
+      modal.classList.add("hidden");
+    }
+  }
+
   // === VISUAL EFFECTS ===
 
   createConfettiExplosion() {
@@ -576,6 +592,21 @@ export class UIManager {
       </main>
       <!-- END: GameBoard -->
       
+      <!-- Privacy Notice Modal -->
+      <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm privacy-modal hidden p-4" id="privacy-modal">
+        <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] p-4 sm:p-6 max-w-sm w-full text-center shadow-2xl max-h-[90vh] max-h-[90svh] overflow-y-auto">
+          <h3 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4"><i class="lni lni-shield"></i> ${translate("firebase.privacy.title")}</h3>
+          <div class="text-white/95 text-sm text-left leading-relaxed mb-4 sm:mb-6" id="privacy-content">
+            <div class="mb-3 sm:mb-4">
+              <p class="mb-2">${translate("firebase.privacy.dataCollection")}</p>
+              <p class="mb-2">${translate("firebase.privacy.noPersonalData")}</p>
+              <p>${translate("firebase.privacy.optOut")}</p>
+            </div>
+          </div>
+          <button class="bg-white/20 hover:bg-white/30 text-white px-4 sm:px-6 py-2 sm:py-3 font-bold uppercase tracking-wide transition-all transform hover:-translate-y-1 text-sm" id="close-privacy-btn">${translate("common.continue") || "Continue"}</button>
+        </div>
+      </div>
+
       <!-- Info Modal -->
       <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm info-modal hidden p-4" id="info-modal">
         <div class="bg-gradient-to-br from-[#4a5568] to-[#2d3748] p-4 sm:p-6 max-w-sm w-full text-center shadow-2xl max-h-[90vh] max-h-[90svh] overflow-y-auto">

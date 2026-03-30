@@ -898,6 +898,10 @@ export const translations = {
 
     // Privacy and Data
     privacy: {
+      title: {
+        en: "Privacy Notice",
+        es: "Aviso de Privacidad",
+      },
       dataCollection: {
         en: "Anonymous gameplay data is collected to improve the game experience.",
         es: "Se recopilan datos de juego anónimos para mejorar la experiencia de juego.",
