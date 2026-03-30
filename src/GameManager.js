@@ -161,7 +161,13 @@ export class GameManager {
   }
 
   getPerformanceGrade(efficiency) {
-    if (efficiency >= 1.0)
+    if (efficiency > 1.0)
+      return {
+        grade: translate("performanceGrades.incredible"),
+        emoji: "<i class='lni lni-cup'></i>",
+        description: translate("performanceDescriptions.incredibleSolution"),
+      };
+    if (efficiency === 1.0)
       return {
         grade: translate("performanceGrades.perfect"),
         emoji: "<i class='lni lni-crown'></i>",

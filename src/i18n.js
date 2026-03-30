@@ -333,6 +333,10 @@ export const translations = {
 
   // Performance Grades
   performanceGrades: {
+    incredible: {
+      en: "Incredible!",
+      es: "¡Increíble!",
+    },
     perfect: {
       en: "Perfect",
       es: "Perfecto",
@@ -357,6 +361,10 @@ export const translations = {
 
   // Performance Descriptions
   performanceDescriptions: {
+    incredibleSolution: {
+      en: "Incredible! You beat the optimal!",
+      es: "¡Increíble! ¡Superaste lo óptimo!",
+    },
     optimalSolution: {
       en: "Optimal solution!",
       es: "¡Solución óptima!",

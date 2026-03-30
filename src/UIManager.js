@@ -599,7 +599,7 @@ export class UIManager {
       </div>
       
       <!-- Success Modal -->
-      <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40" id="success-modal">
+      <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 max-w-md w-full bg-gradient-to-t from-black/90 via-black/70 to-transparent backdrop-blur-sm success-modal hidden z-40" id="success-modal">
         <div class="bg-gradient-to-br from-[#2d3748] to-[#1a1a1a] p-4 text-center shadow-2xl shadow-emerald-500/30">
           <div class="flex items-center justify-center gap-2 sm:gap-3 mb-2">
             <div class="text-3xl sm:text-4xl celebration-emoji" id="celebration-emoji"><i class="lni lni-star-fill"></i></div>
