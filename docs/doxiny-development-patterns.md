@@ -77,7 +77,7 @@ import { GameManager } from './GameManager.js';
 // Before: Global variable in main.js
 let moveLimit = 12;
 function updateMoveLimit() {
-  moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 12);
+  moveLimit = Math.max(gameManager.currentExercise.optimalMoves + 5, 15);
 }
 
 // After: Part of game state in game.js
@@ -92,7 +92,7 @@ export function createGameState(goalNumber = 10, level = 1) {
 }
 
 function updateMoveLimit() {
-  gameState.moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 20);
+  gameState.moveLimit = Math.max(gameManager.currentExercise.optimalMoves + 5, 15);
 }
 ```
 

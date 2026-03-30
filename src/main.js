@@ -48,7 +48,8 @@ const tourManager = new TourManager(uiManager, gameManager, () => handleNewExerc
  * Update move limit based on current exercise optimal moves
  */
 function updateMoveLimit() {
-  uiManager.gameState.moveLimit = Math.max(gameManager.currentExercise.optimalMoves, 20);
+  // max 15, because 16 1's exceeds the MAX_SAFE_INTEGER limit and breaks the game, and optimalMoves + 5 gives some breathing room for harder puzzles
+  uiManager.gameState.moveLimit = Math.max(gameManager.currentExercise.optimalMoves + 5, 15);
   console.log(
     `🎯 Move limit updated to: ${uiManager.gameState.moveLimit} (optimal: ${gameManager.currentExercise.optimalMoves})`,
   );
