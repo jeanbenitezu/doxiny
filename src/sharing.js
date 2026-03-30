@@ -4,6 +4,7 @@
  */
 
 import { t } from "./i18n.js";
+import analyticsService from "./services/firebase/AnalyticsService.js";
 
 /**
  * Get current game URL with puzzle parameters for sharing
@@ -61,23 +62,55 @@ export function generateShareMessage(
 /**
  * Share puzzle using Web Share API or fallback to clipboard
  */
-export async function shareContent(message, title = "Doxiny Number Puzzle") {
+export async function shareContent(message, title = "Doxiny Number Puzzle", analyticsData = {}) {
+  // Track sharing method availability 
+  const webShareAvailable = !!(navigator.share && navigator.canShare);
+  analyticsService.trackSharingMethodPreference?.(webShareAvailable);
+
   try {
+    let method = 'unknown';
+    
     // Try Web Share API first (mobile-friendly)
-    if (navigator.share && navigator.canShare) {
+    if (webShareAvailable) {
       await navigator.share({
         title: title,
         text: message.message,
         url: message.url,
       });
-      return { success: true, method: "native" };
+      method = 'native';
     } else {
       // Fallback to clipboard
       await navigator.clipboard.writeText(message.message + " " + message.url);
-      return { success: true, method: "clipboard" };
+      method = 'clipboard';
     }
+
+    // Track successful sharing
+    analyticsService.trackSharingSuccess?.(analyticsData.shareType, method, {
+      type: analyticsData.contentType,
+      targetNumber: analyticsData.targetNumber,
+      movesUsed: analyticsData.movesUsed,
+      efficiencyPercentage: analyticsData.efficiencyPercentage,
+      messageLength: (message.message + " " + message.url).length
+    }, {
+      gameMode: analyticsData.gameMode,
+      difficultyLevel: analyticsData.difficultyLevel
+    });
+
+    // Also track method preference when actually used
+    analyticsService.trackSharingMethodPreference?.(webShareAvailable, method);
+
+    return { success: true, method: method };
   } catch (error) {
     console.error("Sharing failed:", error);
+    
+    // Track sharing failure
+    analyticsService.trackSharingFailure?.(analyticsData.shareType, error, {
+      targetNumber: analyticsData.targetNumber
+    }, {
+      gameMode: analyticsData.gameMode,
+      difficultyLevel: analyticsData.difficultyLevel
+    });
+
     return { success: false, error: error };
   }
 }
@@ -93,6 +126,37 @@ export async function handleShareVictory(gameState, gameManager) {
     (exercise.optimalMoves / gameState.moves) * 100,
   );
   const isPerfect = gameState.moves === exercise.optimalMoves;
+  
+  // Determine content type for analytics
+  let contentType = 'challenge_victory';
+  if (isPerfect) {
+    contentType = 'perfect_victory';
+  } else if (efficiency >= 80) {
+    contentType = 'excellent_victory';
+  }
+  
+  // Analytics data for tracking
+  const analyticsData = {
+    shareType: 'victory',
+    contentType: contentType,
+    targetNumber: gameState.goal,
+    movesUsed: gameState.moves,
+    efficiencyPercentage: efficiency,
+    gameMode: gameManager.gameModeManager.currentMode,
+    difficultyLevel: gameManager.currentDifficulty
+  };
+  
+  // Track sharing attempt
+  analyticsService.trackSharingAttempt?.(analyticsData.shareType, {
+    type: contentType,
+    targetNumber: gameState.goal,
+    movesUsed: gameState.moves,
+    efficiencyPercentage: efficiency
+  }, {
+    gameMode: gameManager.gameModeManager.currentMode,
+    difficultyLevel: gameManager.currentDifficulty,
+    userTriggered: true
+  });
 
   const message = generateShareMessage(
     gameState.goal,
@@ -103,16 +167,43 @@ export async function handleShareVictory(gameState, gameManager) {
     true,
   );
 
-  const result = await shareContent(message, t("sharing.sharedPuzzle"));
+  const result = await shareContent(message, t("sharing.sharedPuzzle"), analyticsData);
+  return result;
 }
 
 /**
  * Handle sharing current unsolved puzzle as challenge
  */
-export async function handleShareChallenge(gameState) {
+export async function handleShareChallenge(gameState, gameManager = null) {
+  // Determine content type based on difficulty
+  const contentType = gameState.level >= 4 ? 'expert_challenge' : 'unsolved_puzzle';
+  
+  const analyticsData = {
+    shareType: 'challenge', 
+    contentType: contentType,
+    targetNumber: gameState.goal,
+    movesUsed: 0, // Unsolved puzzle
+    efficiencyPercentage: 0,
+    gameMode: gameManager?.gameModeManager?.currentMode || 'unknown',
+    difficultyLevel: gameState.level || 1
+  };
+  
+  // Track sharing attempt
+  analyticsService.trackSharingAttempt?.(analyticsData.shareType, {
+    type: contentType,
+    targetNumber: gameState.goal,
+    movesUsed: 0,
+    efficiencyPercentage: 0
+  }, {
+    gameMode: gameManager?.gameModeManager?.currentMode || 'unknown',
+    difficultyLevel: gameState.level || 1,
+    userTriggered: true
+  });
+
   const message = generateShareMessage(gameState.goal, gameState.level);
 
-  const result = await shareContent(message, t("sharing.sharedPuzzle"));
+  const result = await shareContent(message, t("sharing.sharedPuzzle"), analyticsData);
+  return result;
 }
 
 /**
@@ -146,8 +237,14 @@ export function handleSharedPuzzleURL() {
             moves: challengeMoves,
             goal,
           });
+          
+          // Track shared puzzle load with move data
+          analyticsService.trackSharedPuzzleLoaded?.("url_parameter", goal, true);
         } else {
           notification.textContent = t("sharing.friendChallengesYou", { goal });
+          
+          // Track shared puzzle load without move data
+          analyticsService.trackSharedPuzzleLoaded?.("url_parameter", goal, false);
         }
 
         document.body.appendChild(notification);

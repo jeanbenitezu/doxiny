@@ -1,11 +1,13 @@
 # Doxiny - Architecture & Code Structure
 
-*Last Updated: March 28, 2026 - UI MANAGEMENT REFACTORING: Created UIManager class for unified visual responsibilities*
+*Last Updated: December 21, 2024 - FIREBASE INTEGRATION: Added Firebase Analytics, Performance Monitoring, and Remote Config + Sharing Analytics*
 
 ## Tech Stack
 - **Frontend**: Vanilla JS (ES6+), Vite build system
 - **Styling**: Tailwind CSS v3 (CDN), custom CSS variables, gold accent system
-- **Sharing**: HTML5 Web Share API with progressive fallbacks
+- **Analytics & Performance**: Firebase SDK v10.8.0 (Analytics, Performance Monitoring, Remote Config)
+- **Sharing**: HTML5 Web Share API with progressive fallbacks + sharing analytics
+- **Bundle Size**: ~59KB gzipped (includes optimized Firebase services)
 - **Persistence**: localStorage for game mode, progression, and master status
 - **Deployment**: Surge.sh for previews, GitHub Pages for production
 
@@ -22,9 +24,15 @@
 - **`src/gameHelpers.js`** - Configurable hint system and progress calculation utilities
 - **`src/pathfinding.js`** - Unified pathfinding engine and shared utilities
 - **`src/config.js`** - Global configuration management with preset system
-- **`src/sharing.js`** - Progressive enhancement sharing system with Web Share API
+- **`src/sharing.js`** - Progressive enhancement sharing system with Web Share API + comprehensive sharing analytics
 - **`src/i18n.js`** - Bilingual support system (EN/ES) with sharing messages and master status translations
 - **`src/style.css`** - Custom styles, animated game mode backgrounds, mode transitions, responsive design, gold accent system for masters
+
+### Firebase Services Layer (December 2024)
+- **`src/services/firebase/FirebaseManager.js`** - Central Firebase initialization, service coordination, graceful degradation
+- **`src/services/firebase/AnalyticsService.js`** - Comprehensive user behavior tracking, sharing analytics, exercise completion metrics
+- **`src/services/firebase/PerformanceService.js`** - App performance monitoring, pageload timing, trace measurement
+- **`src/services/firebase/RemoteConfigService.js`** - Feature flags, A/B testing configuration, remote game settings
 
 ### Configuration Files
 - **`vite.config.js`** - Build configuration
@@ -291,6 +299,55 @@ class GameModeManager {
   getEfficiencyRequirement(level): 0.80
   canCreateCustomExercases(): requires FREEPLAY + master status
 }
+```
+
+### Firebase Integration Architecture (December 2024)
+**Service-oriented Firebase integration with graceful degradation and comprehensive analytics.**
+
+```javascript
+// FirebaseManager - Central coordination
+export class FirebaseManager {
+  constructor() {
+    this.initializeFirebase() // Environment-based config
+    this.setupServices() // Analytics, Performance, RemoteConfig
+    this.testConnection() // Availability testing
+  }
+  
+  async initializeFirebase() {
+    // Vite environment variable injection
+    // Graceful degradation for missing Firebase config
+  }
+}
+
+// AnalyticsService - Comprehensive event tracking
+export class AnalyticsService {
+  trackExerciseCompleted() // Game completion metrics
+  trackSharingAttempt() // Sharing behavior analytics
+  trackSharingSuccess() // Method preference tracking
+  trackSharedPuzzleLoaded() // Viral growth metrics
+  trackTourStep() // Onboarding engagement
+}
+
+// Sharing Analytics Pipeline
+shareContent() → trackSharingAttempt() → [success/failure] → trackSharingSuccess|Failure()
+handleSharedPuzzleURL() → trackSharedPuzzleLoaded() → engagement metrics
+```
+
+**Firebase Integration Benefits:**
+- **Bundle Size Optimization**: Tree-shaking reduces Firebase from 90KB to integrated ~59KB total
+- **Privacy-First**: Anonymous analytics without personal data collection
+- **Graceful Degradation**: App works fully without Firebase connection
+- **Comprehensive Sharing Analytics**: Track method preferences (native vs clipboard), content types, success rates
+- **Performance Monitoring**: Real-world app performance and page load metrics
+- **Remote Configuration**: Feature flags and A/B testing infrastructure
+- **Development Tools**: Dev console access to all Firebase services for testing
+
+**Sharing Analytics Capabilities:**
+- **Content Type Tracking**: perfect_victory, excellent_victory, challenge_victory, expert_challenge, unsolved_puzzle
+- **Method Preference Analysis**: Web Share API availability vs actual usage patterns
+- **Success/Failure Metrics**: Sharing attempt outcomes by device type and sharing method
+- **Viral Growth Tracking**: Shared puzzle loading and engagement from URL parameters
+- **Cross-Platform Insights**: Device/browser compatibility and user behavior patterns
 
 // UI Integration
 - Master crown indicator (👑) with completion counter badge

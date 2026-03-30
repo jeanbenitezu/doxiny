@@ -649,7 +649,7 @@ function setupGlobalEventListeners() {
     } else if (e.target.closest("#share-victory-btn")) {
       handleShareVictory(uiManager.gameState, gameManager);
     } else if (e.target.closest("#share-challenge-btn") || e.target.closest("#share-puzzle-btn")) {
-      handleShareChallenge(uiManager.gameState);
+      handleShareChallenge(uiManager.gameState, gameManager);
     } else if (e.target.closest("#game-mode-dropdown-btn")) {
       toggleGameModeDropdown();
     } else if (e.target.closest(".game-mode-option")) {
@@ -778,12 +778,9 @@ async function init() {
     loadCustomExercise(shareResult.goal);
     console.log("🔗 Loaded shared puzzle from URL");
     
-    // Track shared puzzle load
+    // Track shared puzzle load with new method 
     await firebaseStarted.then(() => {
-      analyticsService.trackEvent?.('shared_puzzle_loaded', {
-        goal: shareResult.goal,
-        source: 'url_parameter'
-      });
+      analyticsService.trackSharedPuzzleLoaded?.("url_parameter", shareResult.goal, shareResult.hasMoveData);
     }).catch(() => {});
   } else {
     // No shared puzzle, continue with normal initialization

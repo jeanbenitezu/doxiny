@@ -179,7 +179,66 @@ class AnalyticsService {
       number_size_category: this._getNumberSizeCategory(targetNumber)
     })
   }
+  /**
+   * Track sharing functionality usage and success rates
+   */
+  async trackSharingAttempt(shareType, content, context = {}) {
+    await this._trackEvent('sharing_attempted', {
+      share_type: shareType, // 'victory' | 'challenge' | 'puzzle'
+      content_type: content.type || 'unknown', // 'perfect_victory' | 'excellent_victory' | 'challenge_victory' | 'unsolved_puzzle' | 'expert_challenge'
+      target_number: content.targetNumber || 0,
+      moves_used: content.movesUsed || 0,
+      efficiency_percentage: content.efficiencyPercentage || 0,
+      game_mode: context.gameMode || 'unknown',
+      difficulty_level: context.difficultyLevel || 1,
+      user_triggered: context.userTriggered !== false // Default true
+    });
+  }
 
+  async trackSharingSuccess(shareType, method, content, context = {}) {
+    await this._trackEvent('sharing_succeeded', {
+      share_type: shareType, // 'victory' | 'challenge' | 'puzzle'
+      sharing_method: method, // 'native' | 'clipboard' | 'fallback'
+      content_type: content.type || 'unknown',
+      target_number: content.targetNumber || 0,
+      moves_used: content.movesUsed || 0,
+      efficiency_percentage: content.efficiencyPercentage || 0,
+      game_mode: context.gameMode || 'unknown',
+      difficulty_level: context.difficultyLevel || 1,
+      message_length: content.messageLength || 0
+    });
+  }
+
+  async trackSharingFailure(shareType, error, content, context = {}) {
+    await this._trackEvent('sharing_failed', {
+      share_type: shareType,
+      error_type: error.name || 'unknown_error',
+      error_message: error.message ? error.message.substring(0, 100) : 'unknown',
+      target_number: content.targetNumber || 0,
+      game_mode: context.gameMode || 'unknown',
+      difficulty_level: context.difficultyLevel || 1,
+      user_agent: navigator.userAgent ? navigator.userAgent.substring(0, 100) : 'unknown'
+    });
+  }
+
+  async trackSharedPuzzleLoaded(source, goalNumber, hasMovesData = false) {
+    await this._trackEvent('shared_puzzle_loaded', {
+      source: source, // 'url_parameter' | 'direct_link' | 'social_media'
+      goal_number: goalNumber,
+      has_moves_data: hasMovesData,
+      referrer: document.referrer ? new URL(document.referrer).hostname : 'direct',
+      load_timestamp: Date.now()
+    });
+  }
+
+  async trackSharingMethodPreference(nativeAvailable, methodUsed = null) {
+    await this._trackEvent('sharing_method_preference', {
+      web_share_api_available: nativeAvailable,
+      method_used: methodUsed, // 'native' | 'clipboard' | null (for capability check)
+      device_type: this._detectDeviceType(),
+      browser_type: this._detectBrowserType()
+    });
+  }
   /**
    * Track user engagement metrics
    */
@@ -305,7 +364,25 @@ class AnalyticsService {
     if (engagementScore >= 10) return 'medium'
     return 'low'
   }
-}
+  /**
+   * Device and browser detection for sharing analytics
+   */
+  _detectDeviceType() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (/mobile|android|iphone|ipad|phone|tablet/.test(userAgent)) {
+      return 'mobile';
+    }
+    return 'desktop';
+  }
+
+  _detectBrowserType() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.includes('chrome')) return 'chrome';
+    if (userAgent.includes('firefox')) return 'firefox';
+    if (userAgent.includes('safari') && !userAgent.includes('chrome')) return 'safari';
+    if (userAgent.includes('edge')) return 'edge';
+    return 'other';
+  }}
 
 // Create singleton instance
 const analyticsService = new AnalyticsService()
