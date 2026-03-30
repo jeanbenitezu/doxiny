@@ -268,7 +268,7 @@ export class TourManager {
 
     const modal = document.createElement("div");
     modal.className =
-      "tour-modal bg-white dark:bg-slate-800 p-4 mx-auto absolute bottom-60 left-0 w-full text-black dark:text-white rounded-lg shadow-lg max-w-md";
+      "tour-modal bg-white dark:bg-slate-800 p-4 fixed bottom-60 left-1/2 transform -translate-x-1/2 text-black dark:text-white rounded-lg shadow-lg max-w-md w-full";
 
     modal.innerHTML = `
       <div class="text-center">
@@ -385,17 +385,14 @@ export class TourManager {
 
     switch (position) {
       case "top":
-        tooltip.style.left = `${(targetRect.left + targetRect.width / 2) / 2}px`;
         tooltip.style.top = `${targetRect.top - spacing}px`;
         tooltip.style.transform = "translateY(-100%)";
         break;
       case "bottom":
-        tooltip.style.left = `${(targetRect.left + targetRect.width / 2) / 2}px`;
         tooltip.style.top = `${targetRect.bottom + spacing}px`;
         tooltip.style.transform = "translateY(0)";
         break;
       default: // center
-        tooltip.style.left = "50%";
         tooltip.style.top = "50%";
         tooltip.style.transform = "translate(-50%, -50%)";
     }
