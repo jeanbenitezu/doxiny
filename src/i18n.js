@@ -817,6 +817,113 @@ export const translations = {
       },
     },
   },
+
+  // Firebase Integration Messages
+  firebase: {
+    // Service Status Messages
+    status: {
+      initializing: {
+        en: "Initializing analytics...",
+        es: "Inicializando analíticas...",
+      },
+      initialized: {
+        en: "Analytics ready",
+        es: "Analíticas listas",
+      },
+      unavailable: {
+        en: "Analytics unavailable",
+        es: "Analíticas no disponibles",
+      },
+      offline: {
+        en: "Playing offline",
+        es: "Jugando sin conexión",
+      },
+    },
+
+    // Error Messages
+    errors: {
+      configurationMissing: {
+        en: "Analytics configuration not found. Game features may be limited.",
+        es: "Configuración de analíticas no encontrada. Las funciones del juego pueden estar limitadas.",
+      },
+      initializationFailed: {
+        en: "Failed to initialize analytics services. Continuing in offline mode.",
+        es: "Error al inicializar servicios de analíticas. Continuando en modo sin conexión.",
+      },
+      analyticsError: {
+        en: "Analytics tracking temporarily unavailable.",
+        es: "Seguimiento de analíticas temporalmente no disponible.",
+      },
+      performanceError: {
+        en: "Performance monitoring temporarily unavailable.",
+        es: "Monitoreo de rendimiento temporalmente no disponible.",
+      },
+      remoteConfigError: {
+        en: "Remote configuration unavailable. Using default settings.",
+        es: "Configuración remota no disponible. Usando configuración por defecto.",
+      },
+      networkError: {
+        en: "Network connection required for some features. Playing in offline mode.",
+        es: "Conexión de red requerida para algunas funciones. Jugando en modo sin conexión.",
+      },
+    },
+
+    // Feature Notifications
+    features: {
+      analyticsEnabled: {
+        en: "Game analytics are active to help improve your experience.",
+        es: "Las analíticas del juego están activas para ayudar a mejorar tu experiencia.",
+      },
+      performanceMonitoring: {
+        en: "Performance monitoring is active to ensure smooth gameplay.",
+        es: "El monitoreo de rendimiento está activo para asegurar un juego fluido.",
+      },
+      configUpdateAvailable: {
+        en: "New game features are available! Restart the app to update.",
+        es: "¡Nuevas funciones del juego están disponibles! Reinicia la aplicación para actualizar.",
+      },
+      experimentalFeature: {
+        en: "You're using an experimental feature. Feedback appreciated!",
+        es: "Estás usando una función experimental. ¡Agradecemos tus comentarios!",
+      },
+    },
+
+    // Privacy and Data
+    privacy: {
+      dataCollection: {
+        en: "Anonymous gameplay data is collected to improve the game experience.",
+        es: "Se recopilan datos de juego anónimos para mejorar la experiencia de juego.",
+      },
+      noPersonalData: {
+        en: "No personal information is stored or tracked.",
+        es: "No se almacena ni rastrea información personal.",
+      },
+      optOut: {
+        en: "You can disable analytics in your browser settings if preferred.",
+        es: "Puedes desactivar las analíticas en la configuración de tu navegador si lo prefieres.",
+      },
+    },
+
+    // Debug and Development
+    debug: {
+      serviceInitialized: {
+        en: "Firebase service '{service}' initialized successfully",
+        es: "Servicio Firebase '{service}' inicializado exitosamente",
+      },
+      eventTracked: {
+        en: "Event tracked: {event}",
+        es: "Evento rastreado: {event}",
+      },
+      configLoaded: {
+        en: "Remote configuration loaded with {count} parameters",
+        es: "Configuración remota cargada con {count} parámetros",
+      },
+      performanceTrace: {
+        en: "Performance trace '{trace}' completed in {duration}ms",
+        es: "Rastro de rendimiento '{trace}' completado en {duration}ms",
+      },
+    },
+  },
 };
 
 // Utility functions for i18n

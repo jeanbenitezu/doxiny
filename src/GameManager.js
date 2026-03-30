@@ -10,10 +10,15 @@ import {
   detectCustomExerciseLevel,
 } from "./exerciseGenerator.js";
 import { translate } from "./i18n.js";
+import analyticsService from "./services/firebase/AnalyticsService.js";
+import performanceService from "./services/firebase/PerformanceService.js";
 
 export class GameManager {
   constructor() {
     this.gameModeManager = new GameModeManager();
+    this.exerciseStartTime = null;
+    this.hintsUsed = 0;
+    this.operationsUsed = [];
 
     // In Normal mode, start at highest unlocked level
     if (this.gameModeManager.isNormal()) {
@@ -25,6 +30,13 @@ export class GameManager {
     this.currentExercise = null;
     this.isCustomExercise = false;
     this.customExerciseLevel = null;
+    
+    // Set Analytics context
+    analyticsService.setCurrentContext(
+      this.gameModeManager.currentMode,
+      this.currentDifficulty
+    );
+    
     this.generateNewExercise();
   }
 
@@ -32,6 +44,10 @@ export class GameManager {
     this.currentExercise = generateExercise(this.currentDifficulty);
     this.isCustomExercise = false;
     this.customExerciseLevel = null;
+    this.exerciseStartTime = Date.now();
+    this.hintsUsed = 0;
+    this.operationsUsed = [];
+    
     console.log(
       `🎯 New Exercise: 1 → ${this.currentExercise.goal} (${this.currentExercise.optimalMoves} moves optimal)`,
     );
@@ -42,6 +58,8 @@ export class GameManager {
     const optimal = this.currentExercise.optimalMoves;
     const efficiency = optimal / moves;
     const isPerfect = moves <= optimal;
+    const completionTime = this.exerciseStartTime ? 
+      Math.floor((Date.now() - this.exerciseStartTime) / 1000) : 0;
 
     // Handle Normal Game mode progression
     let levelUnlocked = null;
@@ -56,6 +74,13 @@ export class GameManager {
           const nextLevel = this.currentDifficulty + 1;
           if (this.gameModeManager.unlockLevel(nextLevel)) {
             levelUnlocked = nextLevel;
+            
+            // Track level unlock
+            analyticsService.trackLevelUnlocked(
+              nextLevel,
+              this.gameModeManager.unlockedLevels.length
+            );
+            
             if (updateLevelSelectorUI) {
               updateLevelSelectorUI();
             }
@@ -64,9 +89,34 @@ export class GameManager {
         // Award mastery only when successfully completing level 6
         else if (this.currentDifficulty === 6) {
           masterAchieved = this.gameModeManager.checkAndAwardMasterStatus();
+          
+          if (masterAchieved) {
+            // Track mastery achievement
+            const completionCount = parseInt(localStorage.getItem('doxiny-completion-count') || '0');
+            analyticsService.trackMasteryAchieved({
+              completionCount,
+              averageEfficiency: Math.round(efficiency * 100),
+              totalExercisesCompleted: completionCount,
+              timeToMasteryMinutes: Math.floor((Date.now() - (this.gameModeManager.firstPlayTime || Date.now())) / (1000 * 60))
+            });
+          }
         }
       }
     }
+
+    // Track exercise completion Analytics event
+    analyticsService.trackExerciseCompleted({
+      targetNumber: this.currentExercise.goal,
+      movesUsed: moves,
+      optimalMoves: optimal,
+      efficiencyPercentage: Math.round(efficiency * 100),
+      completionTimeSeconds: completionTime,
+      difficultyLevel: this.isCustomExercise ? this.customExerciseLevel : this.currentDifficulty,
+      gameMode: this.gameModeManager.currentMode,
+      hintsUsed: this.hintsUsed,
+      operationsUsed: [...this.operationsUsed], // Copy array
+      isCustomExercise: this.isCustomExercise
+    });
 
     // Calculate level change (only for display, actual unlocking handled above)
     const levelChange = this.getNextLevelInfo();
@@ -150,7 +200,15 @@ export class GameManager {
         return false;
       }
 
+      const oldDifficulty = this.currentDifficulty;
       this.currentDifficulty = newDifficulty;
+      
+      // Update Analytics context
+      analyticsService.setCurrentContext(
+        this.gameModeManager.currentMode,
+        this.currentDifficulty
+      );
+      
       this.generateNewExercise();
       return true;
     }
@@ -158,6 +216,8 @@ export class GameManager {
   }
 
   setCustomExercise(goal, optimalMoves, solutionPath = []) {
+    const startTime = performance.now();
+    
     // Detect appropriate level for this custom exercise
     this.customExerciseLevel = detectCustomExerciseLevel(goal, optimalMoves);
 
@@ -169,6 +229,13 @@ export class GameManager {
     };
 
     this.isCustomExercise = true;
+    this.exerciseStartTime = Date.now();
+    this.hintsUsed = 0;
+    this.operationsUsed = [];
+    
+    // Track custom exercise generation
+    const generationTime = performance.now() - startTime;
+    analyticsService.trackCustomExercise(goal, generationTime);
 
     console.log(
       `🎯 Custom Exercise: 1 → ${goal} (detected level: ${this.customExerciseLevel}, ${optimalMoves} moves optimal)`,
@@ -184,5 +251,33 @@ export class GameManager {
       exercise: this.currentExercise,
       difficulty: difficultyInfo,
     };
+  }
+
+  /**
+   * Analytics Integration Methods
+   */
+  
+  // Track hint usage
+  trackHintUsed(hintType, currentNumber, movesUsed) {
+    this.hintsUsed++;
+    analyticsService.trackHintUsed(
+      hintType,
+      currentNumber,
+      this.currentExercise.goal,
+      movesUsed
+    );
+  }
+  
+  // Track operation usage
+  trackOperationUsed(operation, fromNumber, toNumber) {
+    this.operationsUsed.push(operation);
+    analyticsService.trackOperationUsed(operation, fromNumber, toNumber);
+  }
+  
+  // Track game mode switch
+  trackGameModeSwitch(fromMode, toMode) {
+    analyticsService.trackGameModeSwitch(fromMode, toMode);
+    // Update Analytics context
+    analyticsService.setCurrentContext(toMode, this.currentDifficulty);
   }
 }

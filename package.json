@@ -12,6 +12,9 @@
     "benchmark:medium": "END_NUMBER=1000 node benchmark-lazy-vs-greedy.js",
     "benchmark:custom": "echo 'Usage: START_NUMBER=10 END_NUMBER=50 npm run benchmark:custom' && node benchmark-lazy-vs-greedy.js"
   },
+  "dependencies": {
+    "firebase": "^10.8.0"
+  },
   "devDependencies": {
     "vite": "^6.0.8"
   }

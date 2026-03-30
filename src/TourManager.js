@@ -5,6 +5,7 @@
 
 import { translate } from "./i18n.js";
 import { doxinyConfig } from "./config.js";
+import analyticsService from "./services/firebase/AnalyticsService.js";
 
 export class TourManager {
   constructor(uiManager, gameManager, onNewExercise = null) {
@@ -562,12 +563,18 @@ export class TourManager {
 
   // Skip tour
   skipTour() {
+    // Track tour skip
+    analyticsService.trackTourCompleted?.('skipped');
+    
     this.markTourCompleted();
     this.endTour();
   }
 
   // Complete tour successfully
   completeTour() {
+    // Track successful tour completion
+    analyticsService.trackTourCompleted?.('finished');
+    
     this.markTourCompleted();
     this.endTour();
   }

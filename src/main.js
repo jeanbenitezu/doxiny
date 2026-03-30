@@ -27,6 +27,9 @@ import {
 } from "./sharing.js";
 import { TourManager } from "./TourManager.js";
 import { doxinyConfig } from "./config.js";
+import analyticsService from "./services/firebase/AnalyticsService.js";
+import performanceService from "./services/firebase/PerformanceService.js";
+import remoteConfigService from "./services/firebase/RemoteConfigService.js";
 import "./style.css";
 
 // Initialize game manager
@@ -134,6 +137,9 @@ function handleOperationClick(operation) {
 
       // Only apply the move if the result is different from current value
       if (resultValue !== uiManager.gameState.current) {
+        // Track operation usage with GameManager
+        gameManager.trackOperationUsed(operation, uiManager.gameState.current, resultValue);
+        
         uiManager.gameState = applyMove(uiManager.gameState, operation);
       }
       // Always update display to show user that operation was attempted
@@ -216,6 +222,9 @@ function handleHintRequest() {
   // Update game state
   uiManager.gameState.hints.used += 1;
   uiManager.gameState.hints.hintsData.push(nextHint);
+  
+  // Track hint usage with GameManager
+  gameManager.trackHintUsed(nextHint.type, uiManager.gameState.current, uiManager.gameState.moves);
 
   // Show hint (modal or button blink depending on type)
   showHint(nextHint, uiManager.gameState.hints.used, uiManager.gameState.hints.maxHints);
@@ -403,7 +412,12 @@ function showInfoModal() {
  * Handle language change
  */
 function handleLanguageChange(langCode) {
+  const currentLang = translate('language');
+  
   if (setLanguage(langCode)) {
+    // Track language change
+    analyticsService.trackLanguageChanged?.(currentLang, langCode);
+    
     uiManager.cleanupSuccessAnimations();
     // Re-render the entire UI with new language
     uiManager.render();
@@ -689,9 +703,36 @@ function setupGlobalEventListeners() {
 }
 
 /**
+ * Initialize Firebase services
+ */
+async function initializeFirebaseServices() {
+  try {
+    console.log('[Firebase] Initializing services...');
+    
+    // Initialize all Firebase services in parallel
+    const initPromises = [
+      analyticsService.initialize(),
+      performanceService.initialize(), 
+      remoteConfigService.initialize()
+    ];
+    
+    await Promise.allSettled(initPromises);
+    
+    console.log('[Firebase] Services initialization completed');
+    return true;
+  } catch (error) {
+    console.warn('[Firebase] Services initialization failed:', error.message);
+    return false;
+  }
+}
+
+/**
  * Initialize the game
  */
-function init() {
+async function init() {
+  // Initialize Firebase services first (non-blocking)
+  const firebaseStarted = initializeFirebaseServices();
+  
   // Set up global event listeners (only once)
   setupGlobalEventListeners();
 
@@ -715,6 +756,11 @@ function init() {
   
   if (shouldShowTour) {
     console.log("🎪 Starting guided tour");
+    // Track tour start
+    await firebaseStarted.then(() => {
+      analyticsService.trackTourStarted?.();
+    }).catch(() => {});
+    
     tourManager.startTour((lvl) => loadCustomExercise(lvl));
     return; // Skip normal initialization when tour is active
   }
@@ -731,10 +777,21 @@ function init() {
   if (shareResult.processed) {
     loadCustomExercise(shareResult.goal);
     console.log("🔗 Loaded shared puzzle from URL");
+    
+    // Track shared puzzle load
+    await firebaseStarted.then(() => {
+      analyticsService.trackEvent?.('shared_puzzle_loaded', {
+        goal: shareResult.goal,
+        source: 'url_parameter'
+      });
+    }).catch(() => {});
   } else {
     // No shared puzzle, continue with normal initialization
     console.log("🎮 Normal game initialization");
   }
+
+  // Wait for Firebase before exposing dev tools (so we can test Firebase in dev)
+  await firebaseStarted;
 
   // Expose functions for dev tools testing
   if (typeof window !== "undefined") {
@@ -760,10 +817,17 @@ function init() {
         doxinyConfig.applyPreset(preset);
         console.log(`🔧 Applied preset: ${preset}`);
       },
+      // Firebase dev tools
+      firebase: {
+        analytics: analyticsService,
+        performance: performanceService,
+        remoteConfig: remoteConfigService
+      }
     };
 
     console.log("🔧 Dev tools available: window.doxinyDev");
     console.log("📋 Available presets:", Object.keys(doxinyConfig.constructor.presets));
+    console.log("🔥 Firebase dev tools: window.doxinyDev.firebase");
   }
 
   const exercise = gameManager.currentExercise;
@@ -839,6 +903,9 @@ function handleGameModeChange(mode) {
 
   const currentMode = gameManager.gameModeManager.getGameMode();
   if (mode === currentMode) return;
+
+  // Track game mode switch
+  gameManager.trackGameModeSwitch(currentMode, mode);
 
   // Change the mode
   gameManager.gameModeManager.setGameMode(mode);
