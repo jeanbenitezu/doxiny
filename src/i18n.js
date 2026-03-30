@@ -812,8 +812,8 @@ export const translations = {
         es: "¡Felicitaciones! 🎉",
       },
       message: {
-        en: "You've successfully completed the tutorial! You transformed 1 → 2 → 21 → 12 → 3 in 4 moves. Now you're ready to start your Doxiny journey!",
-        es: "¡Has completado exitosamente el tutorial! Transformaste 1 → 2 → 21 → 12 → 3 en 4 movimientos. ¡Ahora estás listo para comenzar tu viaje en Doxiny!",
+        en: "You've successfully completed the tutorial! You transformed 1 → 2 → 21 → 12 → 3 in 4 moves. Now master all 6 levels to earn the Master badge and unlock unlimited custom exercises (2-10,000)!",
+        es: "¡Has completado exitosamente el tutorial! Transformaste 1 → 2 → 21 → 12 → 3 en 4 movimientos. ¡Ahora domina los 6 niveles para obtener la insignia de Maestro y desbloquear ejercicios personalizados ilimitados (2-10,000)!",
       },
     },
   },
