@@ -9,7 +9,7 @@
  * - Performance metrics and user behavior analytics
  */
 
-import { logEvent, setUserProperties } from 'firebase/analytics'
+import { logEvent, setUserProperties, setUserId } from 'firebase/analytics'
 import firebaseManager from './FirebaseManager.js'
 
 class AnalyticsService {
@@ -30,6 +30,9 @@ class AnalyticsService {
     if (firebaseManager.available && firebaseManager.getAnalytics()) {
       this.isEnabled = true
       this.sessionStartTime = Date.now()
+      
+      // Set unique user ID
+      await this._setUniqueUserId()
       
       // Set initial user properties
       await this._setInitialUserProperties()
@@ -274,6 +277,34 @@ class AnalyticsService {
   /**
    * Set user properties for segmentation and personalization
    */
+  /**
+   * Generate and set a unique user ID for this device/user
+   */
+  async _setUniqueUserId() {
+    // Get or create a unique user ID for this device
+    let userId = localStorage.getItem('doxiny-user-id')
+    
+    if (!userId) {
+      // Generate a unique ID: timestamp + random string
+      const timestamp = Date.now().toString(36)
+      const randomString = Math.random().toString(36).substring(2, 8)
+      userId = `user_${timestamp}_${randomString}`
+      
+      // Store it in localStorage for persistence
+      localStorage.setItem('doxiny-user-id', userId)
+      console.log('[Analytics] Generated new user ID:', userId)
+    }
+    
+    // Set the user ID in Firebase Analytics
+    return firebaseManager.whenAvailableAsync(async () => {
+      const analytics = firebaseManager.getAnalytics()
+      if (analytics) {
+        await setUserId(analytics, userId)
+        console.log('[Analytics] User ID set:', userId)
+      }
+    })
+  }
+
   async _setInitialUserProperties() {
     // Get current game state from localStorage
     const gameMode = localStorage.getItem('doxiny-gamemode') || 'normal'
