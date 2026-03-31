@@ -153,6 +153,16 @@ class AnalyticsService {
   }
 
   /**
+   * Track tour start event
+   */
+  async trackTourStarted() {
+    await this._trackEvent('tour_started', {
+      start_timestamp: Date.now(),
+      session_age_seconds: Math.floor((Date.now() - this.sessionStartTime) / 1000)
+    })
+  }
+
+  /**
    * Track hint system usage
    */
   async trackHintUsed(hintType, currentNumber, targetNumber, movesUsed) {
@@ -336,14 +346,40 @@ class AnalyticsService {
     }
 
     return firebaseManager.whenAvailableAsync(async () => {
-      const analytics = firebaseManager.getAnalytics()
-      if (analytics) {
-        await logEvent(analytics, eventName, {
+      try {
+        const analytics = firebaseManager.getAnalytics()
+        if (!analytics) {
+          console.warn(`[Analytics] ❌ Event '${eventName}' failed - Analytics instance not available`)
+          return false
+        }
+
+        const eventData = {
           ...parameters,
           timestamp: Date.now(),
           session_id: this.sessionStartTime
+        }
+        
+        // Validate event name follows Firebase rules
+        if (!/^[a-zA-Z][a-zA-Z0-9_]{0,39}$/.test(eventName)) {
+          console.error(`[Analytics] ❌ Invalid event name: '${eventName}' - Must start with letter and contain only letters, numbers, underscores (max 40 chars)`)
+          return false
+        }
+
+        // Validate parameters
+        const validatedParams = this._validateEventParameters(eventData)
+
+        await logEvent(analytics, eventName, validatedParams)
+        console.log(`[Analytics] ✅ Event tracked: ${eventName}`, validatedParams)
+        return true
+        
+      } catch (error) {
+        console.error(`[Analytics] ❌ Event tracking error for '${eventName}':`, {
+          error: error.message,
+          code: error.code || 'unknown',
+          stack: error.stack?.split('\n').slice(0, 3),
+          parameters
         })
-        console.log(`[Analytics] Event tracked: ${eventName}`, parameters)
+        return false
       }
     })
   }
@@ -369,15 +405,90 @@ class AnalyticsService {
    */
   async _setUserProperties(properties) {
     if (!this.isEnabled) {
+      console.warn('[Analytics] User properties not set - service not enabled', properties)
       return
     }
 
     return firebaseManager.whenAvailableAsync(async () => {
-      const analytics = firebaseManager.getAnalytics()
-      if (analytics) {
-        await setUserProperties(analytics, properties)
+      try {
+        const analytics = firebaseManager.getAnalytics()
+        if (!analytics) {
+          console.warn('[Analytics] ❌ User properties failed - Analytics instance not available')
+          return false
+        }
+
+        // Validate property names
+        const validatedProps = this._validateUserProperties(properties)
+
+        await setUserProperties(analytics, validatedProps)
+        console.log('[Analytics] ✅ User properties set:', validatedProps)
+        return true
+        
+      } catch (error) {
+        console.error('[Analytics] ❌ User properties error:', {
+          error: error.message,
+          code: error.code || 'unknown',
+          properties
+        })
+        return false
       }
     })
+  }
+
+  /**
+   * Validate event parameters according to Firebase rules
+   */
+  _validateEventParameters(params) {
+    const validated = {}
+    
+    Object.keys(params).forEach(key => {
+      // Parameter names must be 40 chars or less and contain only letters, numbers, underscores
+      const validKey = key.replace(/[^a-zA-Z0-9_]/g, '_').substring(0, 40)
+      if (validKey !== key) {
+        console.warn(`[Analytics] Parameter key '${key}' converted to '${validKey}'`)
+      }
+      
+      let value = params[key]
+      
+      // Firebase limits: strings to 100 chars, numbers ok, arrays converted to strings
+      if (typeof value === 'string' && value.length > 100) {
+        value = value.substring(0, 97) + '...'
+        console.warn(`[Analytics] Parameter '${validKey}' truncated to 100 chars`)
+      } else if (Array.isArray(value)) {
+        value = value.join(',').substring(0, 100)
+      }
+      
+      validated[validKey] = value
+    })
+    
+    return validated
+  }
+
+  /**
+   * Validate user properties according to Firebase rules
+   */
+  _validateUserProperties(properties) {
+    const validated = {}
+    
+    Object.keys(properties).forEach(key => {
+      // Property names must be 24 chars or less
+      const validKey = key.replace(/[^a-zA-Z0-9_]/g, '_').substring(0, 24)
+      if (validKey !== key) {
+        console.warn(`[Analytics] Property key '${key}' converted to '${validKey}'`)
+      }
+      
+      let value = properties[key]
+      
+      // Property values limited to 36 chars for strings
+      if (typeof value === 'string' && value.length > 36) {
+        value = value.substring(0, 33) + '...'
+        console.warn(`[Analytics] Property '${validKey}' truncated to 36 chars`)
+      }
+      
+      validated[validKey] = value
+    })
+    
+    return validated
   }
 
   /**

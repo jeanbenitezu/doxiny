@@ -40,28 +40,37 @@ class FirebaseManager {
 
   async _performInitialization() {
     try {
+      console.log('[Firebase] Starting initialization...')
+      
       // Check if Firebase config is available
       const config = this._getFirebaseConfig()
-      if (!config.apiKey) {
-        console.warn('[Firebase] Configuration not found. Firebase features disabled.')
+      if (!config.apiKey || !config.projectId || !config.appId) {
+        console.warn('[Firebase] Configuration incomplete. Firebase features disabled.', {
+          reason: 'Missing required environment variables',
+          fix: 'Set VITE_FIREBASE_* environment variables or create env file'
+        })
         this.isAvailable = false
         return false
       }
 
       // Initialize Firebase app
       this.app = initializeApp(config)
-      console.log('[Firebase] App initialized successfully')
+      console.log('[Firebase] App initialized successfully with project:', config.projectId)
 
       // Initialize services with availability checks
       await this._initializeServices()
       
       this.isInitialized = true
       this.isAvailable = true
-      console.log('[Firebase] All services initialized')
+      console.log('[Firebase] All services initialized and ready')
       return true
 
     } catch (error) {
-      console.warn('[Firebase] Initialization failed:', error.message)
+      console.error('[Firebase] Initialization failed:', {
+        error: error.message,
+        stack: error.stack?.split('\n')[1],
+        config: 'Check environment variables'
+      })
       this.isAvailable = false
       return false
     }
@@ -116,7 +125,33 @@ class FirebaseManager {
 
   _getFirebaseConfig() {
     // Configuration is injected by Vite at build time
-    return typeof __FIREBASE_CONFIG__ !== 'undefined' ? __FIREBASE_CONFIG__ : {}
+    const config = typeof __FIREBASE_CONFIG__ !== 'undefined' ? __FIREBASE_CONFIG__ : {}
+    
+    // Log configuration status for debugging
+    const hasValidConfig = config.apiKey && config.projectId && config.appId
+    console.log('[Firebase] Configuration status:', {
+      hasConfig: hasValidConfig,
+      apiKey: config.apiKey ? `${config.apiKey.substring(0, 6)}...` : 'MISSING',
+      projectId: config.projectId || 'MISSING',
+      appId: config.appId ? `${config.appId.substring(0, 10)}...` : 'MISSING'
+    })
+    
+    if (!hasValidConfig) {
+      console.warn('[Firebase] CRITICAL: Firebase configuration incomplete!', {
+        'Required Environment Variables': [
+          'VITE_FIREBASE_API_KEY',
+          'VITE_FIREBASE_PROJECT_ID', 
+          'VITE_FIREBASE_APP_ID',
+          'VITE_FIREBASE_AUTH_DOMAIN',
+          'VITE_FIREBASE_STORAGE_BUCKET',
+          'VITE_FIREBASE_MESSAGING_SENDER_ID',
+          'VITE_FIREBASE_MEASUREMENT_ID'
+        ],
+        'Current Values': config
+      })
+    }
+    
+    return config
   }
 
   /**
@@ -171,9 +206,19 @@ class FirebaseManager {
       try {
         return await callback()
       } catch (error) {
-        console.warn('[Firebase] Async operation failed:', error.message)
+        console.error('[Firebase] Async operation failed:', {
+          error: error.message,
+          operation: callback.name || 'anonymous',
+          stack: error.stack?.split('\n')[1]
+        })
         return null
       }
+    } else {
+      console.warn('[Firebase] Operation skipped - Firebase not available:', {
+        initialized: this.isInitialized,
+        available: this.isAvailable,
+        reason: !this.isInitialized ? 'Not initialized' : 'Initialization failed'
+      })
     }
     return null
   }

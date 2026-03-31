@@ -878,6 +878,22 @@ async function init() {
         analytics: analyticsService,
         performance: performanceService,
         remoteConfig: remoteConfigService
+      },
+      // Analytics debugging
+      analytics: {
+        test: () => {
+          console.log('🧪 Testing Analytics...')
+          analyticsService.trackExerciseCompleted({
+            targetNumber: 8, movesUsed: 4, optimalMoves: 5, 
+            efficiencyPercentage: 80, completionTimeSeconds: 42,
+            difficultyLevel: 1, gameMode: 'normal', hintsUsed: 0,
+            operationsUsed: ['APPEND1', 'DOUBLE']
+          })
+        },
+        status: () => ({
+          isEnabled: analyticsService.isEnabled,
+          sessionStartTime: analyticsService.sessionStartTime
+        })
       }
     };
 
@@ -892,8 +908,8 @@ async function init() {
   );
   console.log(`🎯 This exercise: ${exercise.optimalMoves} moves optimal`);
 
-    // Ensure we start at the top of the page
-    scrollToTop();
+  // Ensure we start at the top of the page
+  scrollToTop();
 }
 
 /**
