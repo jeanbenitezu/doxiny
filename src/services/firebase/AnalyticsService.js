@@ -71,7 +71,13 @@ class AnalyticsService {
     await this._trackEvent('exercise_completed', eventData)
     
     // Track efficiency milestone events
-    if (eventData.efficiency_percentage >= 100) {
+    if (eventData.efficiency_percentage > 100) {
+      await this._trackEvent('above_optimal_efficiency', {
+        difficulty_level: eventData.difficulty_level,
+        target_number: eventData.target_number
+      })
+    }
+    else if (eventData.efficiency_percentage === 100) {
       await this._trackEvent('perfect_efficiency_achieved', {
         difficulty_level: eventData.difficulty_level,
         target_number: eventData.target_number
@@ -188,7 +194,7 @@ class AnalyticsService {
   async trackSharingAttempt(shareType, content, context = {}) {
     await this._trackEvent('sharing_attempted', {
       share_type: shareType, // 'victory' | 'challenge' | 'puzzle'
-      content_type: content.type || 'unknown', // 'perfect_victory' | 'excellent_victory' | 'challenge_victory' | 'unsolved_puzzle' | 'expert_challenge'
+      content_type: content.type || 'unknown', // 'incredible_victory' | 'perfect_victory' | 'excellent_victory' | 'challenge_victory' | 'unsolved_puzzle' | 'expert_challenge'
       target_number: content.targetNumber || 0,
       moves_used: content.movesUsed || 0,
       efficiency_percentage: content.efficiencyPercentage || 0,

@@ -628,6 +628,10 @@ export const translations = {
       en: "🏆 PERFECT SOLUTION! I solved {goal} in the optimal {moves} moves! Can you match this masterpiece? Challenge yourself with Doxiny:",
       es: "🏆 ¡SOLUCIÓN PERFECTA! ¡Resolví {goal} en los {moves} movimientos óptimos! ¿Puedes igualar esta obra maestra? Desafíate con Doxiny:",
     },
+    incredibleVictoryMessage: {
+      en: "🚀 INCREDIBLE EFFICIENCY! I solved {goal} in just {moves} moves with {efficiency}% efficiency - BETTER than optimal! Think you can beat this superhuman performance? Try Doxiny:",
+      es: "🚀 ¡EFICIENCIA INCREÍBLE! ¡Resolví {goal} en solo {moves} movimientos con {efficiency}% de eficiencia - MEJOR que lo óptimo! ¿Crees que puedes superar esta actuación sobrehumana? Prueba Doxiny:",
+    },
     challengeMessage: {
       en: "💪 Can you reach {goal} faster than {moves} moves? I dare you to try! Play Doxiny Number Puzzle:",
       es: "💪 ¿Puedes llegar a {goal} más rápido que en {moves} movimientos? ¡Te reto a intentarlo! Juega Doxiny Number Puzzle:",

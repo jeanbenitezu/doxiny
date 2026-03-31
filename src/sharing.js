@@ -48,6 +48,8 @@ export function generateShareMessage(
         ? "sharing.expertInviteMessage"
         : "sharing.inviteMessage";
     message = t(messageKey, { goal });
+  } else if (efficiency > 100) {
+    message = t("sharing.incredibleVictoryMessage", { goal, moves, efficiency });
   } else if (isPerfect) {
     message = t("sharing.perfectVictoryMessage", { goal, moves });
   } else if (efficiency >= 80) {
@@ -129,7 +131,9 @@ export async function handleShareVictory(gameState, gameManager) {
   
   // Determine content type for analytics
   let contentType = 'challenge_victory';
-  if (isPerfect) {
+  if (efficiency > 100) {
+    contentType = 'incredible_victory';
+  } else if (isPerfect) {
     contentType = 'perfect_victory';
   } else if (efficiency >= 80) {
     contentType = 'excellent_victory';
